@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { VneidService } from '../vneid/vneid.service';
 import { RedisSessionService } from '../redis/redis-session.service';
+import { WalletService } from '../wallet/wallet.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -13,6 +14,7 @@ describe('AuthService', () => {
   let service: AuthService;
   let vneidService: Partial<VneidService>;
   let redisSessionService: Partial<RedisSessionService>;
+  let walletService: Partial<WalletService>;
   let jwtService: Partial<JwtService>;
   let configService: Partial<ConfigService>;
   let userRepository: any;
@@ -29,6 +31,9 @@ describe('AuthService', () => {
       setSession: jest.fn(),
       getSession: jest.fn(),
       blacklistToken: jest.fn(),
+    };
+    walletService = {
+      ensureManagedWallet: jest.fn(),
     };
     jwtService = {
       signAsync: jest.fn(),
@@ -57,6 +62,7 @@ describe('AuthService', () => {
         AuthService,
         { provide: VneidService, useValue: vneidService },
         { provide: RedisSessionService, useValue: redisSessionService },
+        { provide: WalletService, useValue: walletService },
         { provide: JwtService, useValue: jwtService },
         { provide: ConfigService, useValue: configService },
         { provide: getRepositoryToken(User), useValue: userRepository },

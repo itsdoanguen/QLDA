@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, HttpException, HttpStatus, Logger } from '@nestjs/common';
+import { Injectable, UnauthorizedException, HttpException, HttpStatus, Logger, Inject, forwardRef } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 
 import { VneidService } from '../vneid/vneid.service';
 import { RedisSessionService } from '../redis/redis-session.service';
+import { WalletService } from '../wallet/wallet.service';
 import { User } from '../database/entities/user.entity';
 import { Role } from '../database/entities/role.entity';
 import { AppEnv } from '../../config/env/env.schema';
@@ -26,6 +27,8 @@ export class AuthService {
     private userRepository: Repository<User>,
     @InjectRepository(Role)
     private roleRepository: Repository<Role>,
+    @Inject(forwardRef(() => WalletService))
+    private walletService: WalletService,
   ) {}
 
   async login(payload: AuthLoginRequest) {
@@ -119,6 +122,9 @@ export class AuthService {
       } else if (user.status !== 'Active') {
         throw new UnauthorizedException('User account is locked or inactive');
       }
+
+      // Automatically provision or ensure a managed wallet for the user
+      await this.walletService.ensureManagedWallet(user.id);
 
       // 4. Generate internal JWT
       this.logger.log(`Generating internal JWT for user: ${user.id}`);
