@@ -11,7 +11,7 @@ Map each important backlog item to backend endpoint(s), data tables, and test ga
 | EP01/US12 | Auth errors | `/auth/login` error handling | System_Logs | Error mapped correctly |
 | EP01/US34 | Session end | `/auth/logout` | System_Logs, Users | Token invalidated |
 | EP01/US40 | Contact update | `/auth/send-otp`, `/auth/verify-otp` | Users | OTP TTL and rate limit |
-| EP04/US02 | Wallet link | `/wallet/link` | Wallets | 1-1 mapping enforced |
+| EP04/US02 | Managed wallet provisioning | `/auth/verify-otp` | Wallets, Wallet_Secrets | Auto provision and 1-1 mapping enforced |
 | EP04/US15 | Wallet recovery | `/wallet/recovery-request` | Wallet_Recovery_Requests | Pending state created |
 | EP03/US03 | Pinata-IPFS upload | `/files/upload` | Land_Files | CID stored and retrievable |
 | EP03/US13 | Pinata retry policy | `/files/upload` | Land_Files, System_Logs | Retry stops after 3 failures |

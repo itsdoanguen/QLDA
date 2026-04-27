@@ -1,7 +1,7 @@
-## Phase 1 Plan: Auth + Wallet Foundation
+## Phase 1 Plan: Auth + Managed Wallet Foundation
 
 ### Goal
-Deliver the minimum backend foundation that lets a user authenticate, get a session, link one wallet, and start a wallet recovery request.
+Deliver the minimum backend foundation where user verifies identity via VNeID OTP, receives a valid session, and is automatically provisioned a managed custodial wallet.
 
 ### Scope
 Must have:
@@ -9,12 +9,13 @@ Must have:
 - JWT/session handling with timeout and blacklist.
 - Profile read/update.
 - OTP flow for contact updates.
-- 1-1 CCCD to wallet mapping.
+- Auto wallet provisioning after successful verify-otp.
+- Encrypted private key storage (custodial, managed by system).
 - Wallet recovery request creation and status tracking.
 
 Out of scope:
 - Approval of wallet recovery.
-- Multi-sig signing.
+- Meta-transaction, paymaster, or relayer execution.
 - Land, IPFS, mint, transaction, and compliance flows.
 
 ### Backlog Mapping
@@ -31,13 +32,17 @@ Out of scope:
 - `GET /api/v1/auth/profile`
 - `POST /api/v1/auth/send-otp`
 - `POST /api/v1/auth/verify-otp`
-- `POST /api/v1/wallet/link`
 - `POST /api/v1/wallet/recovery-request`
 - `GET /api/v1/wallet/status`
 
+Removed from Phase 1:
+- `POST /api/v1/wallet/link`
+
 ### Required Rules
-- One CCCD can map to one wallet only.
-- One wallet can map to one user only.
+- One CCCD maps to one user.
+- One user maps to one active managed wallet.
+- One wallet address maps to one user only.
+- Wallet is auto-created after verify-otp success if not existed.
 - Recovery request stays in `Pending` until later phase approval.
 - Expired JWT and OTP must be rejected consistently.
 
@@ -45,31 +50,52 @@ Out of scope:
 - `Roles`
 - `Users`
 - `Wallets`
+- `Wallet_Secrets` (or equivalent secure wallet secret table)
 - `Wallet_Recovery_Requests`
 - `System_Logs`
+
+### Data Model Changes
+- `wallets` table extended for managed wallet metadata.
+- New wallet secret storage table for encrypted private key payload:
+	- `encrypted_private_key`
+	- `iv`
+	- `auth_tag`
+	- `algorithm`
+	- `key_version`
+- No plaintext private key in DB/logs/response.
+
+### Security Baseline
+- AES-256-GCM encryption for private key.
+- Master key from env/secret manager only.
+- Key versioning for future rotation.
+- Strict log redaction for sensitive fields.
 
 ### Test Gate
 1. Login returns a valid JWT and profile.
 2. Protected route rejects unauthenticated requests.
-3. Wallet link succeeds once and fails on duplicate link.
-4. OTP expires by TTL and respects rate limit.
-5. Logout invalidates the current session/token.
+3. verify-otp auto-creates wallet exactly once for first login.
+4. verify-otp does not create duplicate wallet for existing user.
+5. OTP expires by TTL and respects rate limit.
+6. Logout invalidates the current session/token.
 
 ### Dependencies
 - Mock VNeID service.
 - VNeID sandbox plan and response contract catalog.
 - Redis or equivalent session store.
-- DB migration for user and wallet tables.
+- DB migration for user, wallet, and wallet secret tables.
+- `ethers` dependency in `apps/api`.
 - Shared DTO and enum definitions.
 
 ### VNeID Sandbox Acceptance
 - Sandbox phai co cac scenario: success, not_found, locked, expired, duplicate, rate_limited.
 - Sandbox phai tra response theo contract chung co `success`, `message`, `data`/`error`, `timestamp`, `request_id`, `trace_id`.
 - Auth login chi duoc pass khi sandbox verify-identity pass.
-- Wallet link chi duoc pass khi duplicate check tra `is_duplicate = false`.
+- verify-otp chi duoc pass khi wallet auto-provision thanh cong (hoac user da co wallet hop le).
 - Moi failure cua sandbox phai duoc map sang domain error cua BE va ghi log.
 
 ### Notes
 - Keep wallet module separate from auth module.
+- Auth service orchestrates wallet provisioning via wallet service (`ensureManagedWallet`).
 - Record all auth failures into logs for auditability.
 - Use sandbox fixtures for deterministic auth tests.
+- Gasless execution remains a next-phase task; only env/interface groundwork is prepared here.

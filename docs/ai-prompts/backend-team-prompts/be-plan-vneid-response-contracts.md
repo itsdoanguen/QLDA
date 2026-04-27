@@ -393,7 +393,7 @@ Dinh nghia day du schema response cho VNeID sandbox va cac BE endpoints Phase 1 
 ### 6.1 VNeID error -> BE error
 - `INVALID_CCCD_FORMAT` -> reject request at validation layer.
 - `CCCD_NOT_FOUND` -> `AUTH_VNEID_FAILED`.
-- `CCCD_ALREADY_REGISTERED` -> `WALLET_DUPLICATE_CCCD` or wallet/link conflict.
+- `CCCD_ALREADY_REGISTERED` -> `WALLET_DUPLICATE_CCCD` or managed-wallet mapping conflict.
 - `RATE_LIMIT_EXCEEDED` -> `AUTH_RATE_LIMITED` if BE wants a local domain code.
 - `VNEID_SERVICE_UNAVAILABLE` -> `AUTH_UPSTREAM_UNAVAILABLE`.
 
@@ -427,5 +427,5 @@ File nay duoc xem la done khi:
 ## 9. Recommended usage
 
 - Doc cung voi [be-plan-vneid-sandbox.md](be-plan-vneid-sandbox.md).
-- Dung lam reference cho Phase 1 auth, wallet link, recovery request, va test harness.
+- Dung lam reference cho Phase 1 auth, managed wallet provisioning, recovery request, va test harness.
 - Neu schema thay doi, cap nhat dong thoi file sandbox plan va Phase 1 plan.

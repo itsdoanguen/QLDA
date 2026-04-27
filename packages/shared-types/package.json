@@ -12,6 +12,11 @@
     "lint": "node -e \"console.log('shared-types: lint baseline pending')\"",
     "test": "node -e \"console.log('shared-types: test bootstrap pending')\""
   },
+  "dependencies": {
+    "@nestjs/swagger": "^7.4.2",
+    "class-validator": "^0.14.1",
+    "class-transformer": "^0.5.1"
+  },
   "devDependencies": {
     "typescript": "^5.8.2"
   }

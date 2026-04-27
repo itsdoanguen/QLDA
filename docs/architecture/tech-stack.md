@@ -32,6 +32,13 @@ Luu y tich hop chain:
 
 Auth baseline: JWT access token + OTP flow cho thay doi thong tin lien he.
 
+Wallet strategy (Phase 1):
+- Model: Custodial Managed Wallet.
+- Provisioning: Tu dong sau khi verify OTP thanh cong qua VNeID.
+- Key management: private key duoc ma hoa AES-256-GCM va luu encrypted payload (khong luu plaintext).
+- Network target: Ethereum Sepolia (`chainId 11155111`).
+- Gasless scope: Chi dung o muc nen tang (env + service boundary), chua relay transaction trong phase nay.
+
 ## Frontend (Web App):
 
 Framework: Next.js (React).

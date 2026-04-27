@@ -112,21 +112,23 @@ Exit criteria Day 4:
 2. [ ] `TODO` Owner A - `POST /api/v1/auth/logout`
 3. [ ] `TODO` Owner A - `GET /api/v1/auth/profile`
 4. [ ] `TODO` Owner A - `POST /api/v1/auth/send-otp`
-5. [ ] `TODO` Owner A - `POST /api/v1/auth/verify-otp`
+5. [ ] `TODO` Owner A - `POST /api/v1/auth/verify-otp` va trigger `ensureManagedWallet(userId)`
 
 ### Wallet module
-6. [ ] `TODO` Owner B - `POST /api/v1/wallet/link`
-7. [ ] `TODO` Owner B - `POST /api/v1/wallet/recovery-request`
-8. [ ] `TODO` Owner B - `GET /api/v1/wallet/status`
+6. [ ] `TODO` Owner B - Remove `POST /api/v1/wallet/link` khoi controller, swagger, va test.
+7. [ ] `TODO` Owner B - Add managed wallet provisioning service (idempotent).
+8. [ ] `TODO` Owner B - `POST /api/v1/wallet/recovery-request`
+9. [ ] `TODO` Owner B - `GET /api/v1/wallet/status`
 
 ### Rules implementation
-9. [ ] `TODO` Owner A/B - Enforce `1 CCCD <-> 1 wallet` va duplicate checks.
-10. [ ] `TODO` Owner A - OTP TTL + rate limit.
-11. [ ] `TODO` Owner A/D - Logout invalidates token/session.
-12. [ ] `TODO` Owner B - Recovery request default `Pending`.
+10. [ ] `TODO` Owner A/B - Enforce `1 user <-> 1 wallet` voi DB unique constraints + service guard.
+11. [ ] `TODO` Owner A - OTP TTL + rate limit.
+12. [ ] `TODO` Owner A/D - Logout invalidates token/session.
+13. [ ] `TODO` Owner B - Recovery request default `Pending`.
+14. [ ] `TODO` Owner B - Introduce encrypted private key storage voi `key_version` va audit-safe logging.
 
 ### Docs
-13. [ ] `TODO` Owner C - Swagger docs cho tat ca endpoints Phase 1.
+15. [ ] `TODO` Owner C - Swagger docs cho tat ca endpoints Phase 1.
 
 Dependencies:
 - Foundation sprint tasks Day 1-4 phai `DONE`.
@@ -140,14 +142,16 @@ Exit criteria Day 8:
 
 1. [ ] `TODO` Owner C - Unit tests cho auth/wallet services.
 2. [ ] `TODO` Owner C - Integration tests cho auth/wallet endpoints.
-3. [ ] `TODO` Owner C/A - E2E slice: login -> wallet link -> recovery request -> logout.
+3. [ ] `TODO` Owner C/A - E2E slice: login -> verify-otp (auto wallet) -> recovery request -> logout.
 4. [ ] `TODO` Owner D - Kiem tra logging/audit cho auth failures.
 5. [ ] `TODO` Owner A/B/C/D - Gate review va quyet dinh Go/No-Go.
 
 Phase 1 Test Gates (bat buoc pass):
 - [ ] Login tra JWT hop le va profile.
 - [ ] Route bao ve tu choi request khong auth.
-- [ ] Wallet link thanh cong 1 lan va fail neu duplicate.
+- [ ] verify-otp auto provision wallet cho first login.
+- [ ] verify-otp khong tao duplicate wallet cho existing user.
+- [ ] `wallet/link` route khong con expose.
 - [ ] OTP het han theo TTL va ton trong rate limit.
 - [ ] Logout vo hieu hoa token/session hien tai.
 

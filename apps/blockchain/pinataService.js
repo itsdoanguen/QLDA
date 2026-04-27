@@ -25,6 +25,9 @@ async function uploadImageToIPFS(filePath) {
 
   const formData = new FormData();
   formData.append("file", fs.createReadStream(absoluteFilePath));
+  formData.append("pinataMetadata", JSON.stringify({
+    name: path.basename(absoluteFilePath)
+  }));
 
   const response = await axios.post(`${PINATA_BASE_URL}/pinFileToIPFS`, formData, {
     maxBodyLength: Infinity,
@@ -54,9 +57,16 @@ async function uploadMetadataToIPFS(name, breed, birthYear, imageCID) {
     ]
   };
 
+  const body = {
+    pinataMetadata: {
+      name: `${name.replace(/\s+/g, '_')}_metadata.json`
+    },
+    pinataContent: metadata
+  };
+
   const response = await axios.post(
     `${PINATA_BASE_URL}/pinJSONToIPFS`,
-    metadata,
+    body,
     {
       headers: {
         ...getAuthHeaders(),
