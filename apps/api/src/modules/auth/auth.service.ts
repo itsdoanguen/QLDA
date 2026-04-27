@@ -56,17 +56,32 @@ export class AuthService {
     try {
       this.logger.log(`Verifying OTP for challenge: ${payload.challengeId}`);
 
-      // 1. Verify OTP with VNeID sandbox
+      // 1. Check max attempts
+      const attemptsKey = `otp_attempts_${payload.challengeId}`;
+      const attemptsStr = this.redisSession.getSession(attemptsKey);
+      const attempts = attemptsStr ? parseInt(attemptsStr, 10) : 0;
+      if (attempts >= 5) {
+        throw new HttpException('Too many OTP attempts', HttpStatus.TOO_MANY_REQUESTS);
+      }
+
+      // 2. Check if OTP flow session expired
+      const sessionKey = `auth_flow_${payload.challengeId}`;
+      const cachedStr = this.redisSession.getSession(sessionKey);
+      if (!cachedStr) {
+        throw new UnauthorizedException('OTP has expired');
+      }
+
+      // 3. Verify OTP with VNeID sandbox
       const result = await this.vneidService.verifyAuth(payload);
       
       this.logger.log(`Sandbox verification result: ${JSON.stringify(result)}`);
 
       if (!result || !result.accessToken) {
+        this.redisSession.setSession(attemptsKey, (attempts + 1).toString(), 300);
         throw new UnauthorizedException('Invalid OTP or Challenge');
       }
 
-      // 2. Fetch cached payload for fullName
-      const cachedStr = this.redisSession.getSession(`auth_flow_${payload.challengeId}`);
+      // 4. Fetch cached payload for fullName
       let fullName = 'Unknown';
       if (cachedStr) {
         const cachedPayload: any = JSON.parse(cachedStr);
