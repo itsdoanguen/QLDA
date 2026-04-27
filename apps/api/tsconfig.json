@@ -14,11 +14,11 @@
     "incremental": true,
     "skipLibCheck": true,
     "strict": true,
+    "strictPropertyInitialization": false,
     "moduleResolution": "node",
     "types": [
       "node"
-    ],
-    "ignoreDeprecations": "6.0"
+    ]
   },
   "include": [
     "src/**/*.ts"
