@@ -17,7 +17,8 @@
     "strictPropertyInitialization": false,
     "moduleResolution": "node",
     "types": [
-      "node"
+      "node",
+      "jest"
     ]
   },
   "include": [

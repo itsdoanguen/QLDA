@@ -37,8 +37,8 @@ export class AuthService {
     if (result && result.challengeId) {
       const sessionData = {
         ...payload,
-        fullName: result.person?.fullName || payload.fullName,
-        dateOfBirth: result.person?.dateOfBirth || payload.dateOfBirth,
+        fullName: result.person?.fullName || (payload as any).fullName,
+        dateOfBirth: result.person?.dateOfBirth || (payload as any).dateOfBirth,
       };
 
       this.redisSession.setSession(
@@ -69,7 +69,7 @@ export class AuthService {
       const cachedStr = this.redisSession.getSession(`auth_flow_${payload.challengeId}`);
       let fullName = 'Unknown';
       if (cachedStr) {
-        const cachedPayload: AuthLoginRequest = JSON.parse(cachedStr);
+        const cachedPayload: any = JSON.parse(cachedStr);
         fullName = cachedPayload.fullName || 'Unknown';
       }
 
