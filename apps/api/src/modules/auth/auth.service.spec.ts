@@ -177,6 +177,8 @@ describe('AuthService', () => {
   describe('2. Sad Path', () => {
     it('TC-S01: should throw UnauthorizedException on invalid OTP or expired challengeId', async () => {
       const payload = { challengeId: 'invalid_challenge', otp: 'wrong_otp' };
+      // Simulate session exists
+      (redisSessionService.getSession as jest.Mock).mockReturnValue(JSON.stringify({ fullName: 'Unknown' }));
       // Simulate VNeID verification failure
       (vneidService.verifyAuth as jest.Mock).mockResolvedValue(null);
 
@@ -202,6 +204,34 @@ describe('AuthService', () => {
       userRepository.findOne.mockResolvedValue(null);
       await expect(service.getProfile(999)).rejects.toThrow(UnauthorizedException);
       await expect(service.getProfile(999)).rejects.toThrow('User not found');
+    });
+
+    it('TC-S04: should throw TooManyRequestsException or block account when entering OTP incorrectly too many times', async () => {
+      const payload = { challengeId: 'challenge_123', otp: 'wrong_otp' };
+      
+      // Simulate that the user has reached the maximum allowed failed attempts in Redis
+      (redisSessionService.getSession as jest.Mock).mockImplementation((key) => {
+        if (key === 'otp_attempts_challenge_123') return '5'; // max attempts reached
+        return null;
+      });
+
+      // Expect the service to throw an exception due to too many failed attempts
+      // Note: Implementation might not exist yet, this is TDD
+      await expect(service.verifyOtp(payload)).rejects.toThrow(/Too many .* attempts/i);
+    });
+
+    it('TC-S05: should throw UnauthorizedException when using an expired OTP', async () => {
+      const payload = { challengeId: 'challenge_123', otp: '123456' };
+      
+      // Simulate that the OTP session has expired (Redis returns null for the challengeId)
+      (redisSessionService.getSession as jest.Mock).mockImplementation((key) => {
+        if (key === 'auth_flow_challenge_123') return null; // Expired or does not exist
+        return null;
+      });
+
+      // Expect the service to throw an exception for expired OTP
+      await expect(service.verifyOtp(payload)).rejects.toThrow(UnauthorizedException);
+      await expect(service.verifyOtp(payload)).rejects.toThrow(/expired/i);
     });
   });
 });
