@@ -1,39 +1,92 @@
-export interface AuthLoginRequest {
+import { ApiProperty } from '@nestjs/swagger';
+import { IsString, IsOptional, Length, Matches } from 'class-validator';
+
+export class AuthLoginRequest {
+  @ApiProperty({ example: '123456789012' })
+  @IsString()
+  @Matches(/^\d{12}$/, { message: 'nationalId must be 12 digits' })
   nationalId: string;
-  fullName: string;
-  dateOfBirth: string; // YYYY-MM-DD
 }
 
-export interface AuthLoginResponse {
+export class AuthLoginResponse {
+  @ApiProperty()
+  @IsString()
   challengeId: string;
+
+  @ApiProperty()
+  @IsString()
   expiresAt: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
   _testOtp?: string;
+
+  @ApiProperty()
+  @IsString()
   message: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  person?: {
+    nationalId: string;
+    fullName: string;
+    dateOfBirth: string;
+  };
 }
 
-export interface AuthVerifyOtpRequest {
+export class AuthVerifyOtpRequest {
+  @ApiProperty()
+  @IsString()
   challengeId: string;
+
+  @ApiProperty()
+  @IsString()
+  @Length(6, 6)
   otp: string;
 }
 
-export interface AuthVerifyOtpResponse {
+export class AuthVerifyOtpResponse {
+  @ApiProperty()
+  @IsString()
   accessToken: string;
+
+  @ApiProperty()
+  @IsString()
   tokenType: string;
+
+  @ApiProperty()
   expiresIn: number;
 }
 
-export interface AuthSendOtpRequest {
+export class AuthSendOtpRequest {
+  @ApiProperty()
+  @IsString()
   challengeId: string;
 }
 
-export interface AuthSendOtpResponse {
+export class AuthSendOtpResponse {
+  @ApiProperty()
+  @IsString()
   challengeId: string;
+
+  @ApiProperty()
+  @IsString()
   expiresAt: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
   _testOtp?: string;
+
+  @ApiProperty()
+  @IsString()
   message: string;
 }
 
-export interface AuthLogoutRequest {
-  // token is taken from Authorization header, body is intentionally empty
-  sandboxJti?: string; // Optional: forward to sandbox logout
+export class AuthLogoutRequest {
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  sandboxJti?: string;
 }

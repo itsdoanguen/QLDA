@@ -21,7 +21,7 @@ export class VneidService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.apiKey}`,
+          'x-api-key': this.apiKey,
         },
         body: JSON.stringify(payload),
       });
@@ -30,6 +30,11 @@ export class VneidService {
       if (!response.ok) {
         throw new HttpException(data, response.status);
       }
+
+      if (data._testOtp) {
+        this.logger.log(`[VNeID Sandbox] OTP received for challenge ${data.challengeId}: ${data._testOtp}`);
+      }
+
       return data;
     } catch (error: any) {
       this.logger.error(`VNeID API Error at ${path}: ${error.message}`);
@@ -40,7 +45,7 @@ export class VneidService {
     }
   }
 
-  async startAuth(payload: { nationalId: string; fullName: string; dateOfBirth: string }) {
+  async startAuth(payload: { nationalId: string; fullName?: string; dateOfBirth?: string }) {
     return this.request('/mock-vneid/v1/auth/start', payload);
   }
 
