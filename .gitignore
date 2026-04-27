@@ -52,3 +52,6 @@ Thumbs.db
 # --- INFRASTRUCTURE & TOOLS ---
 .terraform/
 .serverless/
+
+# --- SCRATCH ---
+scratch/
