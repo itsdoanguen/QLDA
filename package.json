@@ -1,0 +1,23 @@
+{
+	"name": "land-registry-system",
+	"version": "0.1.0",
+	"private": true,
+	"packageManager": "npm@10.8.2",
+	"workspaces": [
+		"apps/*",
+		"packages/*"
+	],
+	"scripts": {
+		"dev": "turbo run dev",
+		"build": "turbo run build",
+		"lint": "turbo run lint",
+		"test": "turbo run test",
+		"db:migrate:up": "npm run -w @land-registry/api db:migrate:up",
+		"db:migrate:down": "npm run -w @land-registry/api db:migrate:down",
+		"db:migrate:status": "npm run -w @land-registry/api db:migrate:status"
+	},
+	"devDependencies": {
+		"turbo": "^2.5.0",
+		"typescript": "^6.0.3"
+	}
+}

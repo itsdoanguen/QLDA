@@ -1,0 +1,2722 @@
+﻿CHƯƠNG I. GIỚI THIỆU VÀ TÓM TẮT NHIỆM VỤ XÂY DỰNG HỒ SƠ
+I. Các căn cứ pháp lý để thực hiện dự án
+    • Căn cứ Luật Đầu tư công số 58/2024/QH15 ngày 29 tháng 11 năm 2024;
+    • Căn cứ Luật Công nghệ thông tin số 67/2006/QH11 ngày 29/6/2006;
+    • Căn cứ Nghị định 73/2019/NĐ-CP, ngày 05/9/2019 của Chính phủ quy định quản lý đầu tư ứng dụng công nghệ thông tin sử dụng nguồn vốn của đơn vị;
+    • Căn cứ Nghị định số 82/2024/NĐ-CP ngày 10/7/2024 của Chính phủ về sửa đổi, bổ sung một số điều của Nghị định số 73/2019/NĐ-CP ngày 05/9/2019 của Chính phủ;
+    • Căn cứ Thông tư số 39/2017/TT-BTTTT ngày 15/12/2017 của Bộ Thông tin và Truyền thông quy định danh mục tiêu chuẩn kỹ thuật về ứng dụng CNTT trong cơ quan nhà nước.
+II. Tên dự án:
+Xây dựng phần mềm Quản lý hồ sơ đất đai và bất động sản minh bạch trên nền tảng Blockchain (Dự án Blockchain Đô Thị).
+III. Tích hợp trên Hệ thống quản lý nội bộ địa phương (Hệ thống nội bộ) :
+☑ Có (Tích hợp hệ thống định danh quốc gia VNeID để xác thực người dùng và liên kết bản đồ quy hoạch). 
+☐ Không
+IV. Tên Chủ đầu tư:
+ Sở Tài nguyên và Môi trường / UBND Thành phố Đà Nẵng.
+V. Địa điểm thực hiện Dự án:
+Thành phố Đà Nẵng.
+VI. Tên, địa chỉ đơn vị tư vấn, lập Thiết kế chi tiết:
+Nhóm Sinh viên.
+VII. Tổng dự toán: 
+0 VNĐ (Bằng chữ: Không Việt Nam đồng).
+VIII. Loại nguồn vốn đầu tư:
+Nguồn vốn nghiên cứu khoa học / Vốn sự nghiệp CNTT năm 2026.
+IX. Thời gian thực hiện:
+Năm 2026, trong vòng 16 tuần (4 tháng).
+X. Yêu cầu, phạm vi theo chủ trương được phê duyệt
+    • Vấn đề giải quyết: Khắc phục tình trạng làm giả sổ đỏ, giấy tờ nhà đất; quy trình hành chính rườm rà, thời gian sang tên đổi chủ lâu; thiếu tính minh bạch, rủi ro cho người mua và tình trạng "ngâm" hồ sơ tại các cơ quan hành chính.
+    • Phạm vi hệ thống: Ứng dụng công nghệ Blockchain kết hợp Smart Contract để lưu trữ hồ sơ không thể giả mạo và tự động hóa quy trình phê duyệt. Hệ thống cho phép số hóa sổ đỏ thành tài sản số lưu trên Blockchain và bản scan lưu trên IPFS.
+    • Đối tượng sử dụng: Cung cấp Web App cho cán bộ/lãnh đạo duyệt hồ sơ (đa chữ ký) và Mobile/Web App cho người dân tra cứu quy hoạch, nộp hồ sơ, ký hợp đồng điện tử và nộp thuế tự động. Bao gồm 5 vai trò dự kiến: Người dân, Cán bộ thụ lý, Lãnh đạo phê duyệt, Cảnh sát/Cán bộ kiểm tra và Quản trị viên.
+XI. Khái quát nội dung thực hiện Trong phạm vi dự án năm 2026, khái quát các nội dung trọng tâm thực hiện như sau:
+    • Công việc 1: Xây dựng phần mềm (Nền tảng Web/Mobile), bao gồm các phân hệ chính:
+        ◦ Định danh & Xác thực: Kết nối hệ thống định danh VNeID để xác thực người dùng và gán duy nhất 1 địa chỉ ví Blockchain cho 1 công dân.
+        ◦ Số hóa & Quản lý tài sản: Chuyển đổi thông tin sổ đỏ thành tài sản số (Mint NFT) và lưu trữ file bản scan an toàn bằng IPFS để chống làm giả.
+        ◦ Quy trình phê duyệt (Smart Contract): Tự động hóa việc luân chuyển hồ sơ và ràng buộc điều kiện ký số đa tầng (Multi-signature: cần 2 cán bộ, 1 lãnh đạo).
+        ◦ Cấp phép và Tra cứu: Tự động sinh mã QR xác thực giấy phép điện tử, cho phép người dùng xem lịch sử biến động thửa đất (Tra cứu nguồn gốc) và tra cứu bản đồ quy hoạch công khai.
+        ◦ Giao dịch & Thanh toán: Công cụ Pre-check rà soát tự động tình trạng tranh chấp, thế chấp; hỗ trợ ký hợp đồng mua bán điện tử và tự động tính toán thuế TNCN, lệ phí trước bạ. 
+    • Công việc 2: Kiểm thử chức năng
+        ◦ Xây dựng Usecase kiểm thử các chức năng cốt lõi (VNeID, upload IPFS, Smart Contract).
+        ◦ Xác định kết quả đầu ra dựa trên các kịch bản nghiệm thu theo tài liệu đặc tả kỹ thuật.
+    • Công việc 3: Kiểm thử an toàn, an ninh thông tin
+        ◦ Thực hiện kiểm toán bảo mật mã nguồn Smart Contract để tránh các lỗ hổng tràn bộ nhớ hoặc chiếm quyền.
+    • Công việc 4: Cài đặt ứng dụng
+        ◦ Cấu hình hạ tầng IPFS Node và triển khai Smart Contract lên mạng tương thích EVM.
+    • Công việc 5: Đào tạo, hướng dẫn sử dụng
+        ◦ Xây dựng tài liệu hướng dẫn và triển khai đào tạo theo từng phân quyền đối tượng sử dụng (Người dân, Lãnh đạo, Cán bộ).
+XII. Tuân thủ khung kiến trúc:
+Hệ thống phần mềm được xây dựng với thiết kế tuân thủ theo Kiến trúc Chính quyền điện tử địa phương, đồng thời áp dụng các tiêu chuẩn tích hợp Web3 và giao thức lưu trữ phi tập trung.
+XIII. Đề xuất cấp độ an toàn thông tin:
+Phần mềm Quản lý Blockchain Đô thị đề xuất cấp độ an toàn hệ thống thông tin cấp 3, do có liên kết trực tiếp với dữ liệu nhạy cảm thông qua VNeID và quản lý các giao dịch tài sản số.
+CHƯƠNG II. HIỆN TRẠNG ỨNG DỤNG CNTT VÀ SỰ CẦN THIẾT ĐẦU TƯ
+I. Hiện trạng bối cảnh và năng lực của đội ngũ phát triển: 
+Dự án được thực hiện trong bối cảnh môi trường học thuật, với những đặc thù riêng về nguồn lực, nhân sự và phương pháp tiếp cận công nghệ của nhóm phát triển.
+1. Hiện trạng về Nhân sự và Tổ chức công việc
+    • Quy mô: Đội ngũ phát triển hiện tại gồm các sinh viên ngành Công nghệ thông tin Ngoại ngữ Nhật.
+    • Phân bổ vai trò: Do quy mô nhóm nhỏ, các thành viên phải hoạt động theo mô hình đa nhiệm. Mỗi cá nhân sẽ luân phiên đảm nhận nhiều vai trò khác nhau trong quy trình Agile/Scrum như: Quản lý dự án (Project Manager/Scrum Master), Phân tích nghiệp vụ (BA), Lập trình viên (Developer) và Chuyên viên Kiểm thử (Tester).
+2. Năng lực ứng dụng công nghệ và Vai trò của AI
+    • Năng lực ứng dụng công nghệ hiện tại:
+        ◦ Đội ngũ phát triển đã có nền tảng cơ bản về phát triển phần mềm truyền thống (Web/Mobile App), bao gồm việc xây dựng giao diện người dùng (Frontend), xử lý logic máy chủ (Backend), quản trị cơ sở dữ liệu và tích hợp API.
+        ◦ Tuy nhiên, do đây là lần đầu tiên nhóm tiếp cận và thực hiện một dự án liên quan đến kiến trúc Web3 và công nghệ chuỗi khối (Blockchain), năng lực thực hành thực tế vẫn còn nhiều hạn chế.
+    • Vai trò của AI: Để khắc phục những điểm yếu về mặt kinh nghiệm đối với các công nghệ mới (Blockchain/Web3) và đảm bảo tiến độ dự án, nhóm phát triển ứng dụng triệt để các công cụ Trợ lý Trí tuệ nhân tạo (AI Agent/Co-pilot). Trong dự án này, AI không chỉ là một công cụ tra cứu thông thường mà đóng vai trò như một "thành viên chuyên gia" (Co-pilot) đồng hành xuyên suốt vòng đời phát triển phần mềm:
+        ◦ Nghiên cứu và Cố vấn kỹ thuật: AI hỗ trợ giải thích các khái niệm phức tạp về Blockchain, hướng dẫn từng bước (step-by-step) cách thiết lập môi trường mạng thử nghiệm (Testnet), cấu hình IPFS Node và cung cấp các khuôn mẫu (template) Smart Contract đạt chuẩn.
+        ◦ Phân tích và Thiết kế hệ thống: Hỗ trợ bóc tách các yêu cầu nghiệp vụ phức tạp của mảng quản lý đất đai thành các User Story (US) chi tiết, xây dựng cấu trúc Product Backlog và tư vấn các chuẩn tài liệu, chuẩn mã hóa (như áp dụng SHA-256) phù hợp.
+        ◦ Hỗ trợ lập trình và Gỡ lỗi (Debugging): AI hỗ trợ sinh mã (Code generation) cho các module khó, giải thích các API tích hợp (ví dụ API của VNeID). Đặc biệt, AI đóng vai trò cực kỳ quan trọng trong việc phân tích các tệp nhật ký lỗi (Error Log) từ hệ thống để định vị nhanh nguyên nhân lỗi (đặc biệt là các lỗi giao dịch thất bại trên mạng lưới Blockchain) và đề xuất các phương án khắc phục, tối ưu mã nguồn.
+3. Hiện trạng về Ngân sách và Quỹ thời gian
+    • Tài chính: Dự án không có ngân sách tài trợ (0 VNĐ). Do đó, nhóm tận dụng 100% hệ sinh thái công cụ miễn phí để quản trị và phát triển: Môi trường code Visual Studio Community 2022, Quản lý mã nguồn qua GitHub, Quản lý tiến độ dự án (Kanban/Sprint) qua Microsoft Planner.
+    • Thời gian: Quỹ thời gian thực thi dự án bị giới hạn trong 4 tháng (16 tuần) và phải chia sẻ quỹ thời gian với các môn học khác. Việc áp dụng mô hình Scrum kết hợp cùng sức mạnh tăng tốc độ xử lý từ AI Agents là điều kiện tiên quyết giúp nhóm đảm bảo đúng tiến độ bàn giao sản phẩm (Release) theo yêu cầu của Giảng viên hướng dẫn.
+II. Sự cần thiết phải đầu tư:
+Hiện nay, công tác quản lý hồ sơ đất đai và bất động sản đô thị đang đối mặt với nhiều hạn chế, tồn tại các vấn đề gây ảnh hưởng tiêu cực đến người dân và bộ máy quản lý nhà nước. Cụ thể:
+    • Vấn đề bảo mật và pháp lý: Tình trạng làm giả sổ đỏ và các loại giấy tờ nhà đất diễn ra phức tạp, gây rủi ro lớn cho người tham gia giao dịch.
+    • Vấn đề quy trình hành chính: Quy trình thủ tục hiện tại còn rườm rà, thời gian sang tên đổi chủ kéo dài. Vẫn tồn tại tình trạng "ngâm" hồ sơ tại các cơ quan hành chính.
+    • Thiếu tính minh bạch: Người dân gặp rất nhiều khó khăn trong việc tra cứu bản đồ quy hoạch, tìm hiểu lịch sử biến động và nguồn gốc mảnh đất, dẫn đến nguy cơ mua phải đất đang tranh chấp hoặc dính quy hoạch.
+Giải pháp và lợi ích mang lại: Do đó, việc đầu tư dự án "Quản lý hồ sơ đất đai và bất động sản minh bạch trên nền tảng Blockchain" là giải pháp công nghệ cấp thiết. Việc ứng dụng Blockchain kết hợp Smart Contract sẽ cho phép lưu trữ hồ sơ trên sổ cái không thể giả mạo và tự động hóa quy trình phê duyệt thông qua cơ chế đa chữ ký (Multi-signature), loại bỏ sự can thiệp sai lệch của con người. Đồng thời, hệ thống cung cấp tính năng truy xuất nguồn gốc (Provenance) rõ ràng theo dòng thời gian, giúp người mua an tâm về lịch sử thửa đất, giải quyết triệt để bài toán minh bạch của thị trường bất động sản.
+III. Mối liên hệ của dự án với hệ thống ứng dụng CNTT khác:
+Mặc dù là một giải pháp phi tập trung, hệ thống Blockchain Đô thị vẫn có mối liên hệ hữu cơ và tích hợp chặt chẽ với các nền tảng dữ liệu quốc gia và công nghệ lưu trữ phụ trợ. Cụ thể như sau:
+    1. Hệ thống Định danh Quốc gia (VNeID): Tích hợp cổng xác thực VNeID hoặc Agent Auth API để định danh người dùng, gán duy nhất 1 địa chỉ ví Blockchain cho 1 công dân nhằm đảm bảo tính pháp lý xác thực.
+    2. Hệ thống Lưu trữ phi tập trung (IPFS): Sử dụng mạng ngang hàng IPFS để lưu trữ các file tài liệu nặng (bản scan sổ đỏ, bản vẽ). Hệ thống chỉ lưu trữ mã băm (CID) trả về lên Blockchain để tối ưu chi phí (Gas fee) và chống làm giả.
+    3. Mạng lưới Blockchain: Hệ thống kế thừa và vận hành trên nền tảng mạng Blockchain tương thích EVM (như Vietchain hoặc Testnet) để triển khai Smart Contract và số hóa sổ đỏ thành tài sản số (Mint NFT tiêu chuẩn ERC-721/1155).
+    4. Hệ thống Bản đồ địa chính và Quy hoạch: Kết nối với cơ sở dữ liệu bản đồ địa chính trực quan thông qua API để hỗ trợ người dân tra cứu quy hoạch, đồng thời làm cơ sở cho công cụ Pre-check tự động rà soát trạng thái đất (tranh chấp, thế chấp) trước khi giao dịch.
+    5. Hệ thống Thanh toán và Thuế điện tử: Tích hợp API ngân hàng/cổng thanh toán online để tự động tính toán thuế Thu nhập cá nhân, lệ phí trước bạ và hỗ trợ đóng thuế tự động thông qua Hợp đồng mua bán điện tử.
+CHƯƠNG III. PHÂN TÍCH VÀ THUYẾT MINH GIẢI PHÁP KỸ THUẬT
+    I. PHÂN TÍCH HỆ THỐNG 
+                1. Mô tả quy trình nghiệp vụ
+Quy trình 1: Xác thực danh tính và Tiếp nhận hồ sơ 
+Thay vì dùng VNeID và ví điện tử, quy trình hiện tại dựa trên sự hiện diện vật lý:
+
+    • Bước 1: Người dân trực tiếp đến Bộ phận Một cửa, xuất trình CCCD bản vật lý và các giấy tờ nhà đất liên quan.
+    • Bước 2: Cán bộ tiếp nhận đối chiếu ảnh trên CCCD với người thật bằng mắt thường.
+    • Bước 3: Cán bộ kiểm tra tính đầy đủ của hồ sơ giấy và viết phiếu hẹn trả kết quả thủ công.
+    • Hạn chế: Dễ xảy ra sai sót khi đối chiếu, khó phát hiện CCCD giả mạo tinh vi.
+Quy trình 2: Số hóa và Lưu trữ hồ sơ 
+Thay vì đẩy lên mạng phân tán IPFS, hồ sơ hiện nay được quản lý như sau:
+
+    • Bước 1: Cán bộ thực hiện quét (scan) các văn bản giấy thành định dạng hình ảnh hoặc PDF.
+    • Bước 2: Các tệp tin được lưu trữ tập trung tại máy chủ nội bộ của cơ quan hoặc ổ cứng máy tính cá nhân.
+    • Bước 3: Thông tin thuộc tính (diện tích, chủ sở hữu) được nhập bằng tay vào cơ sở dữ liệu quản lý đất đai địa phương.
+    • Hạn chế: Dữ liệu lưu tập trung dễ bị tấn công, sửa đổi trái phép hoặc mất mát do hỏng hóc hạ tầng.
+Quy trình 3: Phê duyệt và Luân chuyển hồ sơ
+
+
+Thay vì dùng Smart Contract và Multi-sig, việc phê duyệt hiện tại mang tính tuần tự:
+    • Bước 1: Hồ sơ giấy (hoặc file nội bộ) được luân chuyển qua các phòng ban theo hình thức "gối đầu": xong phòng này mới chuyển sang phòng khác.
+    • Bước 2: Cán bộ thụ lý kiểm tra, ký nháy vào văn bản giấy hoặc xác nhận trên phần mềm nội bộ.
+    • Bước 3: Hồ sơ được trình lên Lãnh đạo phê duyệt cuối cùng bằng chữ ký tươi và đóng dấu đỏ của cơ quan.
+    • Hạn chế: Quy trình rườm rà, dễ xảy ra tình trạng "ngâm" hồ sơ tại một khâu mà không rõ lý do minh bạch.
+Quy trình 4: Tra cứu và Giao dịch bất động sản
+
+
+Thay vì quét mã QR và xem Timeline trên Blockchain, người dân phải thực hiện thủ công:
+    • Bước 1: Người mua phải đến cơ quan chức năng để xin trích lục thông tin quy hoạch và tình trạng tranh chấp.
+    • Bước 2: Việc xác thực lịch sử thửa đất (nguồn gốc, các đời chủ cũ) phụ thuộc vào thông tin lưu trữ tại văn phòng đăng ký đất đai, thường mất nhiều thời gian tra lục.
+    • Bước 3: Giao dịch được thực hiện tại văn phòng công chứng bằng hợp đồng giấy, sau đó mới nộp hồ sơ sang tên.
+    • Hạn chế: Thiếu tính thời gian thực, người mua dễ gặp rủi ro mua phải đất đang thế chấp hoặc giấy tờ giả.
+                2. Đề xuất quy trình Tin học Hóa
+2.1.  Quy trình tin học hóa Định danh, Xác thực và Liên kết tài khoản
+
+Hình 7. Quy trình tin học hóa Định danh, Xác thực và Liên kết tài khoản
+    • Mô tả:
+        ◦ Bước 1: Người dùng truy cập hệ thống và thực hiện yêu cầu "Đăng nhập VNeID", hệ thống chuyển hướng đến API Cổng VNeID để xác thực.
+        ◦ Bước 2: Hệ thống kiểm tra dữ liệu xác thực:
+            ▪ Nếu dữ liệu không hợp lệ (sai mã PIN, hết hạn session, v.v.), hệ thống hiển thị thông báo lỗi và yêu cầu người dùng quay lại bước "Đăng nhập VNeID".
+            ▪ Nếu dữ liệu hợp lệ, tiếp tục đến bước 3.
+        ◦ Bước 3: Người dùng thực hiện thao tác "Connect Wallet" (kết nối ví MetaMask) và xác nhận cấp quyền trên ví.
+        ◦ Bước 4: Hệ thống kiểm tra dữ liệu liên kết ví và định danh:
+            ▪ Nếu dữ liệu không hợp lệ (ID hoặc Ví đã bị liên kết trùng lặp từ trước), hệ thống ngăn chặn và hiển thị thông báo lỗi.
+            ▪ Nếu dữ liệu hợp lệ, hệ thống lưu trữ mapping 1-1, cấp phiên làm việc (Session/JWT) và kết thúc quy trình đăng nhập thành công.
+2.2.  Quy trình tin học hóa Số hóa và Khởi tạo hồ sơ số (IPFS Storage)
+
+Hình 10. Quy trình tin học hóa Số hóa và Khởi tạo hồ sơ số
+    • Mô tả:
+        ◦ Bước 1: Người dân cập nhật và tải lên hệ thống các tệp tin hồ sơ (bản vẽ, ảnh chụp sổ đỏ định dạng JPG, PDF, PNG).
+        ◦ Bước 2: Hệ thống kiểm tra dữ liệu tệp tin:
+            ▪ Nếu dữ liệu không hợp lệ (sai định dạng, vượt quá dung lượng), hệ thống yêu cầu quay lại bước cập nhật tệp tin.
+            ▪ Nếu dữ liệu hợp lệ, hệ thống tự động đẩy tệp tin lên mạng lưu trữ phân tán IPFS thông qua Gateway và tiếp tục đến bước 3.
+        ◦ Bước 3: Hệ thống kiểm tra kết quả phản hồi từ mạng IPFS:
+            ▪ Nếu phản hồi không hợp lệ (lỗi kết nối mạng, timeout), hệ thống tự động chạy cơ chế thử lại (Retry) tối đa 3 lần. Nếu vẫn thất bại, yêu cầu người dùng thực hiện lại bước 1.
+            ▪ Nếu phản hồi hợp lệ (tải lên thành công), mạng IPFS trả về một mã băm định danh duy nhất (CID), tiếp tục đến bước 4.
+        ◦ Bước 4: Hệ thống trích xuất mã CID, lưu bản ghi hồ sơ thô vào cơ sở dữ liệu nội bộ (off-chain) và chuyển trạng thái hồ sơ sang "Chờ đối soát".
+2.3.  Quy trình tin học hóa Làm sạch dữ liệu và Đối soát (Data Cleansing Workflow)
+
+Hình 11.  Quy trình tin học hóa Làm sạch dữ liệu và Đối soát
+    • Mô tả:
+        ◦ Bước 1: Hệ thống tự động chạy thuật toán rà soát dữ liệu sơ bộ (Pre-validation) cho các thông tin người dân vừa nộp.
+        ◦ Bước 2: Hệ thống kiểm tra dữ liệu sơ bộ:
+            ▪ Nếu dữ liệu không hợp lệ (phát hiện trường trống, sai định dạng), hệ thống cảnh báo và yêu cầu người dân bổ sung.
+            ▪ Nếu dữ liệu hợp lệ, tiếp tục đến bước 3.
+        ◦ Bước 3: Cán bộ thụ lý truy cập giao diện đối soát, hệ thống hiển thị trực quan song song ảnh scan hồ sơ và dữ liệu số nhập liệu. Cán bộ tiến hành đối chiếu và kiểm tra.
+        ◦ Bước 4: Hệ thống ghi nhận quyết định kiểm tra từ Cán bộ:
+            ▪ Nếu hồ sơ không hợp lệ (sai sót quá lớn, thiếu giấy tờ), cán bộ nhấn "Từ chối" hoặc "Yêu cầu bổ sung". Hệ thống đẩy trạng thái lùi lại và gửi thông báo cho người dân.
+            ▪ Nếu hồ sơ hợp lệ, cán bộ nhấn xác nhận hồ sơ đã được làm sạch, tiếp tục đến bước 5.
+        ◦ Bước 5: Hệ thống ghi nhận nhật ký thao tác (log người thực hiện, thời gian) và kích hoạt cơ chế "Đóng băng" (freeze) dữ liệu để ngăn chặn chỉnh sửa.
+2.4.  Quy trình tin học hóa Phê duyệt liên thông đa tầng (Multi-signature)
+
+Hình 12. Quy trình tin học hóa Phê duyệt liên thông đa tầng
+    • Mô tả:
+        ◦ Bước 1: Smart Contract tự động điều phối hồ sơ đã làm sạch vào danh sách "Chờ phê duyệt" hiển thị trên Dashboard của cán bộ liên quan.
+        ◦ Bước 2: Các cán bộ kiểm tra hồ sơ và dùng ví MetaMask thực hiện thao tác ký số xác nhận.
+        ◦ Bước 3: Hệ thống (Smart Contract) kiểm tra dữ liệu chữ ký:
+            ▪ Nếu số lượng chữ ký chưa hợp lệ (chưa đủ điều kiện, ví dụ: cần 2 cán bộ), hệ thống tiếp tục chờ các cán bộ khác ký.
+            ▪ Nếu số lượng chữ ký hợp lệ (đã đủ chữ ký cán bộ), hệ thống gửi thông báo yêu cầu Lãnh đạo vào phê duyệt chốt, tiếp tục đến bước 4.
+        ◦ Bước 4: Lãnh đạo truy cập kiểm tra thông tin và đưa ra quyết định:
+            ▪ Nếu không đồng ý phê duyệt, Lãnh đạo nhấn "Từ chối" kèm lý do. Hệ thống hủy bỏ lệnh ký và hoàn tác (revert) hồ sơ quay lại bước "Chờ đối soát".
+            ▪ Nếu đồng ý phê duyệt, Lãnh đạo xác nhận chữ ký số cuối cùng qua ví MetaMask.
+        ◦ Bước 5: Smart Contract đối chiếu ngưỡng điều kiện (Threshold). Khi đã thỏa mãn đa chữ ký, hệ thống kích hoạt thực thi giao dịch ghi nhận lên Blockchain.
+2.5.  Quy trình tin học hóa Quản lý Tài sản số (Mint NFT)
+
+Hình 13. Quy trình tin học hóa Quản lý Tài sản số (Mint NFT)
+    • Mô tả:
+        ◦ Bước 1: Hệ thống tự động tổng hợp gói siêu dữ liệu (Metadata) của hồ sơ bao gồm mã CID IPFS, diện tích và tọa độ GPS.
+        ◦ Bước 2: Hệ thống gọi hàm mintNFT trong Smart Contract, tự động tính toán ước lượng phí Gas và gửi giao dịch tạo Token lên mạng lưới Blockchain.
+        ◦ Bước 3: Hệ thống kiểm tra kết quả giao dịch từ mạng lưới Blockchain:
+            ▪ Nếu giao dịch không hợp lệ (do Out of Gas hoặc nghẽn mạng), hệ thống báo lỗi chi tiết trên giao diện, chuyển hồ sơ về trạng thái "Lỗi giao dịch" để chờ xử lý lại.
+            ▪ Nếu giao dịch hợp lệ (thành công), Token NFT được sinh ra vĩnh viễn trên chuỗi khối, tiếp tục đến bước 4.
+        ◦ Bước 4: Event Listener của hệ thống bắt sự kiện thành công, cập nhật CSDL và tự động gửi thông báo cho Người dân. NFT tài sản hiển thị ngay lập tức trong ví cá nhân.
+2.6.  Quy trình tin học hóa Kiểm tra và Giao dịch bất động sản (Pre-check & Smart Contract)
+
+Hình 14. Quy trình tin học hóa Kiểm tra và Giao dịch bất động sản
+    • Mô tả:
+        ◦ Bước 1: Người dân (bên bán/bên mua) chọn thửa đất trên ứng dụng và kích hoạt công cụ rà soát tự động (Pre-check).
+        ◦ Bước 2: Hệ thống (Smart Contract và Backend) kiểm tra dữ liệu trạng thái thửa đất liên thông với quy hoạch, ngân hàng:
+            ▪ Nếu dữ liệu không hợp lệ (đất đang thế chấp, có tranh chấp, dính quy hoạch), hệ thống hiển thị cảnh báo đỏ và vô hiệu hóa nút "Tạo hợp đồng".
+            ▪ Nếu dữ liệu hợp lệ (an toàn), hệ thống hiển thị cảnh báo xanh và tiếp tục đến bước 3.
+        ◦ Bước 3: Người dân và Cán bộ chứng thực tham gia vào môi trường giao diện hợp đồng mua bán điện tử và tiến hành ký số.
+        ◦ Bước 4: Hệ thống kiểm tra dữ liệu chữ ký đồng thuận:
+            ▪ Nếu chưa đủ chữ ký hợp lệ của các bên, hệ thống ghi nhận và chờ hoàn tất.
+            ▪ Nếu đủ chữ ký hợp lệ, tiếp tục đến bước 5.
+        ◦ Bước 5: Smart Contract thực thi giao dịch, tự động chuyển NFT quyền sở hữu từ ví của người bán sang ví của người mua một cách minh bạch.
+
+2.7.  Quy trình tin học hóa Quản lý Thuế và Lệ phí tự động
+
+Hình 15. Quy trình tin học hóa Quản lý Thuế và Lệ phí tự động
+    • Mô tả:
+        ◦ Bước 1: Hệ thống truy xuất cấu hình tham số động, tự động tính toán Thuế thu nhập cá nhân và Lệ phí trước bạ dựa trên giá trị hợp đồng, sau đó gửi thông báo nộp thuế cho người mua.
+        ◦ Bước 2: Người dân xem bảng chiết tính chi phí và thực hiện thanh toán trực tuyến qua cổng thanh toán (VNPay/Momo...).
+        ◦ Bước 3: Hệ thống kiểm tra dữ liệu giao dịch thanh toán từ cổng kết nối:
+            ▪ Nếu dữ liệu không hợp lệ (giao dịch thất bại do hủy hoặc không đủ tiền), hệ thống ghi nhận lỗi và yêu cầu người dân thực hiện lại thao tác thanh toán.
+            ▪ Nếu dữ liệu hợp lệ (nhận tín hiệu callback thành công), tiếp tục đến bước 4.
+        ◦ Bước 4: Hệ thống thực hiện đối soát tự động (Reconciliation) và cập nhật trạng thái "Đã nộp thuế" lên Smart Contract.
+        ◦ Bước 5: Hệ thống phát hành biên lai điện tử có gắn mã giao dịch Blockchain (TxHash) và chuyển đến tài khoản của người dân.
+2.8.  Quy trình tin học hóa Tra cứu và Truy xuất nguồn gốc (QR Code Verification)
+
+Hình 16. Quy trình tin học hóa Tra cứu và Truy xuất nguồn gốc
+    • Mô tả:
+        ◦ Bước 1: Cảnh sát, cán bộ hoặc người dân sử dụng ứng dụng di động để quét mã QR trên giấy chứng nhận.
+        ◦ Bước 2: Hệ thống giải mã QR, trích xuất ID/TxHash và kiểm tra dữ liệu đối chiếu trực tiếp từ Blockchain:
+            ▪ Nếu dữ liệu không hợp lệ (không trùng khớp, giấy phép giả mạo, đã bị thu hồi), hệ thống hiển thị cảnh báo màu đỏ ngay lập tức.
+            ▪ Nếu dữ liệu hợp lệ (trùng khớp), hệ thống hiển thị thông tin màu xanh xác nhận tính hợp lệ kèm chi tiết của chủ sở hữu, tiếp tục đến bước 3.
+        ◦ Bước 3: Người dùng kích hoạt tính năng xem "Lịch sử biến động" (Timeline).
+        ◦ Bước 4: Hệ thống tự động đọc lại các Sự kiện (Events) được lưu trữ trên Blockchain để vẽ ra giao diện dòng thời gian hiển thị toàn bộ lịch sử (các đời chủ cũ, biến động diện tích, tranh chấp), cung cấp kèm các liên kết đối chứng trên Blockchain Explorer.
+II. XÁC ĐỊNH KHỐI LƯỢNG CÔNG VIỆC
+1. Khảo sát hiện trạng và nhu cầu người dùng
+    • Khảo sát hiện trạng hạ tầng dữ liệu đất đai: Đánh giá cấu trúc dữ liệu sổ đỏ hiện tại (bản giấy và file scan) để xây dựng quy tắc "Làm sạch dữ liệu".
+2. Xây dựng phần mềm nội bộ
+Phát triển hệ thống bao gồm 17 phân hệ chức năng cốt lõi được chia thành các nhóm task FE, BE và BC :
+    • Phân hệ Định danh & Xác thực: Tích hợp VNeID (OAuth2/OIDC) và cơ chế liên kết địa chỉ ví MetaMask 1-1 với số định danh công dân .
+    • Phân hệ Quản lý tài sản số & IPFS: Phát triển chức năng số hóa sổ đỏ thành NFT (ERC-721/1155) và lưu trữ bản scan an toàn trên mạng IPFS (Content Identifier - CID) .
+    • Phân hệ Smart Contract & Workflow: Lập trình logic phê duyệt đa chữ ký (Multi-signature) cho 2 cán bộ và 1 lãnh đạo; tự động hóa quy trình rà soát tranh chấp và tính thuế/phí .
+    • Phân hệ Minh bạch & Giám sát: Xây dựng dòng thời gian truy xuất nguồn gốc, Portal quy hoạch GIS công khai và Dashboard quản trị thời gian thực .
+3. Kiểm thử từng chức năng và chạy thử
+    • Kiểm thử chức năng Web3: Xác thực luồng kết nối ví, thực hiện lệnh Mint NFT và chuyển quyền sở hữu trên môi trường Testnet .
+    • Kiểm thử hiệu năng & Phí Gas: Đánh giá thời gian phản hồi kết quả quét QR (dưới 3 giây) và tối ưu hóa phí Gas cho các giao dịch hàng loạt .
+    • Kiểm thử tích hợp: Chạy thử luồng E2E từ khi Người dân nộp hồ sơ, Cán bộ đối soát đến khi NFT được cấp phát thành công.
+4. Kiểm thử an toàn an ninh thông tin
+Đặc thù Blockchain yêu cầu các hạng mục chuyên sâu hơn so với phần mềm truyền thống:
+    • Kiểm toán Smart Contract: Rà quét lỗ hổng mã nguồn (như Reentrancy, Integer Overflow) để đảm bảo không thể can thiệp sai lệch quy trình phê duyệt.
+    • Kiểm tra tính nhất quán dữ liệu: Phát triển kịch bản đối soát tự động giữa Database PostgreSQL nội bộ và Metadata trên Blockchain để phát hiện dấu hiệu xâm nhập trái phép lớp Database .
+    • Thử nghiệm khôi phục liên kết ví: Kiểm tra kịch bản khôi phục quyền truy cập tài sản thông qua VNeID khi người dân mất Private Key.
+    • Xây dựng hồ sơ cấp độ ATTT: Thiết lập quy trình thu hồi quyền và bảo vệ dữ liệu công dân theo Nghị định 13.
+5. Cài đặt và triển khai ứng dụng
+    • Thiết lập hạ tầng Node: Cài đặt các Node Blockchain tương thích EVM và cấu hình cụm lưu trữ IPFS.
+    • Deploy Smart Contracts: Triển khai các hợp đồng thông minh đã được kiểm toán lên mạng lưới thực tế (Mainnet/Vietchain) và cấu hình Registry quản lý.
+    • Cấu hình tham số hệ thống: Thiết lập các bảng thuế, phí động và SLA thời gian xử lý hồ sơ trên Dashboard Admin.
+6. Đào tạo và hướng dẫn sử dụng
+    • Dành cho người sử dụng (ND, CB, CS): Hướng dẫn cài đặt ví MetaMask, thao tác ký số, nộp thuế online và cách quét mã QR kiểm tra thực địa.
+    • Dành cho quản trị & lãnh đạo (LĐ, AD): Đào tạo quy trình phê duyệt đa tầng, cách quản lý danh sách cán bộ (RBAC) và theo dõi Dashboard báo cáo tồn đọng hồ sơ.
+III. PHÂN TÍCH CÁC YÊU CẦU CỦA PHẦN MỀM
+1. Yêu cầu chức năng của phần mềm
+Hệ thống được thiết kế nhằm số hóa quy trình quản lý đất đai và tài sản đô thị trên nền tảng công nghệ sổ cái phân tán (Blockchain).
+STT
+Yêu cầu chức năng
+Phân loại
+Ghi chú
+I
+Chức năng hệ thống 
+
+
+1
+Quản lý danh mục Smart Contract (Core, NFT, Multi-sig) 
+Cấu hình hệ thống
+Làm mới
+2
+Quản lý danh mục API Key & Kết nối VNeID 
+Dữ liệu đầu vào
+Làm mới
+3
+Quản lý nhóm quyền & Vai trò (RBAC: ND, CB, LĐ, CS, AD) 
+Dữ liệu đầu vào
+Làm mới
+4
+Quản lý danh mục ví Blockchain và Định danh (Mapping 1-1) 
+Dữ liệu đầu vào
+Làm mới
+5
+Log giao dịch Blockchain (Theo dõi TxHash, Phí Gas) 
+Yêu cầu truy vấn
+Làm mới
+6
+Nhật ký sử dụng hệ thống & Audit Log trên chuỗi 
+Yêu cầu truy vấn
+Làm mới
+7
+Sao lưu dữ liệu Database nội bộ và Đồng bộ IPFS 
+Dữ liệu đầu ra
+Làm mới
+8
+Phân quyền ký duyệt đa tầng (Multi-signature) 
+Dữ liệu đầu vào
+Làm mới
+II
+Chức năng nghiệp vụ & Cập nhật mới
+
+
+9
+Khởi tạo hồ sơ số & Upload bản scan sổ đỏ lên IPFS 
+Dữ liệu đầu vào
+Làm mới
+10
+Làm sạch dữ liệu (Data Cleansing) đối soát hồ sơ 
+Dữ liệu đầu vào
+Làm mới
+11
+Lệnh Mint NFT tài sản (Số hóa quyền sử dụng đất) 
+Dữ liệu đầu vào
+Làm mới
+12
+Lọc danh sách hồ sơ theo độ ưu tiên và trạng thái SLA 
+Yêu cầu truy vấn
+Làm mới
+13
+Đơn vị phối hợp phê duyệt liên thông qua Smart Contract 
+Dữ liệu đầu vào
+Làm mới
+14
+Chạy công cụ rà soát tự động (Pre-check tranh chấp/quy hoạch) 
+Yêu cầu truy vấn
+Làm mới
+15
+Thông báo tiến độ hồ sơ & Giao dịch Blockchain qua App/Email 
+Dữ liệu đầu ra
+Làm mới
+16
+Hủy/Hoàn tác lệnh ký duyệt khi phát hiện sai sót 
+Dữ liệu đầu vào
+Làm mới
+17
+Tra cứu lịch sử biến động thửa đất (Provenance Timeline) 
+Yêu cầu truy vấn
+Làm mới
+18
+Danh sách việc trễ hạn/quá hạn theo cấu hình SLA 
+Yêu cầu truy vấn
+Làm mới
+19
+Bản đồ quy hoạch công khai & Tra cứu thửa đất 
+Yêu cầu truy vấn
+Làm mới
+20
+Quét mã QR xác thực tính hợp lệ của giấy phép ngoài thực địa 
+Yêu cầu truy vấn
+Làm mới
+21
+Trao đổi, thảo luận và báo cáo hành vi gian lận (Report) 
+Dữ liệu đầu vào
+Làm mới
+22
+Dashboard theo dõi tải lượng IPFS và giao dịch thời gian thực 
+Yêu cầu truy vấn
+Làm mới
+23
+Tính toán Thuế/Phí tự động & Biên lai điện tử Blockchain 
+Dữ liệu đầu ra
+Làm mới
+24
+Báo cáo hiệu suất xử lý hồ sơ giữa các Sở/Ban ngành 
+Dữ liệu đầu ra
+Làm mới
+25
+Trích xuất bản sao điện tử có chữ ký số & Mã QR xác thực 
+Dữ liệu đầu ra
+Làm mới
+26
+Cấu hình tham số động cho Thuế và Phí giao dịch 
+Dữ liệu đầu vào
+Làm mới
+27
+Khôi phục liên kết ví khi mất Private Key qua xác thực VNeID 
+Dữ liệu đầu vào
+Làm mới
+28
+Báo cáo nhất quán dữ liệu (Consistency Check) 
+Dữ liệu đầu ra
+Làm mới
+29
+Quản lý phiên làm việc & Tự động thu hồi quyền (Timeout) 
+Yêu cầu truy vấn
+Làm mới
+
+2. Yêu cầu Kiểm thử phần mềm
+Công tác kiểm thử được thực hiện nghiêm ngặt qua các cấp độ để đảm bảo hệ thống vận hành ổn định trên môi trường mạng phi tập trung:
+    • Kiểm thử đơn vị (Unit Test): Thực hiện kiểm tra logic của từng hàm trong Smart Contract (chuẩn ERC-721/1155) và các API xử lý định danh VNeID.
+    • Kiểm thử tích hợp (Integration Test): Kiểm tra luồng dữ liệu giữa các thành phần: Giao diện người dùng  API Backend  IPFS Blockchain.
+    • Kiểm toán mã nguồn (Smart Contract Audit): Đây là yêu cầu bắt buộc đối với dự án Blockchain nhằm rà quét các lỗ hổng bảo mật như Reentrancy, Overflow, hoặc lỗi phân quyền trong Smart Contract Multi-sig trước khi triển khai thực tế.
+    • Kiểm thử chấp nhận người dùng (UAT): Tổ chức cho cán bộ thụ lý và lãnh đạo phê duyệt thao tác trực tiếp trên môi trường Testnet để tối ưu hóa quy trình nhập liệu và ký số hàng loạt.
+3. Yêu cầu phi chức năng
+Hệ thống được xây dựng đảm bảo các tiêu chuẩn kỹ thuật hiện đại và an toàn thông tin cấp độ cao:
+3.1 Yêu cầu về cơ sở dữ liệu
+    • Cấu trúc lưu trữ lai (Hybrid Storage): Dữ liệu định danh và log hệ thống được lưu trữ tại cơ sở dữ liệu quan hệ (PostgreSQL) để tối ưu tốc độ truy vấn.
+        ◦ Tài liệu nặng (bản scan sổ đỏ) được lưu trữ trên mạng ngang hàng IPFS để đảm bảo không bị quá tải mạng lưới Blockchain.
+        ◦ Metadata và dấu vết giao dịch (Audit Log) được lưu trữ trực tiếp trên Blockchain (On-chain) để đảm bảo tính bất biến.
+    • Cơ chế sao lưu: Thực hiện sao lưu dữ liệu Database nội bộ định kỳ hàng ngày và duy trì các "Pinning Service" để đảm bảo tính sẵn sàng của file trên IPFS.
+3.2 Yêu cầu về bảo mật
+    • Tăng cường ATTT bằng DLT: Hệ thống sử dụng công nghệ Blockchain để đảm bảo tính toàn vẹn tuyệt đối của hồ sơ đất đai, ngăn chặn mọi hành vi chỉnh sửa dữ liệu trái phép.
+    • Các giải pháp cụ thể:
+        ◦ Mã hóa: Toàn bộ file scan sổ đỏ được mã hóa AES-256 trước khi đẩy lên IPFS nhằm bảo vệ quyền riêng tư theo Nghị định 13.
+        ◦ Xác thực đa tầng: Sử dụng định danh quốc gia VNeID qua giao thức OAuth2/OIDC thay thế cho mật khẩu truyền thống.
+        ◦ Kiểm soát truy cập (RBAC): Phân quyền nghiêm ngặt 5 vai trò; yêu cầu chữ ký số đa tầng (Multi-sig) từ 2 cán bộ và 1 lãnh đạo để thực thi các giao dịch nhạy cảm.
+        ◦ Phiên làm việc: Tự động thu hồi quyền truy cập (Session Timeout) sau 15 phút không có tương tác; yêu cầu kết nối lại ví MetaMask để mở khóa chức năng ký phê duyệt.
+3.3 Yêu cầu về giao diện người sử dụng
+    • Công nghệ: Giao diện Web/Mobile tích hợp thư viện Web3 (ethers.js/viem) hỗ trợ kết nối ví MetaMask và các ví định danh.
+    • Trải nghiệm người dùng: Tích hợp bản đồ địa chính GIS trực quan giúp người dân tra cứu quy hoạch và xem ranh giới thửa đất bằng tọa độ GPS từ NFT.
+    • Định dạng báo cáo: Cho phép kết xuất biên bản đối soát và bản sao điện tử sang PDF có gắn mã QR trỏ trực tiếp đến mã băm giao dịch (TxHash) trên Blockchain để đối chiếu.
+3.4 Yêu cầu về tốc độ xử lý
+Để đảm bảo hiệu quả phục vụ hành chính công, hệ thống cam kết chỉ số KPI sau:
+    • Phản hồi hệ thống: Thời gian kiểm tra trạng thái thửa đất (Pre-check) hoặc xác thực mã QR phải đạt dưới 3 giây.
+    • Hiển thị thông tin: Thời gian tải đầy đủ trang Dashboard báo cáo và Bản đồ quy hoạch dưới 5 giây.
+    • Xử lý Blockchain: Giao dịch ghi nhận lên chuỗi khối (Mint NFT) phải được hoàn tất trong vòng 10-15 giây (tùy thuộc vào thời gian đóng Block của mạng Vietchain).
+3.5 Yêu cầu về hạ tầng và vận hành
+    • An toàn dữ liệu: Sử dụng công nghệ RAID cho máy chủ Database nội bộ; cấu hình cụm máy chủ IPFS (Private Cluster) để lưu trữ tệp tin minh chứng hồ sơ.
+    • Hạ tầng Blockchain: Duy trì các Node RPC có khả năng xử lý từ 50-500 kết nối đồng thời từ các ứng dụng Client và các dịch vụ lắng nghe sự kiện (Event Listener).
+    • Mạng riêng ảo (VPN): Mọi thao tác quản trị Smart Contract và cấu hình tham số hệ thống đều phải thực hiện qua kênh truyền mã hóa VPN để đảm bảo an ninh mạng.
+3.6 Yêu cầu khác
+Hệ thống tương thích hoàn toàn với các trình duyệt Web hiện đại có hỗ trợ các tiện ích mở rộng cho Web3 và hiển thị đa ngôn ngữ Việt/Anh.
+
+
+
+
+
+
+
+
+
+IV. Đề xuất giải pháp kỹ thuật công nghệ
+Mô tả giải pháp tổng thể
+* Giải pháp công nghệ
+Phần mềm loại ứng dụng trên nền web (Web App) và di động, được xây dựng trên cơ sở kết hợp các giải pháp công nghệ truyền thống và công nghệ chuỗi khối (Blockchain):
+    • Framework & Ngôn ngữ: Sử dụng TypeScript cho Backend (xây dựng API, Mock Server) và tích hợp các thư viện Web3 (như ethers.js hoặc viem) cho Frontend.
+    • Hệ quản trị CSDL: Vận hành theo mô hình lưu trữ lai (Hybrid Storage), kết hợp cơ sở dữ liệu PostgreSQL (Off-chain) và mạng lưu trữ phân tán IPFS (Pinata) để lưu trữ file tài liệu.
+    • Nền tảng lõi Blockchain: Sử dụng mạng tương thích EVM (Vietchain/Testnet) để thực thi các Hợp đồng thông minh (Smart Contract).
+    • Hệ điều hành máy chủ: Linux / Windows Server (môi trường tiêu chuẩn cho các máy chủ Cloud và Node Blockchain).
+    • Phương thức hosting: Triển khai trên hạ tầng điện toán đám mây (Cloud) kết hợp mạng lưu trữ ngang hàng phân tán (P2P). 
+    1. Giải pháp đồng bộ chia sẻ dữ liệu
+    a. Đồng bộ với hệ thống nội bộ và cơ sở dữ liệu quốc gia (VNeID, CSDL Đất đai)
+    • Hệ thống định kỳ (hoặc kích hoạt theo thời gian thực) lấy dữ liệu từ các API của hệ thống quản lý đất đai nội bộ địa phương và hệ thống định danh điện tử VNeID. Việc xác định thời gian và phương thức thực hiện đồng bộ do người quản trị cấu hình. 
+    • Khi thực hiện lấy dữ liệu, hệ thống sẽ so sánh, đối chiếu dữ liệu được lưu trữ Off-chain (trên cơ sở dữ liệu cục bộ PostgreSQL) với trạng thái On-chain (trên mạng lưới Blockchain) để cập nhật các thông tin mới, đảm bảo tính đồng nhất và toàn vẹn của hồ sơ tài sản.
+    b. Chia sẻ dữ liệu : Dữ liệu của phần mềm Quản lý Đất đai và Bất động sản Đô thị được bảo mật nghiêm ngặt bằng các thuật toán mã hóa.
+    • Dữ liệu thông tin cá nhân nhạy cảm được bảo mật tuyệt đối, không chia sẻ công khai cho các hệ thống bên ngoài.
+    • Dữ liệu về trạng thái pháp lý, quy hoạch và lịch sử giao dịch (đã được mã băm Hash) được chia sẻ minh bạch, đồng bộ theo thời gian thực cho các cơ quan, đơn vị cùng tham gia vào mạng lưới (Node) như: Sở Tài nguyên Môi trường, Phòng Công chứng, Cơ quan Thuế, nhằm phục vụ công tác đối chiếu, liên thông nghiệp vụ và loại bỏ rủi ro giấy tờ giả.
+    2. Giải pháp lưu ký và bảo mật
+Giải pháp lưu ký: Hệ thống sử dụng mô hình lưu trữ lai (Hybrid Storage), kết hợp hạ tầng tại Trung tâm dữ liệu thành phố và mạng lưới lưu trữ phân tán. Cấu hình dự kiến bao gồm:
+
+    • Cấu hình máy chủ ứng dụng (Web/API Server - 02 máy chủ hoạt động phân tải):
+        ◦ CPU: Tối thiểu 08 virtual processor. (Khuyến nghị: AMD EPYC™ 9135)
+        ◦ HĐH: Linux / Windows Server 
+        ◦ Ram: 16GB
+        ◦ HDD/SSD: 512GB trống 
+    • Cấu hình máy chủ Cơ sở dữ liệu (PostgreSQL lưu trữ Off-chain):
+        ◦ CPU: Tối thiểu 08 virtual processor. (Khuyến nghị: AMD EPYC™ 9135)
+        ◦ HĐH: Linux / Windows Server
+        ◦ Ram: 16GB
+        ◦ HDD/SSD: 512GB trống
+    • Cấu hình cụm máy chủ IPFS Node (Lưu trữ bản scan sổ đỏ phân tán):
+        ◦ CPU: 08 virtual processor (Khuyến nghị: AMD EPYC™ 9135)
+        ◦ HĐH: Linux (Ubuntu/CentOS) 
+        ◦ Ram: 32GB (đáp ứng xử lý tải lượng băng thông file)
+        ◦ SSD: Tối thiểu 1TB (Mở rộng linh hoạt theo dung lượng hồ sơ)
+    • Cấu hình máy chủ Blockchain Node (Thực thi Smart Contract và lưu trạng thái On-chain):
+        ◦ CPU: 08 - 16 virtual processor (Khuyến nghị: AMD EPYC™ 9135)
+        ◦ HĐH: Linux (Ubuntu)
+        ◦ Ram: 32GB
+        ◦ SSD: 1TB NVMe (Yêu cầu tốc độ đọc/ghi cao để đồng bộ mạng lưới) (Khuyến nghị: Sử dụng SSD chuẩn PciE 5.0 x4)
+Phương án bảo mật mức ứng dụng: Bảo mật hệ thống được thiết lập đa lớp, kết hợp giữa các phương pháp truyền thống và công nghệ Web3:
+    • Định danh và Phân quyền: Tích hợp hệ thống định danh điện tử quốc gia VNeID để xác thực cấp độ cao. Hệ thống phân quyền chặt chẽ (RBAC) cho từng nhóm tài khoản (người dân, cán bộ địa chính, lãnh đạo phê duyệt) để khai thác dữ liệu trong phạm vi cho phép.
+    • Bảo mật phiên làm việc (Session Security): Tự động thu hồi quyền truy cập (Session Timeout), xóa phiên và đăng xuất khỏi hệ thống sau 15 phút không có thao tác (Idle time) nhằm ngăn chặn truy cập trái phép vào các thiết bị đang mở.
+    • Xác thực giao dịch nhạy cảm: Ràng buộc cơ chế yêu cầu cán bộ/người dùng phải thực hiện ký số xác thực lại (thông qua chứng thư số hoặc ví Blockchain) mỗi khi mở khóa các chức năng phê duyệt nhạy cảm hoặc thay đổi trạng thái pháp lý của bất động sản.
+    • Mã hóa dữ liệu: Sử dụng giải thuật băm an toàn (SHA-256) để mã hóa mật khẩu tài khoản nội bộ (nếu có). Toàn bộ dữ liệu giao dịch và thông tin hồ sơ trước khi đưa lên Blockchain đều được mã hóa thành các đoạn mã băm (Hash), đảm bảo dữ liệu không thể bị dịch ngược hay giả mạo.
+    3. Giải pháp xây dựng và vận hành CSDL
+Hệ quản trị cơ sở dữ liệu được xây dựng theo mô hình lưu trữ lai (Hybrid Storage) để tối ưu hóa hiệu năng và đảm bảo tính minh bạch, bao gồm:
+    • Dữ liệu Off-chain (Thông tin cấu hình, danh mục, dữ liệu người dùng cơ bản): Sử dụng hệ quản trị CSDL PostgreSQL.
+    • Dữ liệu tệp tin (Bản scan sổ đỏ, tài liệu pháp lý): Vận hành trên mạng lưới lưu trữ phân tán IPFS (Pinata) để đảm bảo file không bị mất mát hay sửa đổi.
+    • Dữ liệu On-chain (Quyền sở hữu, lịch sử giao dịch, mã băm tài liệu): Được lưu trữ và vận hành trực tiếp trên mạng lưới Blockchain (EVM Compatible) thông qua các Hợp đồng thông minh (Smart Contract).
+    4. Giải pháp kiểm thử chức năng
+Phần mềm được kiểm thử chức năng theo danh sách yêu cầu chức năng (bao gồm cả các module Web2 truyền thống và module Web3 giao tiếp Blockchain) và theo quy trình 05 bước: 
+    • Bước 1: Lập kế hoạch và kiểm soát việc kiểm thử Mục đích: 
+        ◦ Nhằm chỉ định và mô tả các loại kiểm tra sẽ được triển khai (kiểm thử giao diện Web/App, kiểm thử API, kiểm thử tích hợp VNeID và kiểm thử tương tác Smart Contract). 
+    • Bước 2: Phân tích và Thiết kế Mục đích: 
+        ◦ Nhằm chỉ định các test case và các bước kiểm tra chi tiết cho mỗi phiên bản PM, bao gồm các kịch bản giao dịch trên mạng Testnet. 
+    • Bước 3: Thực thi kiểm thử Mục đích: 
+        ◦ Thực hiện các bước kiểm tra đã thiết kế trên các môi trường (Local, Testnet Blockchain) và ghi nhận kết quả. 
+    • Bước 4: Đánh giá kết quả thực thi và báo cáo kết quả Mục đích: 
+        ◦ Đánh giá toàn bộ quá trình kiểm tra bao gồm xem xét và đánh giá kết quả kiểm tra lỗi (bug Web/App) và các lỗi logic của Smart Contract, chỉ định các yêu cầu thay đổi, tính toán phí gas tiêu thụ và các số liệu liên quan. 
+    • Bước 5: Đóng hoạt động kiểm thử Mục đích: 
+        ◦ Kết thúc hoạt động kiểm thử, triển khai Smart Contract lên mạng lưới Mainnet (mạng chính thức) và phần mềm sẵn sàng được giao cho đơn vị quản lý.
+Hoạt động phân tích và thiết kế kiểm thử có các nhiệm vụ chủ yếu sau đây:
+    • Rà soát các yêu cầu cần thiết trước khi tiến hành kiểm thử như tài liệu đặc tả, tài liệu thiết kế, tài liệu giao diện, kiến trúc Hợp đồng thông minh...
+    • Xác định các điều kiện kiểm thử (đặc biệt là các điều kiện về ví điện tử, chữ ký số và xác thực VNeID).
+    • Thiết kế test case (bao gồm các luồng phê duyệt hồ sơ và ký giao dịch trên chuỗi).
+    • Đánh giá tính khả thi trong việc kiểm thử của yêu cầu cũng như của hệ thống.
+    • Chuẩn bị môi trường test (máy chủ Web, cơ sở dữ liệu PostgreSQL, IPFS Node local và cấp phát Token trên mạng Blockchain Testnet) cũng như xác định các công cụ kiểm thử tương ứng.
+    5. Giải pháp kiểm thử an toàn thông tin
+    • Thực hiện thuê chuyên gia/ tổ chức đánh giá an toàn thông tin hệ thống phần mềm trước khi đưa vào sử dụng.
+    • Thực hiện xác định cấp độ an toàn hệ thống thông tin theo khoản 1 Điều 5 Nghị định số 85/2016/NĐ-CP và xây dựng phương án bảo đảm an toàn thông tin theo hướng dẫn tại Thông tư số 12/2022/TT-BTTTT ngày 12/8/2022 của Bộ Thông tin và Truyền thông (nay là Bộ Khoa học và Công nghệ).
+V. Danh mục các chuẩn, tiêu chuẩn áp dụng
+Dựa vào các tiêu chuẩn về ứng dụng CNTT trong cơ quan Nhà nước theo Thông tư 39/2017/TT-BTTTT ngày 15/12/2017 của Bộ Thông tin và Truyền thông về việc công bố danh mục tiêu chuẩn kỹ thuật về ứng dụng CNTT trong cơ quan nhà nước, sử dụng các tiêu chuẩn sau:
+    • Tiêu chuẩn về kết nối
+    • Truyền siêu văn bản an toàn (HTTPS / HTTP/2 và WebSockets - WSS): Áp dụng cho việc trao đổi dữ liệu mã hóa giữa trình duyệt máy trạm (Web/Mobile App) và máy chủ API. WebSockets được bổ sung để duy trì kết nối thời gian thực, giúp cập nhật ngay lập tức trạng thái phê duyệt hồ sơ hoặc trạng thái giao dịch (Transaction) trên chuỗi khối.
+    • Giao tiếp Mạng lưới Chuỗi khối (JSON-RPC / Web3 API): Tiêu chuẩn cốt lõi dành riêng cho dự án, cho phép ứng dụng (Frontend/Backend) giao tiếp với các máy chủ Blockchain Node để đọc trạng thái Hợp đồng thông minh (Smart Contract) và gửi yêu cầu xác thực giao dịch sổ đỏ.
+    • Truyền và lưu trữ tệp tin phân tán (IPFS Protocol / HTTPS Gateway): Thay thế giao thức FTP truyền thống. Sử dụng để tải lên (Pinning) và tải xuống các tệp tin dung lượng lớn (bản scan sổ đỏ, hồ sơ pháp lý) từ mạng lưới lưu trữ phân tán IPFS, đảm bảo dữ liệu không bị nghẽn cổ chai và chống giả mạo hiệu quả.
+    • Trao đổi dữ liệu và Tích hợp hệ thống (RESTful API / JSON): Thay thế giao thức SOAP/XML cũ bằng chuẩn RESTful API linh hoạt, tốc độ cao. Sử dụng để kết nối liên thông, chia sẻ dữ liệu với Hệ thống định danh điện tử VNeID và các cơ sở dữ liệu quốc gia khác.
+    • Truyền thư điện tử và Thông báo (SMTP / Push Notification): Sử dụng để gửi email hoặc thông báo đẩy tự động tới người dân và cán bộ địa chính mỗi khi hồ sơ chuyển bước hoặc có giao dịch mới phát sinh cần ký duyệt.
+    • Giao thức mạng ngang hàng (P2P - Peer to Peer): Tiêu chuẩn kết nối hạ tầng bắt buộc giữa các Blockchain Node và IPFS Node trong hệ thống, giúp đồng bộ sổ cái (Ledger) và trạng thái mạng lưới liên tục mà không phụ thuộc vào một máy chủ trung tâm duy nhất.
+    • Dịch vụ đồng bộ thời gian (NTP v3): Thống nhất và đồng bộ mốc thời gian chung cho toàn bộ các máy chủ trong hệ thống. Điều này đặc biệt quan trọng trong công nghệ Blockchain để đảm bảo tính chính xác của dấu thời gian (Timestamp) khi đóng gói các Block và ghi nhận lịch sử giao dịch bất động sản.
+
+    • Tiêu chuẩn tích hợp dữ liệu
+        ◦ Định dạng dữ liệu trao đổi (JSON - JavaScript Object Notation): Thay thế hoàn toàn cho XML. Đây là tiêu chuẩn định dạng dữ liệu chính để trao đổi giữa máy trạm (Web/Mobile App), máy chủ API (Backend) và các hệ thống liên thông bên ngoài (như VNeID, CSDL Đất đai Quốc gia). JSON có ưu điểm là dung lượng nhẹ, tốc độ phân tích (parsing) nhanh và tương thích hoàn toàn với các thư viện Web3.
+        ◦ Giao diện nhị phân ứng dụng (ABI - Application Binary Interface): Tiêu chuẩn cốt lõi và bắt buộc trong công nghệ Blockchain. Được sử dụng để định nghĩa cấu trúc dữ liệu, định dạng các hàm (functions) và sự kiện (events) nhằm phục vụ việc mã hóa/giải mã dữ liệu giao tiếp giữa ứng dụng ngoài chuỗi (Off-chain) và Hợp đồng thông minh (Smart Contract) trên chuỗi (On-chain).
+        ◦ Tiêu chuẩn cấu trúc tài sản số (ERC-721 / ERC-1155 hoặc tiêu chuẩn tương đương trên mạng EVM): Thay thế cho các tiêu chuẩn giao dịch điện tử cũ. Sử dụng để chuẩn hóa cấu trúc dữ liệu của hồ sơ bất động sản (sổ đỏ) khi được số hóa (Tokenization) thành các tài sản độc bản (NFT), phục vụ cho các giao dịch chuyển quyền sở hữu, thế chấp một cách minh bạch.
+        ◦ Định nghĩa lược đồ API (JSON Schema / OpenAPI Specification 3.0): Thay thế cho XML Schema. Sử dụng để mô tả, tài liệu hóa cấu trúc dữ liệu đầu vào/đầu ra và xác thực tự động (Validation) cho các cổng giao tiếp RESTful API.
+        ◦ Tiêu chuẩn Metadata phi tập trung: Tiêu chuẩn cấu trúc dữ liệu mô tả (Metadata) JSON được lưu trữ trên mạng lưới IPFS. Dữ liệu này chứa các đường dẫn (URI) liên kết trực tiếp tới bản scan sổ đỏ gốc, đảm bảo tính liên kết chặt chẽ giữa tài sản On-chain và tài liệu Off-chain.
+        ◦ Mô hình hóa hệ thống (UML v2.5 & Smart Contract Architecture): Kế thừa tiêu chuẩn UML cho việc phân tích và thiết kế hệ thống tổng thể. Bổ sung thêm các lưu đồ tương tác trạng thái (State Machine Diagram) đặc thù để thiết kế vòng đời và giới hạn bảo mật của Hợp đồng thông minh.
+        ◦ Trình diễn bộ ký tự (UTF-8): Tiêu chuẩn bắt buộc được áp dụng đồng bộ trên toàn hệ thống (từ Frontend, Backend, Database cho đến Metadata trên IPFS) để mã hóa và hiển thị chính xác các thông tin hồ sơ, tên người dùng bằng tiếng Việt có dấu.
+
+    • Tiêu chuẩn về truy cập thông tin
+        ◦ Chuẩn nội dung web (HTML5): Tiêu chuẩn hiện đại thay thế cho HTML v4.01, được sử dụng để xây dựng cấu trúc và trình diễn nội dung giao diện ứng dụng (Web App/dApp) của hệ thống quản lý đất đai.
+        ◦ Chuẩn tương tác ứng dụng phi tập trung (Thư viện Web3 như Ethers.js / Viem): Bổ sung và thay thế cho các chuẩn nội dung mở rộng cũ (XHTML). Các tiêu chuẩn này được sử dụng để kết nối giao diện người dùng (Frontend) với ví điện tử và tương tác trực tiếp với các Hợp đồng thông minh (Smart Contract) trên mạng lưới Blockchain.
+        ◦ Giao diện người dùng (CSS3 / Framework hiện đại như Tailwind CSS): Thay thế cho CSS2 và XSL truyền thống. Sử dụng để thiết kế giao diện đáp ứng (Responsive Design), đảm bảo hệ thống hiển thị linh hoạt và tối ưu trên cả thiết bị máy tính lẫn thiết bị di động của người dân và cán bộ.
+        ◦ Văn bản và tài liệu pháp lý (.pdf, .docx, .txt): Định dạng .pdf được thiết lập làm tiêu chuẩn bắt buộc đối với các bản scan Sổ đỏ, quyết định giao đất, hồ sơ pháp lý. Việc sử dụng định dạng này giúp đảm bảo tính nguyên vẹn của tài liệu trước khi thực hiện mã băm (Hash) và đẩy lên lưu trữ bất biến trên mạng lưới phân tán IPFS. Các định dạng còn lại dùng cho các văn bản đính kèm hoặc hướng dẫn sử dụng.
+        ◦ Bảng tính (.csv, .xlsx): Sử dụng cho việc kết xuất dữ liệu báo cáo, thống kê tình hình tiếp nhận hồ sơ, lịch sử giao dịch bất động sản và các số liệu quản lý nội bộ của cơ quan chức năng.
+        ◦ Ảnh đồ họa và Siêu dữ liệu (.jpeg, .png, .svg, .webp): Sử dụng cho việc hiển thị các biểu tượng, hình ảnh trên giao diện hệ thống. Ngoài ra, các định dạng này cũng được dùng để hiển thị hình ảnh đại diện minh chứng (Metadata Image) cho các tài sản số hóa (NFT) liên kết trực tiếp với hồ sơ đất đai.
+
+    • Tiêu chuẩn về bảo mật thông tin
+        ◦ An toàn tầng giao vận và truyền tải dữ liệu (TLS v1.3 / HTTPS): Nâng cấp từ các chuẩn cũ (TLS 1.2/FTPS) để mã hóa toàn bộ luồng thông tin trao đổi giữa trình duyệt người dùng (Web/Mobile App), hệ thống máy chủ API và các cổng kết nối liên thông (VNeID), ngăn chặn tuyệt đối rủi ro đánh chặn hay nghe lén dữ liệu (Man-in-the-Middle).
+        ◦ Tiêu chuẩn Mã hóa và Chữ ký số Blockchain (ECDSA / Ed25519 & SHA-256): Tiêu chuẩn cốt lõi và bắt buộc của dự án. Áp dụng thuật toán băm SHA-256 để mã hóa nội dung hồ sơ/sổ đỏ thành các dải ký tự duy nhất (Hash). Đồng thời, sử dụng thuật toán mã hóa đường cong elliptic (ECDSA) cho việc cấp phát ví điện tử và ký duyệt giao dịch (Transaction), đảm bảo tính toàn vẹn và chống chối bỏ đối với mọi thay đổi pháp lý.
+        ◦ Bảo mật thư điện tử và Thông báo (SPF, DKIM, DMARC & S/MIME v3.2): Áp dụng đồng bộ bộ tiêu chuẩn này để xác thực và bảo mật các email thông báo tiến độ xử lý hồ sơ gửi đến người dân và cán bộ, đảm bảo luồng thông tin liên lạc chính thống không bị giả mạo (Phishing).
+        ◦ Bảo mật quản trị hạ tầng (SSH v2.0 kết hợp mạng riêng ảo VPN): Sử dụng thiết lập các kênh kết nối mã hóa an toàn ở mức cao nhất dành riêng cho đội ngũ kỹ trị khi truy cập vào hệ thống máy chủ Backend, Cơ sở dữ liệu và cụm Node phân tán.
+        ◦ An toàn giao tiếp mạng ngang hàng (Noise Protocol Framework / WebRTC): Tiêu chuẩn bảo mật lớp mạng áp dụng riêng cho mạng lưới Blockchain và IPFS. Khung giao thức này giúp mã hóa các luồng trao đổi dữ liệu phân tán giữa các Node, bảo vệ hệ thống sổ cái (Ledger) khỏi các cuộc tấn công làm sai lệch trạng thái hoặc tấn công từ chối dịch vụ (DDoS).
+
+CHƯƠNG IV. THIẾT KẾ HỆ THỐNG
+    I. Mô hình tổng thể hệ thống
+        1. Mô hình logic
+Phần mềm bao gồm các phân hệ chức năng chính sau:
+    • Định danh & Xác thực: Tích hợp cổng định danh quốc gia VNeID để xác thực công dân và liên kết địa chỉ ví Blockchain duy nhất.
+    • Số hóa & Quản lý tài sản: Chuyển đổi thông tin sổ đỏ thành tài sản số theo chuẩn ERC-721/1155 và lưu trữ bản scan trên mạng phân tán IPFS.
+    • Quy trình phê duyệt (Smart Contract): Tự động hóa luồng xử lý hồ sơ với cơ chế ký duyệt đa tầng (Multi-signature), yêu cầu sự đồng thuận từ nhiều cấp lãnh đạo trước khi ghi nhận lên chuỗi.
+    • Cấp phép và Tra cứu: Tự động sinh mã QR xác thực giấy phép điện tử và cung cấp bản đồ quy hoạch GIS công khai.
+    • Giao dịch & Thanh toán: Hỗ trợ ký hợp đồng mua bán điện tử, tự động rà soát tranh chấp (Pre-check) và tính toán thuế, lệ phí trước bạ.
+    • Truy xuất nguồn gốc: Hiển thị dòng thời gian lịch sử biến động, giao dịch của thửa đất một cách minh bạch.
+    • Quản trị hệ thống: Phân quyền người dùng, quản lý danh mục Smart Contract và giám sát hạ tầng IPFS/Node.
+    • Tích hợp với hệ thống quốc gia: Đồng bộ dữ liệu với CSDL Đất đai và cổng xác thực VNeID thông qua RESTful API.
+
+
+        2. Mô hình kiến trúc vật lý
+Trên cơ sở kiến trúc ứng dụng Web3, mô hình kiến trúc vật lý được thiết kế theo dạng lai để tối ưu hóa hiệu năng và bảo mật dữ liệu.
+
+    • Cụm máy chủ ứng dụng (Web/API Server): Hoạt động theo cơ chế cân bằng tải để tiếp nhận yêu cầu từ người dùng.
+    • Hệ quản trị CSDL (PostgreSQL): Lưu trữ dữ liệu ngoài chuỗi như thông tin người dùng và cấu hình hệ thống.
+    • Cụm lưu trữ phân tán IPFS: Lưu trữ và bảo vệ các tệp tin hồ sơ nặng (bản scan sổ đỏ).
+    • Mạng lưới Blockchain (Vietchain/Testnet): Các Node RPC thực thi Smart Contract và lưu trữ trạng thái sở hữu tài sản.
+    • Kênh truyền an toàn: Đảm bảo an ninh cho mọi giao tiếp giữa các thành phần trong hệ thống và cổng xác thực VNeID.
+Hệ thống cung cấp các Web3 API và JSON-RPC để các cơ quan liên quan (Thuế, Công chứng, Ngân hàng) có thể truy cập và đối soát dữ liệu theo thời gian thực.
+    II. Thiết kế chi tiết
+        1. Danh sách tác nhân
+STT
+Tên tác nhân
+Mô tả tác nhân
+1
+Người dân (ND)
+Định danh và kết nối; Quản lý hồ sơ; Giao dịch bất động sản; Tra cứu và kiểm tra
+2
+Cán bộ thụ lý (CB)
+Xử lý hồ sơ; Quản lý luân chuyển; Tra cứu và báo cáo
+3
+Lãnh đạo phê duyệt (LĐ)
+Phê duyệt hồ sơ; Giám sát và quản lý; Phê quyệt số hóa tài sản
+4
+Cảnh sát / Cán bộ kiểm tra (CS)
+Kiểm tra thực địa; tra cứu chuyên sâu; xử lý vi phạm
+5
+Quản trị viên (AD)
+Quản trị hệ thống và dữ liệu; Cấu hình tham số hệ thống; Quản trị bảo mật và người dùng
+
+        2. Chuyển đổi yêu cầu chức năng 
+        II.1. Xây dựng phần mềm
+STT
+Yêu cầu chức năng
+Tác nhân chính
+Tác nhân phụ
+Giao dịch (Transaction)
+Phân loại theo BMT
+Phân loại theo độ phức tạp
+I
+Nhóm chức năng Định danh & Quản lý tài khoản
+
+
+
+
+
+1
+Đăng nhập và xác thực qua VNeID
+ND, CB, LĐ, CS, AD
+
+
+B
+Trung bình
+
+
+
+
+Đăng nhập hệ thống bằng cổng VneID
+
+
+
+
+
+
+Hiển thị thông báo khi xác thực thất bại
+
+
+
+
+
+
+Đăng xuất khỏi hệ thống an toàn
+
+
+2
+Quản lý liên kết ví Blockchain
+ND, CB, LĐ
+AD
+
+B
+Trung bình
+
+
+
+
+Liên kết ví MetaMask với tài khoản định danh
+
+
+
+
+
+
+Gửi yêu cầu khôi phục liên kết ví khi mất Private Key
+
+
+
+
+
+
+Ký duyệt (Lãnh đạo) ghi đè địa chỉ ví mới
+
+
+3
+Quản lý tài khoản cá nhân
+ND, CB, LĐ, AD
+
+
+B
+Đơn giản
+
+
+
+
+Cập nhật số điện thoại hoặc email khôi phục
+
+
+
+
+
+
+Nhận mã OTP xác thực thay đổi thông tin
+
+
+
+
+
+
+Đăng xuất khỏi hệ thống an toàn
+
+
+II
+Nhóm chức năng Số hóa tài sản và Xử lý hồ sơ
+
+
+
+
+
+4
+Khởi tạo & Quản lý hồ sơ số
+ND
+CB
+
+B
+Trung bình
+
+
+
+
+Upload hồ sơ số hóa (bản vẽ, sổ đỏ)
+
+
+
+
+
+
+Lưu hồ sơ ở dạng bản nháp
+
+
+5
+
+Quản lý lưu trữ IPFS
+
+CB
+AD
+
+B
+Trung bình
+
+
+
+
+Đẩy file lên IPFS và lấy mã CID
+
+
+
+
+
+
+Cảnh báo khi file upload bị lỗi/timeout
+
+
+6
+
+Đối soát & Làm sạch dữ liệu (Data Cleansing)
+
+CB
+
+ND, LĐ
+
+
+B
+Phức tạp
+
+
+
+
+Xem danh sách hồ sơ chờ đối soát
+
+
+
+
+
+
+Cập nhật thông tin bản vẽ kỹ thuật
+
+
+
+
+
+
+Yêu cầu bổ sung hồ sơ
+
+
+
+
+
+
+Từ chối hồ sơ kèm lý do chi tiết
+
+
+
+
+
+
+In biên bản đối soát dữ liệu ra giấy
+
+
+III
+Nhóm chức năng Quản lý giao dịch & Phê duyệt (Smart Contract)
+
+
+
+
+
+7
+Phê duyệt hồ sơ đa tầng (Multi-signature)
+LĐ
+CB
+
+B
+Phức tạp
+
+
+
+
+Xem danh sách hồ sơ chờ duyệt
+
+
+
+
+
+
+Ký số phê duyệt hồ sơ (cần 2 CB + 1 LĐ)
+
+
+
+
+
+
+Ký số hàng loạt (Batch Signing) cho hồ sơ đơn giản
+
+
+
+
+
+
+Hủy bỏ lệnh ký duyệt khi phát hiện sai sót
+
+
+8
+Quản lý Mint NFT & Cấp phép điện tử
+LĐ, AD
+ND
+
+B
+Phức tạp
+
+
+
+
+Thực hiện lệnh "Mint NFT" cho thửa đất
+
+
+
+
+
+
+Xem danh sách bất động sản đang sở hữu
+
+
+
+
+
+
+Yêu cầu trích xuất bản sao điện tử có chữ ký số
+
+
+9
+Quản lý Hợp đồng mua bán điện tử
+ND, CB
+
+
+B
+Trung Bình
+
+
+
+
+Khởi tạo hợp đồng mua bán điện tử
+
+
+
+
+
+
+Hủy yêu cầu giao dịch khi chưa có bên nào ký duyệ
+
+
+IV
+Nhóm chức năng Kiểm tra pháp lý & Đóng thuế tự động
+
+
+
+
+
+10 
+Rà soát tự động (Pre-check)
+ND, CB
+AD
+
+B
+Trung bình
+
+
+
+
+Chạy công cụ rà soát tự động tình trạng đất (tranh chấp, thế chấp)
+
+
+
+
+
+
+Xem cảnh báo rủi ro giao dịch
+
+
+11
+Tính toán Thuế & Phí tự động
+ND
+AD
+
+B
+Trung bình
+
+
+
+
+Xem ước tính thuế TNCN và lệ phí trước bạ
+
+
+
+
+
+
+Thực hiện thanh toán Thuế/Phí online
+
+
+12
+Quy hoạch & Tra cứu nguồn gốc
+ND, CB, LĐ, CS
+
+
+B
+Trung bình
+
+
+
+
+Tìm kiếm thửa đất theo địa chỉ/số tờ/số thửa
+
+
+
+
+
+
+Xem bản đồ quy hoạch công khai trực quan
+
+
+
+
+
+
+Xem dòng thời gian (Timeline) lịch sử biến động thửa đất
+
+
+V
+Nhóm chức năng Kiểm tra thực địa & Cảnh báo (Dành cho Cảnh sát)
+
+
+
+
+
+13
+Quét QR Code Verification
+CS 
+ND
+
+B
+Trung bình
+
+
+
+
+Quét mã QR kiểm tra tính hợp lệ của giấy phép
+
+
+
+
+
+
+Xem vị trí thửa đất trực quan trên bản đồ
+
+
+
+
+
+
+Xem lịch sử tranh chấp cũ của thửa đất
+
+
+14
+Quản lý Báo cáo sai phạm
+CS
+LĐ, AD
+
+B
+Đơn giản
+
+
+
+
+Báo cáo hành vi gian lận thông tin ngay trên App
+
+
+VI
+Nhóm chức năng Quản trị hệ thống 
+
+
+
+
+
+15
+Dashboard & Báo cáo thời gian thực
+AD, LĐ
+CB
+
+B
+Đơn giản
+
+
+
+
+Theo dõi Dashboard biểu đồ hồ sơ tồn đọng
+
+
+
+
+
+
+Xem báo cáo so sánh hiệu suất giữa các phòng ban
+
+
+
+
+
+
+Theo dõi lưu lượng giao dịch và phí Gas trên mạng lưới
+
+
+
+
+
+
+
+
+
+16
+Quản lý Cán bộ & Phân quyền
+AD
+
+
+B
+Trung Bình
+
+
+
+
+Xem danh sách Cán bộ và Lãnh đạo
+
+
+
+
+
+
+Thêm mới/Chỉnh sửa/Vô hiệu hóa tài khoản cán bộ
+
+
+
+
+
+
+Phân quyền truy cập hệ thống
+
+
+17
+Nhật ký kiểm toán & Bảo mật
+AD
+
+
+B
+Trung bình
+
+
+
+
+Tra cứu nhật ký hành động (Audit log) của cán bộ
+
+
+
+
+
+
+Chạy kiểm tra định kỳ tính nhất quán của dữ liệu (Consistency Check)
+
+
+
+
+
+
+Tự động sao lưu (Backup) dữ liệu Database nội bộ
+
+
+18
+Quản trị Cấu hình & Hạ tầng
+AD
+
+Cấu hình các tham số động (Thuế, Phí)
+B
+Trung bình
+
+
+
+
+Quản lý danh sách các Smart Contract đang vận hành (Tạm dừng/Hoạt động)
+
+
+
+
+
+
+Xem biểu đồ tải lượng của IPFS Node
+
+
+
+
+
+
+Kiểm tra tính hợp lệ của mã CID trên IPFS
+
+
+19
+Hệ thống Thông báo
+ND, CB, LĐ, AD
+
+
+B
+Đơn giản
+
+
+
+
+Nhận thông báo thời gian thực về tiến độ hồ sơ
+
+
+
+
+
+
+Xem lại lịch sử các thông báo đã nhận
+
+
+
+
+
+
+Cấu hình thời gian tự động khóa hồ sơ nếu không xử lý (SLA)
+
+
+20
+Báo cáo đăng nhập hệ thống
+AD
+
+
+B
+Đơn giản
+
+
+
+
+Xem danh sách đăng nhập 
+
+
+
+
+
+
+Xuất File Excel nhật ký đăng nhập
+
+
+Bảng x. Bảng chuyển đổi yêu cầu chức năng Usecase của phần mềm
+        II.2. Kiểm thử phần mềm
+        3. Mô tả chi tiết các Use case
+Biểu đồ Usecase Người dân
+
+Biểu đồ Usecase Cán bộ
+
+Biểu đồ Usecase Lãnh đạo
+
+Biểu đồ Usecase Cảnh sát
+
+Biểu đồ Usecase Quản trị viên
+
+        4. Mô tả chi tiết từng Use case
+Đối với chi tiết đặc tả các Use case tham khảo tại phụ lục 1.
+    III. Thiết kế cơ sở dữ liệu
+        1. Mô hình cơ sở dữ liệu
+        I.1. Định nghĩa các bảng
+Bảng x. Định nghĩa các bảng
+STT
+Tên bảng
+Mục đích của bảng
+Ghi chú
+1
+Roles
+Phân loại các nhóm quyền truy cập trong hệ thống.
+Các nhóm: Người dân, Cán bộ, Lãnh đạo, Cảnh sát, Admin.
+2
+Users
+Quản lý thông tin người dùng, định danh điện tử.
+Map trực tiếp với số CCCD qua hệ thống VNeID.
+3
+Wallets
+Liên kết địa chỉ ví MetaMask (Web3) với tài khoản người dùng.
+Mapping 1-1, ví này dùng để chứa NFT và ký giao dịch.
+4
+Wallet_Recovery_Requests
+Xử lý luồng yêu cầu cấp lại/đổi địa chỉ ví khi bị mất.
+Cần qua quy trình xét duyệt của Lãnh đạo.
+5
+Land_Records
+Lưu thông tin hồ sơ đất đai thô (chưa lên Blockchain).
+Có trường is_frozen để khóa dữ liệu khi chốt duyệt.
+6
+Land_Record_Versions
+Lưu lịch sử các phiên bản chỉnh sửa tọa độ, diện tích (Lưu nháp).
+Phục vụ Audit Trail trong quá trình cán bộ đối soát.
+7
+Land_Files
+Quản lý các tệp đính kèm (Bản scan sổ đỏ, giấy tờ).
+Lưu mã CID trả về từ mạng lưu trữ phi tập trung IPFS.
+8
+Smart_Contracts
+Danh sách các Smart Contract đã triển khai lên chuỗi.
+Chứa địa chỉ và ABI để Backend gọi hàm tương tác.
+9
+Land_NFTs
+Đại diện cho "Sổ đỏ điện tử" (Tài sản số) trên Blockchain.
+Mỗi NFT có ID duy nhất, liên kết metadata IPFS và mã QR.
+10
+Cached_Provenance_Logs
+Lưu đệm (Local Cache) lịch sử biến động từ Event Logs của Blockchain.
+Tối ưu tốc độ tải và phục vụ tra cứu Offline cho cảnh sát.
+11
+Approval_Requests
+Quản lý các yêu cầu cần phê duyệt (Mint Sổ, Đổi ví).
+Điểm khởi đầu cho quy trình đa chữ ký (Multi-signature).
+12
+Signatures
+Lưu vết chữ ký/quyết định của từng người tham gia duyệt.
+Phục vụ cơ chế đa chữ ký (vd: 2 cán bộ + 1 lãnh đạo).
+13
+Transactions
+Quản lý các hợp đồng giao dịch, chuyển nhượng Sổ đỏ điện tử.
+Ghi nhận người mua, người bán, cán bộ chứng thực và giá.
+14
+Taxes_Fees
+Quản lý các khoản thuế thu nhập cá nhân, lệ phí trước bạ.
+Tính toán tự động dựa trên giá trị giao dịch ở bảng Transactions.
+15
+Receipts
+Lưu trữ biên lai và trạng thái thanh toán thuế phí.
+Gắn kèm mã TxHash giao dịch nộp tiền.
+16
+Planning_Zones
+Quản lý dữ liệu tọa độ các khu vực đang trong diện quy hoạch.
+Hỗ trợ tính năng kiểm tra tự động (Pre-check).
+17
+Land_Planning_Map
+Bảng trung gian ánh xạ hồ sơ đất đai với khu vực quy hoạch.
+Phát hiện rủi ro (Danger/Warning) trước khi cho phép giao dịch.
+18
+Disputes
+Ghi nhận các khiếu nại, tranh chấp liên quan đến một tài sản.
+Hệ thống sẽ tự động chặn giao dịch nếu Sổ đỏ có tranh chấp.
+19
+Mortgages
+Quản lý trạng thái thế chấp tài sản tại ngân hàng.
+Tương tự tranh chấp, khóa Sổ đỏ điện tử khi đang cắm ngân hàng.
+20
+Fraud_Reports
+Nơi cảnh sát báo cáo các sai phạm, gian lận phát hiện tại hiện trường.
+Có bằng chứng hình ảnh, chờ cấp trên duyệt để khóa tài sản.
+21
+System_Configs
+Lưu trữ các biến số cấu hình động (Tỷ lệ thuế, phí gas tối đa).
+Lưu giá trị cấu hình hiện hành để hệ thống lấy ra tính toán.
+22
+System_Config_Audits
+Nhật ký lưu vết mọi sự thay đổi đối với các biến số cấu hình.
+Xem được ai sửa, sửa lúc nào, giá trị cũ và giá trị mới.
+23
+Notifications
+Quản lý trung tâm thông báo gửi đến các nhóm người dùng.
+Cảnh báo hồ sơ sai lệch, tiến độ phê duyệt.
+24
+System_Logs
+Ghi log mọi hành động của người dùng trên phần mềm nội bộ (Web/App).
+Băm SHA-256 chống việc can thiệp xóa dấu vết.
+25
+Blockchain_Logs
+Nhật ký các giao dịch trực tiếp tương tác với mạng lưới Blockchain.
+Lưu trạng thái Success/Reverted và phí Gas thực tế.
+
+        I.2. Mô tả chi tiết các bảng
+        Role - Phân loại các nhóm quyền truy cập trong hệ thống.
+
+STT
+Tên trường
+Kiểu dữ liệu và kích thước
+Ràng buộc dữ liệu
+Ý nghĩa
+Ghi chú
+1
+id
+int
+Khóa chính (PK), Tự động tăng
+ID định danh duy nhất của vai trò
+
+2
+role_code
+varchar
+
+Mã vai trò
+Gồm các mã: ND (Người dân), CB (Cán bộ), LĐ (Lãnh đạo), CS (Cảnh sát), AD (Admin)
+3
+role_name
+varchar
+
+Tên hiển thị của vai trò
+
+4
+description
+text
+
+Mô tả chi tiết về quyền hạn của vai trò
+
+
+        Users - Lưu trữ thông tin định danh của người dùng hệ thống.
+STT
+Tên trường
+Kiểu dữ liệu và kích thước
+Ràng buộc dữ liệu
+Ý nghĩa
+Ghi chú
+1
+id
+int
+Khóa chính, Tự động tăng
+ID định danh người dùng
+
+2
+role_id
+int
+Khóa ngoại (Roles.id)
+Vai trò của người dùng
+
+3
+vneid_number
+varchar
+Duy nhất (Unique)
+Số CCCD định danh qua VNeID
+Thông tin quan trọng để liên kết định danh thực tế
+4
+full_name
+varchar
+
+Họ và tên đầy đủ
+
+5
+email
+varchar
+
+Địa chỉ email
+
+6
+phone
+varchar
+
+Số điện thoại liên hệ
+
+7
+status
+varchar
+
+Trạng thái tài khoản
+Active (Hoạt động), Inactive (Khóa/Chưa kích hoạt)
+8
+created_at
+timestamp
+
+
+
+
+        Wallets - Liên kết 1-1 giữa người dùng thật và ví tiền mã hóa.
+STT
+Tên trường
+Kiểu dữ liệu và kích thước
+Ràng buộc dữ liệu
+Ý nghĩa
+Ghi chú
+1
+wallet_address
+varchar
+Khóa chính
+Địa chỉ ví tiền điện tử
+VD: Ví MetaMask
+2
+user_id
+int
+Duy nhất, Khóa ngoại (Users.id)
+Chủ sở hữu ví
+Mapping 1-1 với VNeID của người dùng
+3
+status
+varchar
+
+Trạng thái của ví
+Active, Locked, Replaced
+4
+created_at
+timestamp
+
+Thời gian liên kết ví
+
+
+        Wallet_Recovery_Requests - Lưu trữ các yêu cầu đổi địa chỉ ví khi người dùng bị mất     quyền truy cập ví cũ.
+STT
+Tên trường
+Kiểu dữ liệu và kích thước
+Ràng buộc dữ liệu
+Ý nghĩa
+Ghi chú
+1
+id
+int
+Khóa chính, Tự động tăng
+Mã yêu cầu
+
+2
+user_id
+int
+Khóa ngoại (Users.id)
+Người yêu cầu khôi phục
+
+3
+old_wallet_address
+varchar
+
+Địa chỉ ví cũ bị mất
+
+4
+new_wallet_address
+varchar
+
+Địa chỉ ví mới
+
+5
+status
+varchar
+
+Trạng thái yêu cầu
+Pending, Approved, Rejected
+6
+approved_by
+int
+Khóa ngoại (Users.id)
+ID của lãnh đạo phê duyệt
+
+7
+created_at
+timestamp
+
+Thời gian tạo yêu cầu
+
+8
+resolved_at
+timestamp
+
+Thời gian xử lý xong
+
+
+        Land_Records - Quản lý thông tin cốt lõi của mảnh đất trước và trong khi Mint thành NFT.
+STT
+Tên trường
+Kiểu dữ liệu và kích thước
+Ràng buộc dữ liệu
+Ý nghĩa
+Ghi chú
+1
+id
+int
+Khóa chính, Tự động tăng
+Mã hồ sơ đất đai
+
+2
+owner_id
+int
+Khóa ngoại (Users.id)
+Chủ sở hữu mảnh đất
+Người dân tạo hồ sơ
+3
+address
+text
+
+Địa chỉ mảnh đất
+
+4
+area
+decimal
+
+Diện tích đất
+
+5
+gps_coordinates
+text
+
+Tọa độ GPS
+Tọa độ điểm hoặc Polygon hiện hành
+6
+is_frozen
+boolean
+Mặc định: false
+Trạng thái đóng băng dữ liệu
+Khi được đánh dấu là cấm sửa đổi
+7
+status
+varchar
+
+Trạng thái hồ sơ
+Draft, Chờ đối soát, Cần bổ sung, Đã đối soát, Đã Mint
+8
+created_at
+timestamp
+
+Thời gian tạo hồ sơ
+
+9
+updated_at
+timestamp
+
+Thời gian cập nhật gần nhất
+
+
+        Land_Record_Versions - Lưu trữ các phiên bản thay đổi thông số của hồ sơ đất đai để đối soát.
+STT
+Tên trường
+Kiểu dữ liệu và kích thước
+Ràng buộc dữ liệu
+Ý nghĩa
+Ghi chú
+1
+id
+int
+Khóa chính, Tự động tăng
+ID phiên bản
+
+2
+record_id
+int
+Khóa ngoại (Land_Records.id)
+Hồ sơ được chỉnh sửa
+
+3
+editor_id
+int
+Khóa ngoại (Users.id)
+Người chỉnh sửa
+Cán bộ thực hiện đối soát/chỉnh sửa
+4
+old_area
+decimal
+
+Diện tích cũ
+
+5
+new_area
+decimal
+
+Diện tích mới
+
+6
+old_gps_coordinates
+text
+
+Tọa độ cũ
+
+7
+new_gps_coordinates
+text
+
+Tọa độ mới
+
+8
+edit_reason
+text
+
+Lý do chỉnh sửa
+
+9
+version_number
+int
+
+Số thứ tự phiên bản
+
+10
+created_at
+timestamp
+
+Thời điểm thực hiện
+
+
+        Land_Files - Lưu trữ bản đồ, sổ hồng (scan) của hồ sơ. Tệp thực tế lưu trên IPFS.
+STT
+Tên trường
+Kiểu dữ liệu và kích thước
+Ràng buộc dữ liệu
+Ý nghĩa
+Ghi chú
+1
+id
+int
+Khóa chính, Tự động tăng
+ID file đính kèm
+
+2
+record_id
+int
+Khóa ngoại (Land_Records.id)
+Thuộc hồ sơ nào
+
+3
+file_name
+varchar
+
+Tên file
+
+4
+file_type
+varchar
+
+Định dạng file
+JPG, PDF, PNG
+5
+ipfs_cid
+varchar
+Duy nhất
+Mã lưu trữ phi tập trung
+CID lưu trữ trên IPFS
+6
+uploaded_by
+int
+Khóa ngoại (Users.id)
+Người tải lên
+
+7
+created_at
+timestamp
+
+Thời gian tải file
+
+
+        Smart_Contracts - Lưu trữ thông tin về các Smart Contract được triển khai trên hệ thống.
+STT
+Tên trường
+Kiểu dữ liệu và kích thước
+Ràng buộc dữ liệu
+Ý nghĩa
+Ghi chú
+1
+contract_address
+varchar
+Khóa chính
+Địa chỉ hợp đồng
+
+2
+name
+varchar
+
+Tên hợp đồng
+Core, NFT, Multi-sig, Transaction
+3
+abi
+text
+
+Giao diện nhị phân (ABI)
+Dùng để tương tác với Contract
+4
+version
+varchar
+
+Phiên bản hợp đồng
+
+5
+status
+varchar
+
+Trạng thái hoạt động
+Active, Paused
+6
+deployed_at
+timestamp
+
+Thời gian deploy
+
+
+        Land_NFTs - Chứa thông tin của giấy chứng nhận quyền sử dụng đất sau khi được mã hóa (Mint) thành NFT.
+STT
+Tên trường
+Kiểu dữ liệu và kích thước
+Ràng buộc dữ liệu
+Ý nghĩa
+Ghi chú
+1
+token_id
+varchar
+Khóa chính
+ID của NFT
+
+2
+record_id
+int
+Duy nhất, Khóa ngoại (Land_Records.id)
+ID hồ sơ gốc
+
+3
+contract_address
+varchar
+Khóa ngoại (Smart_Contracts)
+Contract quản lý NFT này
+
+4
+owner_wallet
+varchar
+Khóa ngoại (Wallets.wallet_address)
+Ví đang sở hữu NFT
+
+5
+metadata_uri
+varchar
+
+Đường dẫn dữ liệu metadata
+Link chứa CID trên IPFS
+6
+qr_code
+varchar
+Duy nhất
+Chuỗi/Link tạo mã QR
+Phục vụ tra cứu nhanh
+7
+mint_tx_hash
+varchar
+Khóa ngoại (Blockchain_Logs)
+Mã giao dịch Mint
+
+8
+status
+varchar
+
+Trạng thái tài sản
+Normal, Trading (đang GD), Locked (Khóa)
+9
+mint_date
+timestamp
+
+Ngày tạo (Mint) NFT
+
+
+        Cached_Provenance_Logs - Đồng bộ lịch sử từ Blockchain về DB để tăng tốc độ truy vấn và phục vụ offline.
+STT
+Tên trường
+Kiểu dữ liệu và kích thước
+Ràng buộc dữ liệu
+Ý nghĩa
+Ghi chú
+1
+id
+int
+Khóa chính, Tự động tăng
+ID dòng log
+
+2
+token_id
+varchar
+Khóa ngoại (Land_NFTs.token_id)
+NFT có biến động
+Tra cứu offline qua QR cho Cảnh sát
+3
+event_type
+varchar
+
+Loại sự kiện
+Transfer, Area_Change, Dispute_Resolved
+4
+event_data
+text
+
+Dữ liệu chi tiết
+Chuỗi JSON chứa chi tiết từ Blockchain
+5
+tx_hash
+varchar
+Khóa ngoại (Blockchain_Logs)
+Mã giao dịch blockchain
+
+6
+block_number
+int
+
+Số block ghi nhận sự kiện
+
+7
+cached_at
+timestamp
+
+Thời điểm đồng bộ cache
+
+
+        Approval_Requests - Quản lý các quy trình cần nhiều người duyệt (Multi-sig) như Mint NFT hay khôi phục ví.
+STT
+Tên trường
+Kiểu dữ liệu và kích thước
+Ràng buộc dữ liệu
+Ý nghĩa
+Ghi chú
+1
+id
+int
+Khóa chính, Tự động tăng
+Mã yêu cầu phê duyệt
+
+2
+record_id
+int
+Khóa ngoại (Land_Records.id)
+ID hồ sơ liên quan
+
+3
+request_type
+varchar
+
+Loại yêu cầu
+Mint_NFT, Recover_Wallet
+4
+status
+varchar
+
+Trạng thái yêu cầu
+Pending, Approved, Rejected, Reverted
+5
+created_at
+timestamp
+
+Thời gian tạo yêu cầu
+
+
+        Signatures - Lưu các quyết định duyệt/từ chối chi tiết của từng cán bộ/lãnh đạo cho một Yêu cầu.
+STT
+Tên trường
+Kiểu dữ liệu và kích thước
+Ràng buộc dữ liệu
+Ý nghĩa
+Ghi chú
+1
+id
+int
+Khóa chính, Tự động tăng
+ID chữ ký
+
+2
+request_id
+int
+Khóa ngoại (Approval_Requests.id)
+Thuộc yêu cầu nào
+
+3
+user_id
+int
+Khóa ngoại (Users.id)
+Người ký
+
+4
+decision
+varchar
+
+Quyết định
+Approved (Đồng ý), Rejected (Từ chối)
+5
+reason
+text
+
+Lý do
+Bắt buộc nếu Rejected
+6
+sign_tx_hash
+varchar
+
+Hash giao dịch ký (nếu có)
+Trên blockchain
+7
+signed_at
+timestamp
+
+Thời gian ký
+
+
+        Transactions - Quản lý tiến trình mua bán đất đai giữa các bên.
+STT
+Tên trường
+Kiểu dữ liệu và kích thước
+Ràng buộc dữ liệu
+Ý nghĩa
+Ghi chú
+1
+id
+int
+Khóa chính, Tự động tăng
+Mã giao dịch nội bộ
+
+2
+token_id
+varchar
+Khóa ngoại (Land_NFTs.token_id)
+NFT được giao dịch
+
+3
+seller_id
+int
+Khóa ngoại (Users.id)
+Người bán
+
+4
+buyer_id
+int
+Khóa ngoại (Users.id)
+Người mua
+
+5
+certifier_id
+int
+Khóa ngoại (Users.id)
+Cán bộ chứng thực
+
+6
+contract_price
+decimal
+
+Giá trị hợp đồng
+
+7
+status
+varchar
+
+Trạng thái giao dịch
+Pre-check, Draft, Signed, Completed, Cancelled
+8
+created_at
+timestamp
+
+Ngày tạo giao dịch
+
+9
+completed_at
+timestamp
+
+Ngày hoàn tất giao dịch
+
+
+        Taxes_Fees - Các khoản thuế phát sinh từ một giao dịch.
+STT
+Tên trường
+Kiểu dữ liệu và kích thước
+Ràng buộc dữ liệu
+Ý nghĩa
+Ghi chú
+1
+id
+int
+Khóa chính, Tự động tăng
+ID khoản thuế/phí
+
+2
+transaction_id
+int
+Khóa ngoại (Transactions.id)
+Thuộc giao dịch nào
+
+3
+tax_type
+varchar
+
+Loại thuế/phí
+VD: TNCN (2%), Lệ phí trước bạ
+4
+amount
+decimal
+
+Số tiền phải đóng
+
+5
+status
+varchar
+
+Trạng thái thanh toán
+Unpaid (Chưa thanh toán), Paid (Đã thanh toán)
+6
+calculated_at
+timestamp
+
+Thời gian tính toán
+
+
+        Receipts - Lưu thông tin biên lai khi người dùng thanh toán thuế, phí.
+STT
+Tên trường
+Kiểu dữ liệu và kích thước
+Ràng buộc dữ liệu
+Ý nghĩa
+Ghi chú
+1
+id
+int
+Khóa chính, Tự động tăng
+Mã biên lai
+
+2
+tax_id
+int
+Khóa ngoại (Taxes_Fees.id)
+Thanh toán cho khoản thuế nào
+
+3
+payment_method
+varchar
+
+Phương thức thanh toán
+VD: Banking, Crypto, Tiền mặt
+4
+blockchain_tx_hash
+varchar
+
+Mã TX nếu thanh toán on-chain
+
+5
+paid_at
+timestamp
+
+Thời gian thanh toán
+
+
+        Planning_Zones - Lưu trữ thông tin các vùng bị quy hoạch để đối soát Pre-check.
+STT
+Tên trường
+Kiểu dữ liệu và kích thước
+Ràng buộc dữ liệu
+Ý nghĩa
+Ghi chú
+1
+id
+int
+Khóa chính, Tự động tăng
+ID khu vực quy hoạch
+
+2
+zone_name
+varchar
+
+Tên khu vực quy hoạch
+
+3
+description
+text
+
+Mô tả chi tiết
+
+4
+polygon_coordinates
+text
+
+Tọa độ đa giác vùng quy hoạch
+Dùng để check giao cắt (intersect) với đất
+5
+status
+varchar
+
+Trạng thái
+Đang hiệu lực, Đã hủy
+6
+updated_at
+timestamp
+
+Lần cập nhật gần nhất
+
+
+        Land_Planning_Map - Bảng trung gian thể hiện mảnh đất có nằm trong vùng quy hoạch hay không.
+STT
+Tên trường
+Kiểu dữ liệu và kích thước
+Ràng buộc dữ liệu
+Ý nghĩa
+Ghi chú
+1
+record_id
+int
+Khóa chính (Composite), Khóa ngoại
+ID hồ sơ đất đai
+
+2
+zone_id
+int
+Khóa chính (Composite), Khóa ngoại
+ID khu vực quy hoạch
+
+3
+status
+varchar
+
+Cảnh báo quy hoạch
+Safe, Warning (Chạm viền), Danger (Nằm trọn trong QH)
+
+        Disputes - Hệ thống ghi nhận tranh chấp, khi có tranh chấp tài sản (NFT) sẽ bị cấm giao dịch.
+STT
+Tên trường
+Kiểu dữ liệu và kích thước
+Ràng buộc dữ liệu
+Ý nghĩa
+Ghi chú
+1
+id
+int
+Khóa chính, Tự động tăng
+ID đơn tranh chấp
+
+2
+token_id
+varchar
+Khóa ngoại (Land_NFTs.token_id)
+NFT đang bị tranh chấp
+
+3
+claimant_id
+int
+Khóa ngoại (Users.id)
+Người khởi kiện/khiếu nại
+
+4
+description
+text
+
+Nội dung tranh chấp
+
+5
+status
+varchar
+
+Trạng thái xử lý
+Pending, Resolving, Resolved
+6
+created_at
+timestamp
+
+Ngày tạo khiếu nại
+
+7
+resolved_at
+timestamp
+
+Ngày giải quyết xong
+
+
+        Mortgages - Quản lý việc thế chấp đất đai tại Ngân hàng.
+STT
+Tên trường
+Kiểu dữ liệu và kích thước
+Ràng buộc dữ liệu
+Ý nghĩa
+Ghi chú
+1
+id
+int
+Khóa chính, Tự động tăng
+Mã thế chấp
+
+2
+token_id
+varchar
+Khóa ngoại (Land_NFTs.token_id)
+NFT được thế chấp
+
+3
+bank_name
+varchar
+
+Tên ngân hàng nhận thế chấp
+
+4
+mortgage_amount
+decimal
+
+Số tiền thế chấp (khoản vay)
+
+5
+status
+varchar
+
+Trạng thái thế chấp
+Active (Đang cắm), Released (Đã giải chấp)
+6
+created_at
+timestamp
+
+Ngày bắt đầu thế chấp
+
+7
+released_at
+timestamp
+
+Ngày giải chấp
+
+
+        Fraud_Reports - Dành cho Cảnh sát (Role: CS) báo cáo các sai phạm tại thực địa.
+STT
+Tên trường
+Kiểu dữ liệu và kích thước
+Ràng buộc dữ liệu
+Ý nghĩa
+Ghi chú
+1
+id
+int
+Khóa chính, Tự động tăng
+Mã báo cáo
+
+2
+reporter_id
+int
+Khóa ngoại (Users.id)
+ID cảnh sát báo cáo
+
+3
+token_id
+varchar
+Khóa ngoại (Land_NFTs.token_id)
+NFT phát hiện sai phạm
+
+4
+reason
+text
+
+Lý do báo cáo gian lận
+
+5
+evidence_images
+text
+
+Bằng chứng
+Link ảnh/video hiện trường
+6
+status
+varchar
+
+Trạng thái báo cáo
+Pending, Verified (Xác thực), Rejected
+7
+reviewed_by
+int
+Khóa ngoại (Users.id)
+Lãnh đạo hoặc Admin duyệt
+
+
+        System_Configs - Lưu trữ các biến số hệ thống có thể thay đổi linh hoạt bởi Admin (Ví dụ: % Thuế).
+STT
+Tên trường
+Kiểu dữ liệu và kích thước
+Ràng buộc dữ liệu
+Ý nghĩa
+Ghi chú
+1
+config_key
+varchar
+Khóa chính
+Mã cấu hình
+VD: TAX_RATE_TNCN, TAX_RATE_TRUCBA
+2
+config_value
+varchar
+
+Giá trị cấu hình
+VD: "0.02"
+3
+description
+text
+
+Giải thích chức năng của key
+
+4
+updated_at
+timestamp
+
+Thời gian cập nhật gần nhất
+
+
+        System_Config_Audits - Lưu lại vết (Audit Trail) ai đã thay đổi cấu hình hệ thống từ giá trị nào sang giá trị nào.
+STT
+Tên trường
+Kiểu dữ liệu và kích thước
+Ràng buộc dữ liệu
+Ý nghĩa
+Ghi chú
+1
+id
+int
+Khóa chính, Tự động tăng
+ID log thay đổi
+
+2
+config_key
+varchar
+Khóa ngoại (System_Configs)
+Key cấu hình bị thay đổi
+
+3
+editor_id
+int
+Khóa ngoại (Users.id)
+Admin thực hiện
+
+4
+old_value
+varchar
+
+Giá trị trước khi đổi
+
+5
+new_value
+varchar
+
+Giá trị sau khi đổi
+
+6
+changed_at
+timestamp
+
+Thời điểm thay đổi
+Hiển thị trên Timeline/Audit View
+
+        Notifications - Hệ thống thông báo đẩy (Notification) cho người dùng.
+STT
+Tên trường
+Kiểu dữ liệu và kích thước
+Ràng buộc dữ liệu
+Ý nghĩa
+Ghi chú
+1
+id
+int
+Khóa chính, Tự động tăng
+Mã thông báo
+
+2
+user_id
+int
+Khóa ngoại (Users.id)
+Người nhận thông báo
+
+3
+title
+varchar
+
+Tiêu đề thông báo
+
+4
+content
+text
+
+Nội dung chi tiết
+
+5
+type
+varchar
+
+Loại thông báo
+Warning, Info, System, SLA_Alert
+6
+is_read
+boolean
+
+Đã đọc chưa
+True/False
+7
+created_at
+timestamp
+
+Thời gian gửi thông báo
+
+
+        System_Logs - Bảo mật hệ thống, lưu mọi thao tác (CRUD) của Cán bộ/Lãnh đạo để phòng ngừa rủi ro.
+STT
+Tên trường
+Kiểu dữ liệu và kích thước
+Ràng buộc dữ liệu
+Ý nghĩa
+Ghi chú
+1
+id
+int
+Khóa chính, Tự động tăng
+ID Log
+
+2
+user_id
+int
+Khóa ngoại (Users.id)
+Người thực hiện hành động
+
+3
+action
+varchar
+
+Hành động cụ thể
+Xem, Sửa, Duyệt, Xóa...
+4
+target_table
+varchar
+
+Bảng dữ liệu bị tác động
+VD: Land_Records
+5
+target_id
+varchar
+
+ID của row bị tác động
+
+6
+hash_value
+varchar
+
+Băm SHA-256 nội dung log
+Chống DBA sửa log (Tính vẹn toàn)
+7
+ip_address
+varchar
+
+IP thiết bị của user
+
+8
+created_at
+timestamp
+
+Thời gian thao tác
+
+
+        Blockchain_Logs - Theo dõi tình trạng của các giao dịch đẩy lên mạng Blockchain (Pending, Success, Failed).
+STT
+Tên trường
+Kiểu dữ liệu và kích thước
+Ràng buộc dữ liệu
+Ý nghĩa
+Ghi chú
+1
+tx_hash
+varchar
+Khóa chính
+Mã giao dịch trên mạng lưới
+Độc nhất trên mạng lưới blockchain
+2
+action_type
+varchar
+
+Loại tương tác Smart Contract
+Mint_NFT, Transfer, Multi-sig...
+3
+gas_fee
+decimal
+
+Phí Gas đã tiêu thụ
+Tính bằng Native Token (VD: ETH, MATIC)
+4
+status
+varchar
+
+Tình trạng giao dịch
+Success, Reverted, Out_Of_Gas
+5
+timestamp
+timestamp
+
+Thời gian ghi nhận block
+
+
+        2. Sơ đồ mô tả mối quan hệ giữa các bản
+
+Hình xx. Mối quan hệ giữa các bảng CSDL Số hóa và Cấp phát tài sản số
+
+Hình xx. Mối quan hệ giữa các bảng CSDL Giao dịch và Nghĩa vụ tài chính
+
+Hình xx. Mối quan hệ giữa các bảng CSDL Tiền kiểm và Quản lý rủi ro
+
+Hình xx. Mối quan hệ giữa các bảng CSDL Phê duyệt và Lịch sử biến động
+    IV. Thiết kế giao diện
+
+Hình xx. Giao diện trang chủ người dùng
+
+Hình xx. Phê duyệt đa tầng (lãnh đạo)
+
+Hình xx. Nộp hồ sơ (mobile)
+
+Hình xx. Giao diện chức năng làm sạch dữ liệu
+
+Phụ lục I
+BẢNG MÔ TẢ CHI TIẾT USECASE CỦA HỆ THỐNG PHẦN MỀM
+        1. Đặc tả UseCase Đăng nhập xác thực VNeID và quản lý tài khoản cá nhân
+Tên Usecase: Đăng nhập xác thực VNeID quản lý tài khoản cá nhân
+Mức độ BMT: B
+Tác nhân chính: ND, CB, LĐ, CS, AD
+Tác nhân phụ
+Mô tả Usecase: Đăng nhập thông qua VneID và cập nhật thông tin cá nhân
+Điều kiện để bắt đầu Usecase: Tác nhân truy cập vào trang chủ của nền tảng Web hoặc App
+Điều kiện để kết thúc Usecase: Hệ thống xác thực danh tính, cấp phiên làm việc (session) và trả về kết quả hiển thị thông tin người dùng
+Trình tự các sự kiện diễn ra trong quá trình hoạt động của Usecase:
+        ◦ Đăng nhập vào hệ thống thông qua VneID
+        ◦ Hệ thống chuyển hướng đến API VNeID và nhận diện số CCCD/thông tin cá nhân
+        ◦ Hệ thống hiển thị thông báo khi xác thực thất bại
+        ◦ Cập nhật số điện thoại hoặc Email dùng để khôi phục mật khẩu
+        ◦ Nhận mã OTP xác thực thay đổi thông tin
+        ◦ Đăng xuất khỏi hệ thống
+Hoàn cảnh sử dụng thành công cơ bản (tùy chọn): Hệ thống xác thực thành công, hiển thị đúng họ tên/CCCD và lưu các thông tin liên hệ mới vào cơ sở dữ liệu
+Hoàn cảnh sử dụng phụ (thay thế) trong trường hợp không thành công (tùy chọn):
+    • Hệ thống hiển thị cảnh báo lỗi chi tiết nếu nhập sai mã PIN, mất kết nối API VNeID, hoặc hết hạn phiên làm việc (Session Timeout)
+
+Hành động liên quan sẽ xảy ra sau khi Usecase kết thúc (tùy chọn): Khởi tạo phiên làm việc, tự động thu hồi quyền truy cập (đăng xuất) nếu không có thao tác nào trong 15 phút
+Biểu đồ mô tả liên quan:
+
+        2. Đặc tả UseCase Liên kết ví Blockchain
+Tên Usecase: Liên kết ví Blockchain
+Mức độ BMT: B
+Tác nhân chính: ND, CB, LĐ
+Tác nhân phụ: AD
+Mô tả Usecase: Cho phép người dùng liên kết tài khoản định danh VNeID với duy nhất một địa chỉ ví Web3 (MetaMask). Hỗ trợ quy trình khôi phục khi mất Private Key
+Điều kiện để bắt đầu Usecase: Tác nhân đã đăng nhập thành công vào hệ thống qua VNeID.
+Điều kiện để kết thúc Usecase: Hệ thống ghi nhận ánh xạ (mapping) 1-1 giữa ID định danh và địa chỉ ví trên Database.
+Trình tự các sự kiện diễn ra trong quá trình hoạt động của Usecase:
+        ◦ Tác nhân chọn nút "Connect Wallet" trên giao diện
+        ◦ Hệ thống gọi tiện ích ví (MetaMask) để xác nhận liên kết
+        ◦ Hệ thống lưu trữ ánh xạ địa chỉ ví và kiểm tra điều kiện độc quyền
+        ◦ (Trường hợp mất ví): Tác nhân gửi yêu cầu khôi phục liên kết ví mới thông qua bước xác thực VNeID nghiêm ngặt
+        ◦ Lãnh đạo phê duyệt (Ký số) yêu cầu để ghi đè (Override) địa chỉ ví cũ bằng ví mới trên Smart Contract
+Hoàn cảnh sử dụng thành công cơ bản (tùy chọn): Tác nhân liên kết thành công và có thể thực hiện xem danh sách tài sản (NFT) hoặc ký hợp đồng
+Hoàn cảnh sử dụng phụ (thay thế) trong trường hợp không thành công (tùy chọn): Trả về thông báo lỗi và ngăn chặn nếu người dùng cố gắng liên kết nhiều mã định danh với cùng một địa chỉ ví
+
+Biểu đồ mô tả liên quan:
+
+        3. Đặc tả Usecase Khởi tạo hồ sơ, đối soát và lưu trữ IFPS
+Tên Usecase: Khởi tạo hồ sơ và lưu trữ IPFS
+Mức độ BMT: B
+Tác nhân chính: ND, CB
+Tác nhân phụ: AD
+Mô tả Usecase: Người dân nộp hồ sơ số hóa (bản vẽ, sổ đỏ). Hệ thống lưu hoặc chính thức đẩy các tài liệu lên mạng lưu trữ phi tập trung IPFS, lấy mã CID để đảm bảo chống sửa đổi
+Điều kiện để bắt đầu Usecase: Tác nhân chuẩn bị đủ file mềm (PDF, JPG, PNG) của hồ sơ
+Điều kiện để kết thúc Usecase: Hồ sơ được tạo trong Database trạng thái "Chờ đối soát", kèm theo mã băm CID từ IPFS
+Trình tự các sự kiện diễn ra trong quá trình hoạt động của Usecase:
+        ◦ Tác nhân Người dân điền thông tin và tải lên các file bản vẽ/sổ đỏ
+        ◦ Tác nhân bấm "Lưu nháp" để lưu trữ off-chain (nếu chưa muốn nộp)
+        ◦ Tác nhân bấm "Gửi hồ sơ"
+        ◦ Cán bộ/Hệ thống tự động đẩy file scan lên IPFS Gateway
+        ◦ Hệ thống nhận về mã CID (Content Identifier) duy nhất và lưu vào Database
+Hoàn cảnh sử dụng thành công cơ bản (tùy chọn): Hồ sơ upload thành công, hiển thị thanh tiến trình 100%, mã CID sinh ra hợp lệ
+Hoàn cảnh sử dụng phụ (thay thế) trong trường hợp không thành công (tùy chọn): Nếu kết nối mạng IPFS bị lỗi/timeout hoặc file quá dung lượng, hệ thống tự động thử lại (Retry) tối đa 3 lần, sau đó hiển thị cảnh báo lỗi không mất dữ liệu
+Biểu đồ mô tả liên quan:
+
+        4. Đặc tả Usecase Đối soát & Làm sạch dữ liệu
+Tên Usecase: Đối soát & Làm sạch dữ liệu
+Mức độ BMT: B
+Tác nhân chính: CB
+Tác nhân phụ: ND, LĐ
+Mô tả Usecase: Quy trình hậu kiểm do Cán bộ thực hiện nhằm kiểm tra chéo giữa file giấy tờ scan và dữ liệu số trên hệ thống. Đảm bảo mọi thông tin chính xác tuyệt đối trước khi Mint lên Blockchain
+Điều kiện để bắt đầu Usecase: Hệ thống có danh sách các hồ sơ đang ở trạng thái "Chờ đối soát"
+Điều kiện để kết thúc Usecase: Hồ sơ được xác nhận hợp lệ, yêu cầu bổ sung, hoặc bị từ chối; hệ thống lưu lại Audit log thao tác
+Trình tự các sự kiện diễn ra trong quá trình hoạt động của Usecase:
+        ◦ Cán bộ tìm kiếm, lọc danh sách hồ sơ theo độ ưu tiên/ngày nộp/VneID
+        ◦ Hệ thống hiển thị song song bản chụp (scan) và các trường dữ liệu số để đối soát
+        ◦ Cán bộ tiến hành chỉnh sửa, cập nhật lại bản vẽ kỹ thuật (tọa độ GPS, diện tích) nếu có sai lệch
+        ◦ Cán bộ xác nhận tính hợp lệ
+        ◦ (Hoặc) Cán bộ chọn chức năng "Yêu cầu bổ sung hồ sơ" hoặc "Từ chối hồ sơ", bắt buộc nhập lý do chi tiết. Hệ thống gửi thông báo cho Người dân
+        ◦ Cán bộ in biên bản đối soát dữ liệu ra giấy có kèm mã QR.
+Hoàn cảnh sử dụng thành công cơ bản (tùy chọn): Dữ liệu được làm sạch, "đóng băng" không cho chỉnh sửa tiếp và chuyển trạng thái sang "Chờ phê duyệt" (cho Lãnh đạo). Mọi thao tác được lưu log lịch sử
+Hoàn cảnh sử dụng phụ (thay thế) trong trường hợp không thành công (tùy chọn): Nếu Cán bộ ấn "Từ chối" mà không nhập lý do, hệ thống vô hiệu hóa nút xác nhận và yêu cầu bổ sung nội dung
+Biểu đồ mô tả liên quan:
+
+        5. Đặc tả Usecase Phê duyệt hồ sơ đa tầng
+Tên Usecase: Phê duyệt hồ sơ đa tầng
+Mức độ BMT: B
+Tác nhân chính: LĐ, CB
+Tác nhân phụ: Không
+Mô tả Usecase: Cán bộ và Lãnh đạo thực hiện ký số phê duyệt hồ sơ thông qua cơ chế đa chữ ký (Multi-signature: cần 2 cán bộ và 1 lãnh đạo) bằng ví MetaMask. Hệ thống cho phép ký từng hồ sơ, ký hàng loạt, hoặc hủy bỏ/hoàn tác lệnh ký khi phát hiện sai sót
+Điều kiện để bắt đầu Usecase: Hồ sơ đã được làm sạch và Smart Contract điều phối vào danh sách "Chờ phê duyệt". Các tác nhân đã đăng nhập vào hệ thống và kết nối thành công ví MetaMask
+Điều kiện để kết thúc Usecase: Hồ sơ đạt đủ ngưỡng chữ ký yêu cầu (Threshold) và giao dịch được Smart Contract kích hoạt ghi nhận lên Blockchain, hoặc bị từ chối/hoàn tác trở về trạng thái đối soát
+Trình tự các sự kiện diễn ra trong quá trình hoạt động của Usecase:
+1. Smart Contract tự động điều phối hồ sơ vào danh sách "Chờ phê duyệt" hiển thị trên Dashboard của cán bộ liên quan .
+2. Tác nhân truy cập hệ thống và xem danh sách hồ sơ chờ duyệt .
+3. Các cán bộ thụ lý kiểm tra hồ sơ và dùng ví MetaMask thực hiện thao tác ký số xác nhận (có thể áp dụng ký số hàng loạt cho các hồ sơ đơn giản) .
+4. Hệ thống kiểm tra dữ liệu chữ ký: Nếu đủ số lượng chữ ký hợp lệ của cán bộ, gửi thông báo yêu cầu Lãnh đạo vào phê duyệt chốt .
+5. Lãnh đạo truy cập kiểm tra thông tin và đưa ra quyết định :
+- Đồng ý: Xác nhận chữ ký số cuối cùng qua ví MetaMask .
+- Từ chối: Nhấn "Từ chối" kèm lý do, hoặc hủy bỏ lệnh ký duyệt khi phát hiện sai sót .
+6. Smart Contract đối chiếu ngưỡng điều kiện, khi thỏa mãn sẽ kích hoạt thực thi giao dịch ghi nhận lên Blockchain.
+Hoàn cảnh sử dụng thành công cơ bản (tùy chọn): Hệ thống thu thập đủ chữ ký hợp lệ của tất cả các cấp (2 Cán bộ, 1 Lãnh đạo), giao dịch được Smart Contract xác thực thành công và trạng thái phê duyệt được lưu trữ vĩnh viễn trên chuỗi khối
+Hoàn cảnh sử dụng phụ (thay thế) trong trường hợp không thành công (tùy chọn): Lãnh đạo không đồng ý phê duyệt hoặc phát hiện sai sót, hệ thống sẽ thực hiện hủy bỏ lệnh ký và hoàn tác hồ sơ quay lại bước "Chờ đối soát"
+Hành động liên quan sẽ xảy ra sau khi Usecase kết thúc (tùy chọn): Hệ thống tiếp tục tự động chuyển tiếp hồ sơ sang quy trình Quản lý Tài sản số và phát thông báo cập nhật tiến độ qua App/Email cho Người dân cùng các bên liên quan
+Biểu đồ miêu tả liên quan:
+
+        6. Đặc tả Usecase Quy hoạch và tra cứu nguồn gốc
+Tên Usecase: Quy hoạch và tra cứu nguồn gốc.
+Mức độ BMT: B
+Tác nhân chính:NĐ, CB, LĐ, CS 
+Tác nhân phụ: Không
+Mô tả Usecase: Cho phép tác nhân tìm kiếm thửa đất theo địa chỉ, số tờ, số thửa và xem bản đồ quy hoạch công khai trực quan. Hỗ trợ quét mã QR để xác thực tính hợp lệ của giấy phép và xem dòng thời gian truy xuất lịch sử biến động của thửa đất
+Điều kiện để bắt đầu Usecase: Tác nhân truy cập vào hệ thống (có thể qua trình duyệt hoặc Mobile App). Đối với việc quét mã QR, tác nhân cần sử dụng ứng dụng di động để quét trực tiếp trên giấy chứng nhận
+Điều kiện để kết thúc Usecase: Hệ thống hiển thị thành công thông tin thửa đất trên bản đồ quy hoạch hoặc vẽ ra giao diện dòng thời gian hiển thị toàn bộ lịch sử biến động kèm các liên kết đối chứng
+Trình tự các sự kiện diễn ra trong quá trình hoạt động của Usecase:
+1. Tác nhân tìm kiếm thửa đất theo địa chỉ/số tờ/số thửa trên ứng dụng, hoặc sử dụng ứng dụng di động quét mã QR trên giấy chứng nhận .
+2. Nếu sử dụng quét QR, hệ thống giải mã, trích xuất ID và kiểm tra dữ liệu đối chiếu trực tiếp từ Blockchain .
+3. Tác nhân xem bản đồ quy hoạch công khai trực quan để xác định vị trí và tình trạng quy hoạch .
+4. Tác nhân kích hoạt tính năng xem "Lịch sử biến động".
+5. Hệ thống tự động đọc lại các Sự kiện được lưu trữ trên Blockchain để vẽ ra giao diện dòng thời gian hiển thị toàn bộ lịch sử (như các đời chủ cũ, biến động diện tích, tranh chấp) và cung cấp kèm các liên kết đối chứng trên Blockchain Explorer.
+Hoàn cảnh sử dụng thành công cơ bản (tùy chọn): Dữ liệu kiểm tra hợp lệ (trùng khớp), hệ thống hiển thị thông tin màu xanh xác nhận tính hợp lệ kèm chi tiết của chủ sở hữu. Tác nhân có thể tra cứu toàn bộ bản đồ quy hoạch và truy xuất nguồn gốc đất đai một cách minh bạch, rõ ràng
+Hoàn cảnh sử dụng phụ (thay thế) trong trường hợp không thành công (tùy chọn): Nếu dữ liệu đối chiếu không hợp lệ (không trùng khớp, giấy phép giả mạo, hoặc đã bị thu hồi), hệ thống sẽ hiển thị cảnh báo màu đỏ ngay lập tức và yêu cầu thao tác lại
+Hành động liên quan sẽ xảy ra sau khi Usecase kết thúc (tùy chọn): Nếu phát hiện sai phạm hoặc giấy phép giả mạo thông qua quá trình tra cứu, tác nhân (đặc biệt là Cảnh sát/Cán bộ kiểm tra) có thể chuyển sang chức năng "Quản lý Báo cáo vi phạm" để báo cáo hành vi gian lận thông tin ngay trên App
+Biểu đồ miêu tả liên quan:
+
+        7. Đặc tả Usecase Quản lý phân quyền
+Tên Usecase: Quản lý phân quyền
+Mức độ BMT: B
+Tác nhân chính: AD
+Tác nhân phụ: Không
+Mô tả Usecase: Cho phép Quản trị viên thực hiện xem danh sách, thêm mới, chỉnh sửa, hoặc vô hiệu hóa tài khoản cán bộ. Quản trị viên tiến hành phân quyền truy cập hệ thống theo mô hình kiểm soát truy cập với 5 vai trò phân định rõ ràng 
+Điều kiện để bắt đầu Usecase: Tác nhân đã đăng nhập thành công vào hệ thống quản trị với đúng vai trò Quản trị viên
+Điều kiện để kết thúc Usecase: Hệ thống ghi nhận các thay đổi về danh sách cán bộ, trạng thái tài khoản hoặc nhóm quyền vào cơ sở dữ liệu và cập nhật quyền truy cập mới
+Trình tự các sự kiện diễn ra trong quá trình hoạt động của Usecase:
+1. Tác nhân truy cập vào phân hệ Quản trị hệ thống và chọn chức năng quản lý Cán bộ & Phân quyền.
+2. Tác nhân xem danh sách Cán bộ và Lãnh đạo hiện có trên hệ thống .
+3. Tác nhân thực hiện các thao tác: Thêm mới, Chỉnh sửa thông tin, hoặc Vô hiệu hóa tài khoản cán bộ nếu cần .
+4. Tác nhân thực hiện thiết lập phân quyền truy cập hệ thống cho các nhóm tài khoản theo RBAC.
+5. Hệ thống kiểm tra tính hợp lệ của dữ liệu, lưu cấu hình vào cơ sở dữ liệu nội bộ (PostgreSQL) và hiển thị thông báo thành công.
+Hoàn cảnh sử dụng thành công cơ bản (tùy chọn): Tác nhân thêm mới cán bộ hoặc cập nhật phân quyền thành công. Dữ liệu được lưu trữ chính xác và tài khoản cán bộ có thể đăng nhập, sử dụng các chức năng đúng với vai trò đã được phân công
+Hoàn cảnh sử dụng phụ (thay thế) trong trường hợp không thành công (tùy chọn): Hệ thống hiển thị thông báo lỗi nếu tác nhân nhập thiếu các thông tin bắt buộc khi tạo tài khoản, hoặc hệ thống mất kết nối với cơ sở dữ liệu nội bộ
+Nếu một tài khoản bị vô hiệu hóa hoặc bị thay đổi quyền hạn, giới hạn truy cập của người dùng đó (kiểm soát thông qua RBAC) sẽ có hiệu lực ngay lập tức, ngăn chặn các thao tác trái phép vào hệ thống
+Biểu đồ mô tả liên quan:
+
+        8. Đặc tả Usecase Quản trị cấu hình và hạ tầng 
+Tên Usecase: Quản trị cấu hình và hạ tầng
+Mức độ BMT: B
+Tác nhân chính: AD
+Tác nhân phụ: Không
+Mô tả Usecase: Cho phép Quản trị viên cấu hình các tham số động của hệ thống (phí giao dịch, SLA), quản lý trạng thái các Smart Contract đang vận hành (tạm dừng/hoạt động), xem biểu đồ tải lượng của IPFS Node và kiểm tra tính hợp lệ của mã CID trên mạng lưới IPFS.
+Điều kiện để bắt đầu Usecase: Tác nhân đã đăng nhập thành công vào hệ thống với đúng vai trò Quản trị viên
+Điều kiện để kết thúc Usecase: Các thông số cấu hình mới được hệ thống ghi nhận, trạng thái Smart Contract được cập nhật thành công, hoặc tác nhân hoàn tất việc tra cứu biểu đồ tải lượng/mã CID
+Trình tự các sự kiện diễn ra trong quá trình hoạt động của Usecase:
+1. Tác nhân truy cập vào phân hệ Quản trị hệ thống và chọn chức năng Quản trị cấu hình & hạ tầng.
+2. Quản lý cấu hình động: Tác nhân thực hiện thay đổi/cập nhật các biến số hệ thống như Tỷ lệ thuế, Phí giao dịch, hoặc SLA thời gian xử lý.
+3. Quản lý Smart Contract: Tác nhân xem danh sách các Hợp đồng thông minh và thực hiện chuyển đổi trạng thái hoạt động (Tạm dừng/Hoạt động) nếu cần thiết.
+4. Giám sát hạ tầng: Tác nhân xem biểu đồ tải lượng của các Node IPFS để theo dõi băng thông và khả năng lưu trữ.
+5. Kiểm tra dữ liệu: Tác nhân nhập mã CID để kiểm tra tính hợp lệ và sự tồn tại của tệp tin lưu trên mạng IPFS.
+Hoàn cảnh sử dụng thành công cơ bản (tùy chọn): Tác nhân cập nhật thành công các thông số hệ thống, dữ liệu cấu hình mới được lưu lại. Tác nhân có thể giám sát theo thời gian thực tình trạng hạ tầng, tải lượng IPFS Node và trạng thái của các Smart Contract trên mạng lưới
+Hoàn cảnh sử dụng phụ (thay thế) trong trường hợp không thành công (tùy chọn): Hệ thống hiển thị thông báo lỗi nếu tác nhân nhập sai định dạng của tham số cấu hình, hoặc khi hệ thống không thể kết nối tới các máy chủ Blockchain Node/IPFS Node để lấy dữ liệu tải lượng và tra cứu mã CID
+Hành động liên quan sẽ xảy ra sau khi Usecase kết thúc (tùy chọn): Không
+Biểu đồ mô tả liên quan:
+
+        9. Đặc tả Usecase Quản lý báo cáo vi phạm
+Tên Usecase: Quản lý báo cáo vi phạm
+Mức độ BMT: B
+Tác nhân chính: CS
+Tác nhân phụ: LĐ, AD
+Mô tả Usecase: Chức năng cho phép Cảnh sát hoặc Cán bộ kiểm tra báo cáo các hành vi gian lận thông tin, sai phạm phát hiện tại hiện trường ngay trên ứng dụng di động. Báo cáo bao gồm lý do và bằng chứng hình ảnh/video, sau đó được gửi lên chờ cấp trên (Lãnh đạo hoặc Admin) phê duyệt để tiến hành khóa tài sản (NFT).
+Điều kiện để bắt đầu Usecase: Cảnh sát/Cán bộ kiểm tra truy cập thành công vào hệ thống ứng dụng.
+Điều kiện để kết thúc Usecase: Hệ thống ghi nhận thông tin báo cáo, cập nhật trạng thái và trả về kết quả cho tác nhân.
+Trình tự các sự kiện diễn ra trong quá trình hoạt động của Usecase:
+-  Xem danh sách báo cáo sai phạm (theo các trạng thái: Pending, Verified, Rejected).
+-  Tìm kiếm/Tra cứu báo cáo sai phạm dựa trên ID hoặc mã NFT.
+-  Thêm mới báo cáo hành vi gian lận (Nhập lý do sai phạm và tải lên bằng chứng hình ảnh/video hiện trường).
+-  Xem chi tiết một báo cáo sai phạm.
+-  Duyệt báo cáo sai phạm (Hành động dành cho tác nhân Lãnh đạo/Admin: chuyển trạng thái sang Xác thực - Verified).
+-  Từ chối báo cáo sai phạm (Hành động dành cho tác nhân Lãnh đạo/Admin: chuyển trạng thái sang Từ chối - Rejected).
+
+Hoàn cảnh sử dụng thành công cơ bản (tùy chọn): Hệ thống lưu trữ báo cáo thành công, tạo bản ghi mới trong cơ sở dữ liệu và hiển thị thông báo hoàn tất cho tác nhân.
+Hoàn cảnh sử dụng phụ (thay thế) trong trường hợp không thành công (tùy chọn): Hệ thống hiển thị thông báo lỗi (ví dụ: thiếu thông tin bắt buộc, lỗi không tải được hình ảnh/video đính kèm).
+Hành động liên quan sẽ xảy ra sau khi Usecase kết thúc (tùy chọn): Nếu báo cáo được Lãnh đạo hoặc Admin phê duyệt (Verified), hệ thống có thể kích hoạt cơ chế khóa tài sản điện tử (NFT) liên quan để ngăn chặn giao dịch.
+Các yêu cầu phi chức năng (tùy chọn): Không có.
+
+
+
+
+        10. Đặc tả UseCase Quản lý thuế và phí tự động
+Tên Usecase: Tính toán Thuế & Phí tự động
+Mức độ BMT: B
+Tác nhân chính: ND
+Tác nhân phụ: AD
+Mô tả Usecase: Cho phép người dùng tự động xem các khoản ước tính về thuế Thu nhập cá nhân và lệ phí trước bạ liên quan đến tài sản/giao dịch. Đồng thời, hỗ trợ người dùng thực hiện thanh toán các khoản thuế, phí này trực tuyến ngay trên hệ thống.
+Điều kiện để bắt đầu Usecase: Tác nhân đăng nhập thành công vào hệ thống và đang tiến hành một giao dịch hoặc tra cứu thông tin tài sản cần nộp thuế/phí.
+Điều kiện để kết thúc Usecase: Hệ thống hiển thị bảng tính toán thuế/phí chi tiết hoặc trả về kết quả thanh toán trực tuyến (thành công hoặc thất bại) cho tác nhân.
+Trình tự các sự kiện diễn ra trong quá trình hoạt động của Usecase:
+-  Hệ thống trích xuất thông tin giao dịch/tài sản.
+-  Hệ thống tự động tính toán và hiển thị ước tính thuế TNCN và lệ phí trước bạ dựa trên quy định hiện hành.
+-  Tác nhân xem và xác nhận chi tiết các khoản thuế/phí.
+-  Tác nhân chọn chức năng "Thanh toán online".
+-  Hệ thống điều hướng tác nhân tới cổng thanh toán trực tuyến.
+-  Tác nhân tiến hành thanh toán.
+-  Hệ thống nhận phản hồi từ cổng thanh toán, cập nhật trạng thái đã nộp thuế/phí và thông báo kết quả cho tác nhân.
+Hoàn cảnh sử dụng thành công cơ bản (tùy chọn): Hệ thống tính toán chính xác số tiền cần nộp dựa trên dữ liệu tài sản và tác nhân thực hiện giao dịch thanh toán online thành công, hệ thống cập nhật trạng thái "Đã thanh toán".
+Hoàn cảnh sử dụng phụ (thay thế) trong trường hợp không thành công (tùy chọn): Hệ thống hiển thị thông báo lỗi trong các trường hợp: thiếu dữ liệu để tính toán, lỗi kết nối với cổng thanh toán, hoặc thanh toán thất bại do tài khoản ngân hàng của tác nhân có vấn đề (không đủ số dư, nhập sai mã OTP,...).
+Hành động liên quan sẽ xảy ra sau khi Usecase kết thúc (tùy chọn): Khi thuế/phí được thanh toán thành công, hệ thống sẽ mở khóa bước tiếp theo của quy trình giao dịch (ví dụ: cho phép chuyển nhượng, sang tên tài sản).
+Các yêu cầu phi chức năng (tùy chọn): Các công thức tính thuế/phí phải được cập nhật chính xác theo quy định của pháp luật. Quá trình thanh toán phải đảm bảo bảo mật và mã hóa dữ liệu.
+
+
+        11. Đặc tả Quản lý hợp đồng mua bán điện tử
+Tên Usecase: Quản lý hợp đồng mua bán điện tử
+Mức độ BMT: B
+Tác nhân chính: ND, CB
+Tác nhân phụ:
+Mô tả Usecase: Cho phép Người dân (bên mua/bên bán) và Cán bộ chứng thực tham gia vào môi trường giao dịch để tạo lập, quản lý và theo dõi các hợp đồng mua bán bất động sản điện tử.
+Điều kiện để bắt đầu Usecase: Đăng nhập thành công vào hệ thống bằng VNeID và đã liên kết ví điện tử. Giao dịch chỉ được khởi tạo khi thửa đất đã vượt qua công cụ rà soát tự động (Pre-check) hiển thị cảnh báo an toàn.
+Điều kiện để kết thúc Usecase: Hệ thống lưu trữ trạng thái của hợp đồng (đã tạo, đã hủy, v.v.) và phản hồi kết quả trực quan trên giao diện cho các bên liên quan.
+Trình tự các sự kiện diễn ra trong quá trình hoạt động của Usecase:
+-  Xem danh sách các hợp đồng mua bán điện tử đang tham gia.
+-  Tìm kiếm/Tra cứu thông tin hợp đồng.
+-  Khởi tạo hợp đồng mua bán điện tử (nhập thông tin các bên, giá trị chuyển nhượng, v.v.).
+-  Xem chi tiết nội dung hợp đồng mua bán điện tử.
+-  Hủy yêu cầu giao dịch khi chưa có bên nào ký duyệt.
+Hoàn cảnh sử dụng thành công cơ bản (tùy chọn): Hợp đồng được khởi tạo thành công trên hệ thống và chuyển sang trạng thái chờ các bên (người mua, người bán, cán bộ) tiến hành ký số xác nhận.
+Hoàn cảnh sử dụng phụ (thay thế) trong trường hợp không thành công (tùy chọn): Hệ thống vô hiệu hóa chức năng tạo hợp đồng và hiển thị cảnh báo nếu dữ liệu thửa đất không hợp lệ (đang thế chấp, có tranh chấp, dính quy hoạch).
+Hành động liên quan sẽ xảy ra sau khi Usecase kết thúc (tùy chọn): Nếu hợp đồng được khởi tạo và không bị hủy, các bên sẽ tiến hành ký số. Khi thu thập đủ chữ ký hợp lệ, Smart Contract sẽ thực thi giao dịch chuyển quyền sở hữu tài sản (NFT).
+Các yêu cầu phi chức năng (tùy chọn): Đảm bảo an toàn thông tin và tính toàn vẹn của hợp đồng điện tử theo tiêu chuẩn mã hóa.
+
+
+        12. Đặc tả Quản lý Mint NFT & Cấp phép điện tử
+Tên Usecase: Quản lý NFT & Cấp phép điện tử
+Mức độ BMT: B
+Tác nhân chính: LĐ, AD
+Tác nhân phụ: ND
+Mô tả Usecase: Cho phép cấp quản lý (Lãnh đạo, Admin) thực hiện số hóa quyền sở hữu đất đai bằng cách tạo (Mint) NFT đại diện cho thửa đất trên nền tảng blockchain. Đồng thời, cung cấp tiện ích cho Người dùng (chủ sở hữu) theo dõi danh mục tài sản và yêu cầu cấp phát các bản sao giấy chứng nhận điện tử có tính pháp lý cao.
+Điều kiện để bắt đầu Usecase: Tác nhân đăng nhập vào hệ thống với phân quyền tương ứng. Đối với việc Mint NFT, hồ sơ/thửa đất phải ở trạng thái đã được thẩm định và phê duyệt tính hợp lệ.
+Điều kiện để kết thúc Usecase: Hệ thống ghi nhận thành công tài sản số (NFT) trên blockchain hoặc trả về bản sao tài liệu điện tử đúng theo yêu cầu của tác nhân.
+Trình tự các sự kiện diễn ra trong quá trình hoạt động của Usecase:
+-  (Dành cho LĐ, AD): Truy cập danh sách các thửa đất đủ điều kiện cấp phát tài sản số.
+-  (Dành cho LĐ, AD): Thực hiện lệnh "Mint NFT" cho thửa đất. Hệ thống tiến hành mã hóa thông tin, tương tác với Smart Contract và ghi nhận NFT lên sổ cái blockchain, sau đó chuyển quyền sở hữu về ví điện tử của Người dùng.
+-  (Dành cho ND): Truy cập vào khu vực quản lý tài sản cá nhân.
+-  (Dành cho ND): Xem danh sách bất động sản (dưới dạng NFT) mà mình đang sở hữu cùng các thông tin chi tiết đính kèm.
+-  (Dành cho ND): Chọn một bất động sản và thực hiện thao tác "Yêu cầu trích xuất bản sao điện tử có chữ ký số".
+-  Hệ thống trích xuất dữ liệu, đóng dấu chữ ký số của cơ quan có thẩm quyền và cho phép ND tải về (thường dưới dạng file PDF).
+Hoàn cảnh sử dụng thành công cơ bản (tùy chọn): Quá trình Mint NFT diễn ra suôn sẻ, tài sản được tạo mới và liên kết chính xác với chủ sở hữu trên blockchain. Người dùng nhận được bản sao chứng nhận điện tử có chữ ký số hợp lệ và minh bạch.
+Hoàn cảnh sử dụng phụ (thay thế) trong trường hợp không thành công (tùy chọn): Hệ thống hiển thị thông báo lỗi nếu quá trình tương tác với blockchain thất bại (ví dụ: nghẽn mạng lưới, lỗi Smart Contract) hoặc từ chối trích xuất bản sao nếu người dùng không chứng minh được quyền sở hữu đối với tài sản đó.
+Hành động liên quan sẽ xảy ra sau khi Usecase kết thúc (tùy chọn): Bất động sản sau khi được "Mint" thành NFT đã sẵn sàng để tham gia vào các Use case giao dịch tiếp theo (như tạo hợp đồng mua bán điện tử, chuyển nhượng, thế chấp).
+Các yêu cầu phi chức năng (tùy chọn): Quá trình Mint NFT cần đảm bảo tính duy nhất (Uniqueness), không thể thay đổi (Immutability) và bảo mật tuyệt đối. Bản sao điện tử trích xuất phải tuân thủ nghiêm ngặt các tiêu chuẩn về chữ ký số và lưu trữ hồ sơ điện tử của Nhà nước.
+
+

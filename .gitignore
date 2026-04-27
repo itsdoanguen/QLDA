@@ -1,0 +1,54 @@
+# --- DEPENDENCIES ---
+node_modules/
+**/node_modules/
+.pnp
+.pnp.js
+
+# --- BUILD & OUTPUT ---
+dist/
+**/dist/
+build/
+**/build/
+.next/
+**/.next/
+out/
+.turbo/
+**/.turbo/
+*.tsbuildinfo
+
+# --- LOGS & DIAGNOSTICS ---
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+coverage/
+**/coverage/
+.npm
+.eslintcache
+
+# --- ENVIRONMENT & SECRETS ---
+.env
+.env.*
+# Ngoại trừ các file mẫu
+!.env.example
+!**/.env.example
+!**/.env.*.example
+
+# --- IDE & SYSTEM ---
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
+
+# --- INFRASTRUCTURE & TOOLS ---
+.terraform/
+.serverless/

@@ -1,0 +1,18 @@
+{
+  "name": "@land-registry/shared-types",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "node -e \"console.log('shared-types: lint baseline pending')\"",
+    "test": "node -e \"console.log('shared-types: test bootstrap pending')\""
+  },
+  "devDependencies": {
+    "typescript": "^5.8.2"
+  }
+}

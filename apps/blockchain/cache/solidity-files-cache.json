@@ -1,0 +1,113 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "E:\\CODE\\QLDA\\QLDA\\apps\\blockchain\\contracts\\LandNFT.sol": {
+      "lastModificationDate": 1777274819185,
+      "contentHash": "c73895b2764e37a8ee234a740cea5bec",
+      "sourceName": "contracts/LandNFT.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.24"
+      ],
+      "artifacts": [
+        "LandNFT"
+      ]
+    },
+    "E:\\CODE\\QLDA\\QLDA\\apps\\blockchain\\contracts\\LandRegistry.sol": {
+      "lastModificationDate": 1777274812430,
+      "contentHash": "3b5bcce66f7a9b8603a66c8b0c7e1462",
+      "sourceName": "contracts/LandRegistry.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.24"
+      ],
+      "artifacts": [
+        "LandRegistry"
+      ]
+    },
+    "E:\\CODE\\QLDA\\QLDA\\apps\\blockchain\\contracts\\utils\\AccessControl.sol": {
+      "lastModificationDate": 1777274948277,
+      "contentHash": "28145a56f7ec145b36f6efe5a37fbb6d",
+      "sourceName": "contracts/utils/AccessControl.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.24"
+      ],
+      "artifacts": [
+        "AccessControl"
+      ]
+    }
+  }
+}
