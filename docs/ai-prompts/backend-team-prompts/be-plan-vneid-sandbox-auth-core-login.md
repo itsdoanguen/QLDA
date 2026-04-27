@@ -11,7 +11,7 @@ Included:
 
 Excluded (deferred):
 - OTP flow.
-- Wallet link/recovery flow.
+- Managed wallet provisioning/recovery flow.
 - Blockchain boundary mo rong cho auth increment nay.
 - Full CI hard-gate phase 0.
 
@@ -162,7 +162,7 @@ Nhiem vu:
 ### Step 7: Chot deferred backlog
 Phu thuoc: khong.
 - OTP.
-- Wallet link/recovery.
+- Managed wallet provisioning/recovery.
 - Blockchain boundary mo rong.
 - Full CI hard-gate phase 0.
 

@@ -50,7 +50,7 @@ Khong bao gom:
 
 ### 2.2 BE integration points
 - `POST /api/v1/auth/login`
-- `POST /api/v1/wallet/link`
+- `POST /api/v1/auth/verify-otp` (auto provision managed wallet)
 - `POST /api/v1/wallet/recovery-request`
 
 ---

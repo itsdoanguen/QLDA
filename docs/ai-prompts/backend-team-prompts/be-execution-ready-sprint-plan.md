@@ -187,23 +187,23 @@ Deliverable:
   - `POST /api/v1/auth/logout`
   - `GET /api/v1/auth/profile`
   - `POST /api/v1/auth/send-otp`
-  - `POST /api/v1/auth/verify-otp`
+  - `POST /api/v1/auth/verify-otp` (auto provision managed wallet)
 - Wallet endpoints:
-  - `POST /api/v1/wallet/link`
   - `POST /api/v1/wallet/recovery-request`
   - `GET /api/v1/wallet/status`
 - Enforce rules:
-  - 1 CCCD <-> 1 wallet
+  - 1 user <-> 1 active wallet
   - OTP TTL + rate limit
   - logout invalidate token/session
   - recovery request mac dinh Pending
+  - encrypted private key storage with key version
 
 Deliverable:
 - Toan bo endpoint Phase 1 chay va co Swagger docs.
 
 ### Day 8-10: Test Gate + Release Decision
 - Unit + integration test cho toan bo rule Phase 1.
-- E2E slice: login -> wallet link -> recovery request -> logout.
+- E2E slice: login -> verify-otp (auto wallet) -> recovery request -> logout.
 - Security + audit check cho auth failures.
 - Go/No-Go:
   - Go neu pass du 5 test gate va khong con bug high severity.
