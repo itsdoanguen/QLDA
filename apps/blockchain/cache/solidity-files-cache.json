@@ -108,6 +108,42 @@
       "artifacts": [
         "AccessControl"
       ]
+    },
+    "E:\\CODE\\QLDA\\LandContractQLDA\\apps\\blockchain\\contracts\\MultiSigWorkflow.sol": {
+      "lastModificationDate": 1777286255668,
+      "contentHash": "d40826db881eb44f99160a8ce84e69d4",
+      "sourceName": "contracts/MultiSigWorkflow.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.24"
+      ],
+      "artifacts": [
+        "MultiSigWorkflow"
+      ]
     }
   }
 }
