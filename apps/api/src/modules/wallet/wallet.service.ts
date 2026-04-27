@@ -1,9 +1,11 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ethers } from 'ethers';
 
 import { Wallet } from '../database/entities/wallet.entity';
 import { WalletRecoveryRequest } from '../database/entities/wallet-recovery-request.entity';
+import { User } from '../database/entities/user.entity';
 import { WalletLinkRequest, WalletRecoveryRequestDto } from '@land-registry/shared-types';
 
 @Injectable()
@@ -13,17 +15,24 @@ export class WalletService {
     private walletRepository: Repository<Wallet>,
     @InjectRepository(WalletRecoveryRequest)
     private recoveryRepository: Repository<WalletRecoveryRequest>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
   ) {}
 
   async linkWallet(userId: number, payload: WalletLinkRequest) {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
     const existingByUser = await this.walletRepository.findOne({ where: { userId } });
     if (existingByUser) {
-      throw new BadRequestException('User already has a linked wallet');
+      throw new BadRequestException(`CCCD ${user.vneidNumber} is already linked to a wallet`);
     }
 
     const existingByAddress = await this.walletRepository.findOne({ where: { walletAddress: payload.walletAddress } });
     if (existingByAddress) {
-      throw new BadRequestException('Wallet address is already linked to another user');
+      throw new BadRequestException('Wallet address is already linked to another CCCD');
     }
 
     let wallet = this.walletRepository.create({
@@ -34,6 +43,32 @@ export class WalletService {
     wallet = await this.walletRepository.save(wallet);
 
     return { message: 'Wallet linked successfully' };
+  }
+
+  async ensureManagedWallet(userId: number) {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    let existingWallet = await this.walletRepository.findOne({ where: { userId } });
+    if (existingWallet) {
+      return existingWallet;
+    }
+
+    // Auto-provision a managed wallet for the user
+    // Note: In Phase 1, we generate a new keypair and will store it securely.
+    // For now, we simulate wallet generation.
+    const newWallet = ethers.Wallet.createRandom();
+    
+    let wallet = this.walletRepository.create({
+      walletAddress: newWallet.address,
+      userId: userId,
+      status: 'Active',
+    });
+    wallet = await this.walletRepository.save(wallet);
+
+    return wallet;
   }
 
   async requestRecovery(userId: number, payload: WalletRecoveryRequestDto) {
