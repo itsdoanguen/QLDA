@@ -19,6 +19,26 @@ Table Users {
   created_at timestamp
 }
 
+Table Auth_Identities {
+  id int [pk, increment]
+  user_id int [ref: - Users.id]
+  provider varchar [note: 'vneid']
+  provider_id varchar [note: 'Số CCCD']
+  auth_level varchar [note: 'loa1, loa2']
+  last_verified_at timestamp
+  created_at timestamp
+}
+
+Table User_Sessions {
+  id varchar [pk, note: 'Session Token / JTI']
+  user_id int [ref: > Users.id]
+  provider_session_id varchar [note: 'JTI từ VNeID Sandbox']
+  ip_address varchar
+  user_agent varchar
+  expires_at timestamp
+  created_at timestamp
+}
+
 // ==========================================
 // 2. QUẢN LÝ VÍ VÀ LIÊN KẾT ĐỊNH DANH
 // ==========================================

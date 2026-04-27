@@ -1,22 +1,39 @@
-export type OtpChannel = 'sms' | 'email';
-
-export interface LoginRequest {
-  vneidNumber: string;
-  otpCode: string;
+export interface AuthLoginRequest {
+  nationalId: string;
+  fullName: string;
+  dateOfBirth: string; // YYYY-MM-DD
 }
 
-export interface LoginResponse {
+export interface AuthLoginResponse {
+  challengeId: string;
+  expiresAt: string;
+  _testOtp?: string;
+  message: string;
+}
+
+export interface AuthVerifyOtpRequest {
+  challengeId: string;
+  otp: string;
+}
+
+export interface AuthVerifyOtpResponse {
   accessToken: string;
-  refreshToken: string;
-  expiresIn: string;
+  tokenType: string;
+  expiresIn: number;
 }
 
-export interface SendOtpRequest {
-  vneidNumber: string;
-  channel: OtpChannel;
+export interface AuthSendOtpRequest {
+  challengeId: string;
 }
 
-export interface VerifyOtpRequest {
-  vneidNumber: string;
-  otpCode: string;
+export interface AuthSendOtpResponse {
+  challengeId: string;
+  expiresAt: string;
+  _testOtp?: string;
+  message: string;
+}
+
+export interface AuthLogoutRequest {
+  // token is taken from Authorization header, body is intentionally empty
+  sandboxJti?: string; // Optional: forward to sandbox logout
 }

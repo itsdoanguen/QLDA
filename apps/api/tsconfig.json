@@ -8,16 +8,18 @@
     "allowSyntheticDefaultImports": true,
     "target": "es2021",
     "sourceMap": true,
+    "rootDir": "./src",
     "outDir": "./dist",
     "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
     "strict": true,
+    "strictPropertyInitialization": false,
     "moduleResolution": "node",
+    "ignoreDeprecations": "5.0",
     "types": [
       "node"
-    ],
-    "ignoreDeprecations": "6.0"
+    ]
   },
   "include": [
     "src/**/*.ts"

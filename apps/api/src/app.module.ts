@@ -11,6 +11,7 @@ import { IpfsModule } from './modules/ipfs/ipfs.module';
 import { RedisModule } from './modules/redis/redis.module';
 import { VneidModule } from './modules/vneid/vneid.module';
 import { WalletModule } from './modules/wallet/wallet.module';
+import { BlockchainModule } from './modules/blockchain/blockchain.module';
 
 @Module({
 	imports: [
@@ -27,6 +28,7 @@ import { WalletModule } from './modules/wallet/wallet.module';
 		IpfsModule,
 		VneidModule,
 		HealthModule,
+		BlockchainModule,
 	],
 })
 export class AppModule implements NestModule {
