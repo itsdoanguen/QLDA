@@ -14,8 +14,9 @@ export type AppEnv = {
   JWT_ACCESS_EXPIRES_IN: string;
   JWT_REFRESH_SECRET: string;
   JWT_REFRESH_EXPIRES_IN: string;
-  IPFS_API_URL: string;
-  IPFS_API_KEY: string;
+  PINATA_JWT: string;
+  PINATA_API_BASE: string;
+  PINATA_GATEWAY_BASE: string;
   RPC_URL: string;
   CHAIN_ID: number;
   LAND_REGISTRY_CONTRACT_ADDRESS: string;
@@ -39,8 +40,9 @@ const REQUIRED_KEYS: Array<keyof AppEnv> = [
   'JWT_ACCESS_EXPIRES_IN',
   'JWT_REFRESH_SECRET',
   'JWT_REFRESH_EXPIRES_IN',
-  'IPFS_API_URL',
-  'IPFS_API_KEY',
+  'PINATA_JWT',
+  'PINATA_API_BASE',
+  'PINATA_GATEWAY_BASE',
   'RPC_URL',
   'CHAIN_ID',
   'LAND_REGISTRY_CONTRACT_ADDRESS',
@@ -87,8 +89,9 @@ export function validateEnv(rawEnv: RawEnv): AppEnv {
     JWT_ACCESS_EXPIRES_IN: getString(rawEnv, 'JWT_ACCESS_EXPIRES_IN'),
     JWT_REFRESH_SECRET: getString(rawEnv, 'JWT_REFRESH_SECRET'),
     JWT_REFRESH_EXPIRES_IN: getString(rawEnv, 'JWT_REFRESH_EXPIRES_IN'),
-    IPFS_API_URL: getString(rawEnv, 'IPFS_API_URL'),
-    IPFS_API_KEY: getString(rawEnv, 'IPFS_API_KEY'),
+    PINATA_JWT: getString(rawEnv, 'PINATA_JWT'),
+    PINATA_API_BASE: getString(rawEnv, 'PINATA_API_BASE'),
+    PINATA_GATEWAY_BASE: getString(rawEnv, 'PINATA_GATEWAY_BASE'),
     RPC_URL: getString(rawEnv, 'RPC_URL'),
     CHAIN_ID: toNumber(getString(rawEnv, 'CHAIN_ID'), 'CHAIN_ID'),
     LAND_REGISTRY_CONTRACT_ADDRESS: getString(rawEnv, 'LAND_REGISTRY_CONTRACT_ADDRESS'),
