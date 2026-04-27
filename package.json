@@ -8,7 +8,7 @@
 		"packages/*"
 	],
 	"scripts": {
-		"dev": "turbo run dev",
+		"dev": "turbo run build --filter=@land-registry/shared-types && turbo run dev",
 		"build": "turbo run build",
 		"lint": "turbo run lint",
 		"test": "turbo run test",
