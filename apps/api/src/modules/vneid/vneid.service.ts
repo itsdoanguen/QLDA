@@ -15,7 +15,9 @@ export class VneidService {
   }
 
   private async request(path: string, payload: any) {
-    const url = `${this.baseUrl}${path}`;
+    const cleanBaseUrl = this.baseUrl.endsWith('/') ? this.baseUrl.slice(0, -1) : this.baseUrl;
+    const cleanPath = path.startsWith('/') ? path : `/${path}`;
+    const url = `${cleanBaseUrl}${cleanPath}`;
     try {
       const response = await fetch(url, {
         method: 'POST',
@@ -59,5 +61,9 @@ export class VneidService {
 
   async logoutAuth(jti: string) {
     return this.request('/mock-vneid/v1/auth/logout', { jti });
+  }
+
+  async verifyIdentity(nationalId: string) {
+    return this.request('/mock-vneid/v1/verify-identity', { nationalId });
   }
 }

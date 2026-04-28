@@ -32,18 +32,22 @@ const features: Feature[] = [
 export function LandingPage() {
   const router = useRouter();
 
+  const handleLogin = () => {
+    router.push("/login");
+  };
+
   return (
     <main className="min-h-screen text-slate-900">
-      <LandingHeader router={router} />
+      <LandingHeader onLogin={handleLogin} />
       <HeroSection router={router} />
       <FeaturesSection />
-      <CtaSection router={router} />
+      <CtaSection onLogin={handleLogin} />
       <LandingFooter router={router} />
     </main>
   );
 }
 
-function LandingHeader({ router }: { router: ReturnType<typeof useRouter> }) {
+function LandingHeader({ onLogin }: { onLogin: () => void }) {
   return (
     <header className="border-b border-slate-200/80 bg-white/90 backdrop-blur-sm">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
@@ -59,7 +63,7 @@ function LandingHeader({ router }: { router: ReturnType<typeof useRouter> }) {
         <Button
           type="primary"
           icon={<LoginOutlined />}
-          onClick={() => router.push("/in-development")}
+          onClick={onLogin}
           className="!h-10 !rounded-md !bg-blue-700 !px-4 !font-medium !shadow-none hover:!bg-blue-800"
         >
           Đăng nhập VNeID
@@ -90,7 +94,7 @@ function HeroSection({ router }: { router: ReturnType<typeof useRouter> }) {
           <Button
             type="primary"
             icon={<ArrowRightOutlined />}
-            onClick={() => router.push("/in-development")}
+            onClick={() => router.push("/login")}
             className="!h-12 !rounded-md !bg-blue-700 !px-6 !font-semibold !shadow-none hover:!bg-blue-800"
           >
             Bắt đầu ngay
@@ -217,7 +221,7 @@ function FeatureCard({ title, description, icon }: Feature) {
   );
 }
 
-function CtaSection({ router }: { router: ReturnType<typeof useRouter> }) {
+function CtaSection({ onLogin }: { onLogin: () => void }) {
   return (
     <section className="py-16 sm:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
@@ -230,7 +234,7 @@ function CtaSection({ router }: { router: ReturnType<typeof useRouter> }) {
           <div className="mt-8">
             <Button
               icon={<LoginOutlined />}
-              onClick={() => router.push("/in-development")}
+              onClick={onLogin}
               className="!h-12 !rounded-md !border-0 !bg-white !px-6 !font-semibold !text-blue-700 !shadow-none hover:!bg-blue-50"
             >
               Đăng nhập bằng VNeID
