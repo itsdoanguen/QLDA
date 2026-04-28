@@ -112,6 +112,7 @@ describe('AuthService', () => {
       
       userRepository.create.mockReturnValue({ id: 1, vneidNumber: '123456789', fullName: 'Nguyen Van A', status: 'Active', roleId: 1 });
       userRepository.save.mockResolvedValue({ id: 1, vneidNumber: '123456789', fullName: 'Nguyen Van A', status: 'Active', roleId: 1 });
+      (walletService.ensureManagedWallet as jest.Mock).mockResolvedValue({ walletAddress: '0x123' });
       
       (jwtService.signAsync as jest.Mock).mockResolvedValue('internal_jwt_token');
       (jwtService.decode as jest.Mock).mockReturnValue({ jti: 'jwt_id' });
@@ -123,6 +124,7 @@ describe('AuthService', () => {
       expect(roleRepository.findOne).toHaveBeenCalledWith({ where: { roleCode: 'CITIZEN' } });
       expect(roleRepository.save).toHaveBeenCalled();
       expect(userRepository.save).toHaveBeenCalled();
+      expect(walletService.ensureManagedWallet).toHaveBeenCalledWith(1);
       expect(redisSessionService.setSession).toHaveBeenCalledWith('jwt_id', JSON.stringify({ userId: 1 }), 900);
       
       expect(result).toEqual({
@@ -142,6 +144,7 @@ describe('AuthService', () => {
       
       // User found and active
       userRepository.findOne.mockResolvedValue({ id: 2, vneidNumber: '123456789', fullName: 'Existing User', status: 'Active', roleId: 1 });
+      (walletService.ensureManagedWallet as jest.Mock).mockResolvedValue({ walletAddress: '0xabc' });
       
       (jwtService.signAsync as jest.Mock).mockResolvedValue('internal_jwt_token_2');
       (jwtService.decode as jest.Mock).mockReturnValue({ jti: 'jwt_id_2' });
@@ -150,6 +153,7 @@ describe('AuthService', () => {
 
       expect(userRepository.create).not.toHaveBeenCalled();
       expect(userRepository.save).not.toHaveBeenCalled();
+      expect(walletService.ensureManagedWallet).toHaveBeenCalledWith(2);
       
       expect(result).toEqual({
         accessToken: 'internal_jwt_token_2',

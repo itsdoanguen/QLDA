@@ -28,4 +28,10 @@ export class WalletController {
   async getStatus(@Req() req: any) {
     return this.walletService.getStatus(req.user.sub);
   }
+
+  @Get('details')
+  @ApiOperation({ summary: 'Get current wallet details' })
+  async getDetails(@Req() req: any) {
+    return this.walletService.getWalletDetails(req.user.sub);
+  }
 }

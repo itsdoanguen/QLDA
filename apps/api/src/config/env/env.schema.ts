@@ -24,6 +24,7 @@ export type AppEnv = {
   VNEID_BASE_URL: string;
   VNEID_API_KEY: string;
   PAYMENT_CALLBACK_URL: string;
+  MASTER_ENCRYPTION_KEY: string;
 };
 
 const REQUIRED_KEYS: Array<keyof AppEnv> = [
@@ -50,6 +51,7 @@ const REQUIRED_KEYS: Array<keyof AppEnv> = [
   'VNEID_BASE_URL',
   'VNEID_API_KEY',
   'PAYMENT_CALLBACK_URL',
+  'MASTER_ENCRYPTION_KEY',
 ];
 
 function toNumber(value: string, key: string): number {
@@ -99,6 +101,7 @@ export function validateEnv(rawEnv: RawEnv): AppEnv {
     VNEID_BASE_URL: getString(rawEnv, 'VNEID_BASE_URL'),
     VNEID_API_KEY: getString(rawEnv, 'VNEID_API_KEY'),
     PAYMENT_CALLBACK_URL: getString(rawEnv, 'PAYMENT_CALLBACK_URL'),
+    MASTER_ENCRYPTION_KEY: getString(rawEnv, 'MASTER_ENCRYPTION_KEY'),
   };
 
   return env;

@@ -27,6 +27,7 @@ import { Role } from '../modules/database/entities/role.entity';
 import { SystemLog } from '../modules/database/entities/system-log.entity';
 import { User } from '../modules/database/entities/user.entity';
 import { WalletRecoveryRequest } from '../modules/database/entities/wallet-recovery-request.entity';
+import { WalletSecret } from '../modules/database/entities/wallet-secret.entity';
 import { Wallet } from '../modules/database/entities/wallet.entity';
 
 const appDataSource = new DataSource({
@@ -38,7 +39,7 @@ const appDataSource = new DataSource({
   database: env.DB_NAME,
   synchronize: false,
   logging: false,
-  entities: [Role, User, Wallet, WalletRecoveryRequest, SystemLog],
+  entities: [Role, User, Wallet, WalletSecret, WalletRecoveryRequest, SystemLog],
   migrations: ['src/database/migrations/*.ts'],
 });
 
