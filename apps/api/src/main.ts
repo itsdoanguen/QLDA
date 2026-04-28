@@ -1,6 +1,17 @@
 import 'reflect-metadata';
 import * as dotenv from 'dotenv';
-dotenv.config();
+import * as path from 'path';
+
+// Load env files relative to apps/api so turbo/monorepo run location does not change PORT unexpectedly.
+const envFiles = [
+	path.resolve(__dirname, '../.env.development.local'),
+	path.resolve(__dirname, '../.env.local'),
+	path.resolve(__dirname, '../.env'),
+];
+
+for (const envFile of envFiles) {
+	dotenv.config({ path: envFile, override: true });
+}
 
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
@@ -27,7 +38,7 @@ async function bootstrap(): Promise<void> {
 		.setTitle('Land Registry API')
 		.setDescription('The Land Registry System API documentation')
 		.setVersion('1.0')
-		.addBearerAuth()
+		.addBearerAuth(undefined, 'access-token')
 		.build();
 	const document = SwaggerModule.createDocument(app, config);
 	SwaggerModule.setup('api/v1/docs', app, document);

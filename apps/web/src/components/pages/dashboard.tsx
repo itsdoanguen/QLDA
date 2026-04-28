@@ -76,9 +76,11 @@ export function DashboardPage() {
           Quản lý đô thị thông minh
         </div>
         <div className="flex items-center gap-6">
-          <Button className="!rounded-sm !border-[#d1d5db] !text-[#374151] hover:!text-[#0052cc] hover:!border-[#0052cc] !font-medium">
-            Connect Wallet
-          </Button>
+          <Link href="/wallet">
+            <Button className="!rounded-sm !border-[#d1d5db] !text-[#374151] hover:!text-[#0052cc] hover:!border-[#0052cc] !font-medium">
+              Check Wallet
+            </Button>
+          </Link>
           <div className="flex items-center gap-3">
             <span className="text-[14px] text-[#4b5563]">Xin chào, {profile?.fullName || "Bạn"}</span>
             <div className="h-8 w-8 rounded-full bg-[#d1d5db] flex items-center justify-center text-white">

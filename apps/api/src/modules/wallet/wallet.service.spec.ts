@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { WalletService } from './wallet.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Wallet } from '../database/entities/wallet.entity';
+import { WalletSecret } from '../database/entities/wallet-secret.entity';
 import { WalletRecoveryRequest } from '../database/entities/wallet-recovery-request.entity';
 import { User } from '../database/entities/user.entity';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
@@ -9,12 +10,20 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 describe('WalletService - CCCD Constraints', () => {
   let service: WalletService;
   let walletRepository: any;
+  let walletSecretRepository: any;
   let recoveryRepository: any;
   let userRepository: any;
 
   beforeEach(async () => {
     walletRepository = {
       findOne: jest.fn(),
+      create: jest.fn(),
+      save: jest.fn(),
+      manager: {
+        transaction: jest.fn(),
+      },
+    };
+    walletSecretRepository = {
       create: jest.fn(),
       save: jest.fn(),
     };
@@ -31,6 +40,7 @@ describe('WalletService - CCCD Constraints', () => {
       providers: [
         WalletService,
         { provide: getRepositoryToken(Wallet), useValue: walletRepository },
+        { provide: getRepositoryToken(WalletSecret), useValue: walletSecretRepository },
         { provide: getRepositoryToken(WalletRecoveryRequest), useValue: recoveryRepository },
         { provide: getRepositoryToken(User), useValue: userRepository },
       ],
@@ -90,17 +100,37 @@ describe('WalletService - CCCD Constraints', () => {
   });
 
   describe('ensureManagedWallet', () => {
+    beforeEach(() => {
+      process.env.MASTER_ENCRYPTION_KEY = Buffer.alloc(32, 1).toString('base64');
+    });
+
     it('should auto-create a wallet if the CCCD does not have one', async () => {
       userRepository.findOne.mockResolvedValue({ id: 1, vneidNumber: '012345678912' });
       walletRepository.findOne.mockResolvedValue(null);
       walletRepository.create.mockReturnValue({ walletAddress: '0xAuto', userId: 1, status: 'Active' });
       walletRepository.save.mockResolvedValue({ walletAddress: '0xAuto', userId: 1, status: 'Active' });
+      walletSecretRepository.create.mockReturnValue({
+        walletAddress: '0xAuto',
+        encryptedPrivateKey: 'encrypted',
+        iv: 'iv',
+        authTag: 'tag',
+      });
+      walletSecretRepository.save.mockResolvedValue({ id: 1 });
 
-      // Mock ethers if used inside ensureManagedWallet, or assume basic mock works
+      const txManager = {
+        getRepository: jest.fn((entity: any) => {
+          if (entity === Wallet) return walletRepository;
+          return walletSecretRepository;
+        }),
+      };
+
+      walletRepository.manager.transaction.mockImplementation(async (callback: any) => callback(txManager));
+
       const result = await service.ensureManagedWallet(1);
       
       expect(result.walletAddress).toBeDefined();
       expect(walletRepository.save).toHaveBeenCalled();
+      expect(walletSecretRepository.save).toHaveBeenCalled();
     });
 
     it('should return the existing wallet if the CCCD already has one without creating a new one', async () => {
@@ -112,6 +142,31 @@ describe('WalletService - CCCD Constraints', () => {
       expect(walletRepository.create).not.toHaveBeenCalled();
       expect(walletRepository.save).not.toHaveBeenCalled();
       expect(result.walletAddress).toBe('0xExisting');
+    });
+  });
+
+  describe('getWalletDetails', () => {
+    it('should return wallet details when wallet exists', async () => {
+      const now = new Date();
+      walletRepository.findOne.mockResolvedValue({
+        walletAddress: '0x123',
+        status: 'Active',
+        createdAt: now,
+      });
+
+      const result = await service.getWalletDetails(1);
+
+      expect(result).toEqual({
+        walletAddress: '0x123',
+        status: 'Active',
+        linkedAt: now,
+      });
+    });
+
+    it('should throw NotFoundException when wallet does not exist', async () => {
+      walletRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.getWalletDetails(1)).rejects.toThrow(NotFoundException);
     });
   });
 });
