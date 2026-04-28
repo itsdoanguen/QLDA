@@ -199,9 +199,21 @@ export class AuthService {
 
   async getProfile(userId: number) {
     const user = await this.userRepository.findOne({ where: { id: userId } });
+    
     if (!user) {
-      throw new UnauthorizedException('User not found');
+      throw new HttpException('User not found', 404);
     }
+
+    let vneid = null;
+    try {
+      const identityRes = await this.vneidService.verifyIdentity(user.vneidNumber);
+      if (identityRes && identityRes.verified) {
+        vneid = identityRes.person;
+      }
+    } catch (e) {
+      this.logger.warn(`Could not fetch VNeID data for user ${userId}`);
+    }
+
     return {
       id: user.id,
       vneidNumber: user.vneidNumber,
@@ -209,6 +221,7 @@ export class AuthService {
       email: user.email,
       phone: user.phone,
       status: user.status,
+      vneid,
     };
   }
 }
