@@ -18,7 +18,7 @@ export class User {
   @JoinColumn({ name: 'role_id' })
   role: Role;
 
-  @Column({ name: 'role_id', nullable: true })
+  @Column({ name: 'role_id' })
   roleId: number;
 
   @Column({ name: 'vneid_number', length: 20, unique: true })
@@ -33,7 +33,7 @@ export class User {
   @Column({ length: 20, nullable: true })
   phone: string;
 
-  @Column({ length: 50, default: 'Active' })
+  @Column({ length: 20, default: 'Active' })
   status: string;
 
   @CreateDateColumn({ name: 'created_at' })

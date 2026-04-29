@@ -29,6 +29,28 @@ import { User } from '../modules/database/entities/user.entity';
 import { WalletRecoveryRequest } from '../modules/database/entities/wallet-recovery-request.entity';
 import { WalletSecret } from '../modules/database/entities/wallet-secret.entity';
 import { Wallet } from '../modules/database/entities/wallet.entity';
+import { AuthIdentity } from '../modules/database/entities/auth-identity.entity';
+import { UserSession } from '../modules/database/entities/user-session.entity';
+import { LandRecord } from '../modules/database/entities/land-record.entity';
+import { LandRecordVersion } from '../modules/database/entities/land-record-version.entity';
+import { LandFile } from '../modules/database/entities/land-file.entity';
+import { BlockchainLog } from '../modules/database/entities/blockchain-log.entity';
+import { SmartContract } from '../modules/database/entities/smart-contract.entity';
+import { LandNFT } from '../modules/database/entities/land-nft.entity';
+import { CachedProvenanceLog } from '../modules/database/entities/cached-provenance-log.entity';
+import { ApprovalRequest } from '../modules/database/entities/approval-request.entity';
+import { Signature } from '../modules/database/entities/signature.entity';
+import { Transaction } from '../modules/database/entities/transaction.entity';
+import { TaxFee } from '../modules/database/entities/tax-fee.entity';
+import { Receipt } from '../modules/database/entities/receipt.entity';
+import { PlanningZone } from '../modules/database/entities/planning-zone.entity';
+import { LandPlanningMap } from '../modules/database/entities/land-planning-map.entity';
+import { Dispute } from '../modules/database/entities/dispute.entity';
+import { Mortgage } from '../modules/database/entities/mortgage.entity';
+import { FraudReport } from '../modules/database/entities/fraud-report.entity';
+import { SystemConfig } from '../modules/database/entities/system-config.entity';
+import { SystemConfigAudit } from '../modules/database/entities/system-config-audit.entity';
+import { Notification } from '../modules/database/entities/notification.entity';
 
 const appDataSource = new DataSource({
   type: 'postgres',
@@ -39,7 +61,36 @@ const appDataSource = new DataSource({
   database: env.DB_NAME,
   synchronize: false,
   logging: false,
-  entities: [Role, User, Wallet, WalletSecret, WalletRecoveryRequest, SystemLog],
+  entities: [
+    Role,
+    User,
+    Wallet,
+    WalletSecret,
+    WalletRecoveryRequest,
+    SystemLog,
+    AuthIdentity,
+    UserSession,
+    LandRecord,
+    LandRecordVersion,
+    LandFile,
+    BlockchainLog,
+    SmartContract,
+    LandNFT,
+    CachedProvenanceLog,
+    ApprovalRequest,
+    Signature,
+    Transaction,
+    TaxFee,
+    Receipt,
+    PlanningZone,
+    LandPlanningMap,
+    Dispute,
+    Mortgage,
+    FraudReport,
+    SystemConfig,
+    SystemConfigAudit,
+    Notification,
+  ],
   migrations: ['src/database/migrations/*.ts'],
 });
 
