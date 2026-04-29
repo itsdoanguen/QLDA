@@ -9,8 +9,8 @@ import {
 
 import { User } from './user.entity';
 
-@Entity('system_logs')
-export class SystemLog {
+@Entity('notifications')
+export class Notification {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -21,20 +21,17 @@ export class SystemLog {
   @Column({ name: 'user_id' })
   userId: number;
 
-  @Column({ length: 100 })
-  action: string;
+  @Column({ length: 255 })
+  title: string;
 
-  @Column({ name: 'target_table', length: 100 })
-  targetTable: string;
+  @Column({ type: 'text' })
+  content: string;
 
-  @Column({ name: 'target_id', length: 100 })
-  targetId: string;
+  @Column({ length: 50 })
+  type: string; // Warning, Info, System, SLA_Alert
 
-  @Column({ name: 'hash_value', length: 128 })
-  hashValue: string;
-
-  @Column({ name: 'ip_address', length: 64, nullable: true })
-  ipAddress: string;
+  @Column({ name: 'is_read', default: false })
+  isRead: boolean;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

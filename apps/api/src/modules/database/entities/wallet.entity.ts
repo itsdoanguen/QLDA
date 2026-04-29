@@ -11,7 +11,7 @@ import { User } from './user.entity';
 
 @Entity('wallets')
 export class Wallet {
-  @PrimaryColumn({ name: 'wallet_address', length: 42 })
+  @PrimaryColumn({ name: 'wallet_address', length: 128 })
   walletAddress: string;
 
   @OneToOne(() => User)
@@ -21,7 +21,7 @@ export class Wallet {
   @Column({ name: 'user_id', unique: true })
   userId: number;
 
-  @Column({ length: 50, default: 'Active' })
+  @Column({ length: 20, default: 'Active' })
   status: string; // Active, Locked, Replaced
 
   @CreateDateColumn({ name: 'created_at' })

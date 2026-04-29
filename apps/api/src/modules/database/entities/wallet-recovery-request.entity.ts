@@ -21,13 +21,13 @@ export class WalletRecoveryRequest {
   @Column({ name: 'user_id' })
   userId: number;
 
-  @Column({ name: 'old_wallet_address', length: 42 })
+  @Column({ name: 'old_wallet_address', length: 128 })
   oldWalletAddress: string;
 
-  @Column({ name: 'new_wallet_address', length: 42 })
+  @Column({ name: 'new_wallet_address', length: 128 })
   newWalletAddress: string;
 
-  @Column({ length: 50, default: 'Pending' })
+  @Column({ length: 20, default: 'Pending' })
   status: string; // Pending, Approved, Rejected
 
   @ManyToOne(() => User)

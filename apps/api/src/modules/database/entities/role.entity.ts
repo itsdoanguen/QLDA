@@ -5,7 +5,7 @@ export class Role {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'role_code', length: 10, unique: true })
+  @Column({ name: 'role_code', length: 20, unique: true })
   roleCode: string;
 
   @Column({ name: 'role_name', length: 100 })
