@@ -15,12 +15,13 @@ export class LandFile {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => LandRecord)
+  @ManyToOne(() => LandRecord, { nullable: true })
   @JoinColumn({ name: 'record_id' })
   record: LandRecord;
 
-  @Column({ name: 'record_id' })
+  @Column({ name: 'record_id', nullable: true })
   recordId: number;
+
 
   @Column({ name: 'file_name', length: 255 })
   fileName: string;

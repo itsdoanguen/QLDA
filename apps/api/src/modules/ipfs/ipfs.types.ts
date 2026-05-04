@@ -1,6 +1,7 @@
 export interface IpfsUploadInput {
-  content: string;
-  filename?: string;
+  content: Buffer | string;
+  fileName: string;
+  mimeType?: string;
 }
 
 export interface IpfsUploadResult {
@@ -11,3 +12,4 @@ export interface IpfsUploadResult {
 export interface IpfsClient {
   upload(input: IpfsUploadInput): Promise<IpfsUploadResult>;
 }
+
