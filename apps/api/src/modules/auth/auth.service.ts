@@ -143,16 +143,15 @@ export class AuthService {
       const jti = decoded?.jti || Date.now().toString();
 
       // 5. Store session
-      const ttlStr = this.configService.get<string>('JWT_ACCESS_EXPIRES_IN') || '15m';
-      const ttlSeconds = parseInt(ttlStr) * 60;
-      this.redisSession.setSession(jti, JSON.stringify({ userId: user.id }), ttlSeconds || 900);
+      const sessionTtl = this.configService.get<number>('REDIS_SESSION_TTL_SECONDS') || 900;
+      this.redisSession.setSession(jti, JSON.stringify({ userId: user.id }), sessionTtl);
 
       this.logger.log(`Login successful for user: ${user.vneidNumber}`);
 
       return {
         accessToken,
         tokenType: 'Bearer',
-        expiresIn: ttlSeconds || 900,
+        expiresIn: sessionTtl,
         user: {
           id: user.id,
           fullName: user.fullName,
