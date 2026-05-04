@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 
 import { Role } from './role.entity';
+import { Department } from './department.entity';
 
 @Entity('users')
 export class User {
@@ -20,6 +21,13 @@ export class User {
 
   @Column({ name: 'role_id' })
   roleId: number;
+
+  @ManyToOne(() => Department, { nullable: true })
+  @JoinColumn({ name: 'department_id' })
+  department: Department;
+
+  @Column({ name: 'department_id', nullable: true })
+  departmentId: number;
 
   @Column({ name: 'vneid_number', length: 20, unique: true })
   vneidNumber: string;

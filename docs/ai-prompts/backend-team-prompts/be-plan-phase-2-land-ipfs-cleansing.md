@@ -1,19 +1,21 @@
-## Phase 2 Plan: Land Records + IPFS + Data Cleansing
+## Phase 2 Plan: Land Records + IPFS + Data Cleansing + RBAC (Cán bộ)
 
 ### Goal
-Let a user create a land record draft, upload scan files through Pinata to IPFS, and let staff perform data cleansing before approval.
+Implement Staff Role-Based Access Control (Admin, Cán bộ 1, Cán bộ 2). Let a user submit a land record draft, upload scan files to IPFS, and let Cán bộ perform a strict 2-round data cleansing and checking process before Lãnh đạo approval.
 
 ### Scope
 Must have:
-- Draft creation and update before freeze.
+- RBAC Middleware (`RolesGuard`) for Staff roles (`ADMIN`, `CAN_BO_1`, `CAN_BO_2`).
+- Staff Account Management CRUD (for Admin).
+- Draft creation (Citizen) and state transitions (`SUBMITTED` -> `CB1_APPROVED` -> `CB2_APPROVED` -> `NEEDS_SUPPLEMENT`).
 - File upload to Pinata-backed IPFS with retry.
 - CID storage and retrieval.
 - Version history.
-- Staff actions: request supplement, reject with reason, update GPS.
+- Staff actions: Cán bộ 1 checks (Round 1), Cán bộ 2 checks (Round 2), request supplement, reject with reason, update GPS.
 - Base pre-check query for planning/dispute/mortgage.
 
 Out of scope:
-- Multi-sig approval.
+- Lãnh đạo signing (Moved to Phase 3).
 - Minting NFT.
 - Transaction signing.
 - PDF export of cleansing report.
@@ -25,22 +27,29 @@ Out of scope:
 - EP05/US06: pre-check query core.
 
 ### API Contracts
-- `POST /api/v1/land-records`
+- `POST /api/v1/land-records/submit`
 - `PUT /api/v1/land-records/:id`
-- `PATCH /api/v1/land-records/:id/freeze`
 - `GET /api/v1/land-records/:id/versions`
 - `GET /api/v1/land-records`
 - `POST /api/v1/files/upload`
 - `GET /api/v1/files/:id`
 - `DELETE /api/v1/files/:id`
+- `POST /api/v1/land-records/:id/review-round-1` (Cán bộ 1)
+- `POST /api/v1/land-records/:id/review-round-2` (Cán bộ 2 - Freezes record)
 - `POST /api/v1/land-records/:id/request-supplement`
 - `POST /api/v1/land-records/:id/reject`
 - `PATCH /api/v1/land-records/:id/update-gps`
 - `POST /api/v1/compliance/pre-check`
+- `POST /api/v1/staff` (Admin)
+- `GET /api/v1/staff` (Admin)
+- `PATCH /api/v1/staff/:id/deactivate` (Admin)
 
 ### Required Rules
-- A frozen record cannot be edited.
-- Reject and supplement actions require a non-empty reason.
+- Only records with `SUBMITTED` status can be reviewed by `CAN_BO_1`.
+- Only records with `CB1_APPROVED` status can be reviewed by `CAN_BO_2`.
+- A record becomes frozen (`isFrozen = true`) and moves to `CB2_APPROVED` after Round 2 checking.
+- A frozen record cannot be edited by the citizen.
+- Reject and supplement actions require a non-empty reason and return the record to `NEEDS_SUPPLEMENT`.
 - GPS update must pass format validation before saving.
 - Pinata upload should retry up to 3 times for retryable errors and then fail gracefully.
 - API response for file upload must expose normalized fields (`cid`, `fileName`, `mimeType`, `size`) only.

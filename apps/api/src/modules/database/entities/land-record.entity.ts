@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 
 import { User } from './user.entity';
+import { LandRecordStatus } from '../../../common/enums/land-record-status.enum';
 
 @Entity('land_records')
 export class LandRecord {
@@ -34,8 +35,12 @@ export class LandRecord {
   @Column({ name: 'is_frozen', type: 'boolean', default: false })
   isFrozen: boolean;
 
-  @Column({ length: 50 })
-  status: string; // Draft, Chờ đối soát, Cần bổ sung, Đã đối soát, Đã Mint
+  @Column({
+    type: 'varchar',
+    length: 50,
+    default: LandRecordStatus.DRAFT,
+  })
+  status: LandRecordStatus;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

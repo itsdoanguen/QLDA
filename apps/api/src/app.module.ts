@@ -13,6 +13,7 @@ import { VneidModule } from './modules/vneid/vneid.module';
 import { WalletModule } from './modules/wallet/wallet.module';
 import { BlockchainModule } from './modules/blockchain/blockchain.module';
 import { FilesModule } from './modules/files/files.module';
+import { StaffModule } from './modules/staff/staff.module';
 
 
 @Module({
@@ -32,6 +33,7 @@ import { FilesModule } from './modules/files/files.module';
 		HealthModule,
 		BlockchainModule,
 		FilesModule,
+		StaffModule,
 	],
 
 })
