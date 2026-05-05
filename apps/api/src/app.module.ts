@@ -12,6 +12,8 @@ import { RedisModule } from './modules/redis/redis.module';
 import { VneidModule } from './modules/vneid/vneid.module';
 import { WalletModule } from './modules/wallet/wallet.module';
 import { BlockchainModule } from './modules/blockchain/blockchain.module';
+import { FilesModule } from './modules/files/files.module';
+
 
 @Module({
 	imports: [
@@ -29,7 +31,9 @@ import { BlockchainModule } from './modules/blockchain/blockchain.module';
 		VneidModule,
 		HealthModule,
 		BlockchainModule,
+		FilesModule,
 	],
+
 })
 export class AppModule implements NestModule {
 	configure(consumer: MiddlewareConsumer): void {

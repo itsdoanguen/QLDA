@@ -19,8 +19,10 @@
     "ignoreDeprecations": "5.0",
     "types": [
       "node",
-      "jest"
+      "jest",
+      "multer"
     ]
+
   },
   "include": [
     "src/**/*.ts"

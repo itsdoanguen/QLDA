@@ -12,7 +12,11 @@ export class MockIpfsClient implements IpfsClient {
     while (attempts < 3) {
       attempts += 1;
       try {
-        if (input.content.includes('simulate-ipfs-failure')) {
+        const contentStr = Buffer.isBuffer(input.content)
+          ? input.content.toString('utf8')
+          : input.content;
+
+        if (contentStr.includes('simulate-ipfs-failure')) {
           throw new Error('Simulated IPFS upload failure.');
         }
 
@@ -21,6 +25,7 @@ export class MockIpfsClient implements IpfsClient {
           cid: `Qm${digest}`,
           attempts,
         };
+
       } catch (error) {
         lastError = error instanceof Error ? error : new Error('Unknown IPFS error.');
       }

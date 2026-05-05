@@ -49,8 +49,9 @@ export class HealthService {
 
     const ipfsResult = await this.ipfsClient.upload({
       content: 'smoke-check-content',
-      filename: 'smoke.txt',
+      fileName: 'smoke.txt',
     });
+
     if (!ipfsResult.cid.startsWith('Qm')) {
       throw new Error('IPFS smoke check failed.');
     }

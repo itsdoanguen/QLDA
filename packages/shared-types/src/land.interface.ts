@@ -26,3 +26,24 @@ export class LandRecordSummary {
 	@ApiProperty()
 	updatedAt: string;
 }
+
+export class LandFileResponse {
+	@ApiProperty()
+	id: number;
+
+	@ApiProperty()
+	fileName: string;
+
+	@ApiProperty()
+	fileType: string;
+
+	@ApiProperty()
+	ipfsCid: string;
+
+	@ApiProperty({ required: false })
+	recordId?: number;
+
+	@ApiProperty()
+	createdAt: string;
+}
+

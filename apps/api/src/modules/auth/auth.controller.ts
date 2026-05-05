@@ -31,7 +31,7 @@ export class AuthController {
   }
 
   @UseGuards(AuthGuard)
-  @ApiBearerAuth()
+  @ApiBearerAuth('access-token')
   @Post('logout')
   @ApiOperation({ summary: 'Logout and invalidate session' })
   async logout(@Req() req: any) {
@@ -39,7 +39,7 @@ export class AuthController {
   }
 
   @UseGuards(AuthGuard)
-  @ApiBearerAuth()
+  @ApiBearerAuth('access-token')
   @Get('profile')
   @ApiOperation({ summary: 'Get current user profile' })
   async getProfile(@Req() req: any) {
