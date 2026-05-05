@@ -2,18 +2,20 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { LockFilled, QuestionCircleFilled } from "@ant-design/icons";
-import { Button } from "antd";
-import { useVerifyOtp } from "@/hooks/useAuth";
+import { Button, message } from "antd";
+import { useRouter } from "next/navigation";
+import { api } from "@/utils/api";
 
 const OTP_LENGTH = 6;
 const RESEND_SECONDS = 59;
 
 export function AuthOtpPage() {
-  const { verifyOtp, isSubmitting } = useVerifyOtp();
+  const router = useRouter();
   const [challengeId, setChallengeId] = useState<string | null>(null);
   const [otp, setOtp] = useState<string[]>(() => ["", "", "", "", "", ""]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [secondsLeft, setSecondsLeft] = useState(RESEND_SECONDS);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
 
   useEffect(() => {
@@ -87,10 +89,29 @@ export function AuthOtpPage() {
     }
 
     if (!challengeId) {
+      message.error("Lỗi: Không tìm thấy challengeId");
       return;
     }
 
-    await verifyOtp(challengeId, otpValue);
+    setIsSubmitting(true);
+    try {
+      const response = await api.post("/auth/verify-otp", {
+        challengeId,
+        otp: otpValue
+      });
+
+      if (response.data && response.data.accessToken) {
+        localStorage.setItem("accessToken", response.data.accessToken);
+        router.push('/dashboard');
+      } else {
+        message.error("Xác thực thất bại");
+      }
+    } catch (error: any) {
+      console.error("OTP verification failed:", error);
+      message.error(error?.response?.data?.message || "Mã OTP không đúng hoặc đã hết hạn.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

@@ -1,7 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "antd";
 import Link from "next/link";
+import { api } from "@/utils/api";
 import {
   UserOutlined,
   FileTextOutlined,
@@ -11,10 +14,48 @@ import {
   SafetyCertificateOutlined,
   EditOutlined,
 } from "@ant-design/icons";
-import { useProfile } from "@/hooks/useAuth";
 
 export function ProfilePage() {
-  const { profile, loading, logout } = useProfile();
+  const router = useRouter();
+  const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        router.push("/login");
+        return;
+      }
+
+      try {
+        const response = await api.get("/auth/profile");
+        setProfile(response.data);
+      } catch (error) {
+        console.error("Failed to fetch profile", error);
+        localStorage.removeItem("accessToken");
+        router.push("/login");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [router]);
+
+  const handleLogout = async () => {
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      try {
+        await api.post("/auth/logout");
+      } catch (error) {
+        console.error("Logout error", error);
+      }
+    }
+    localStorage.removeItem("accessToken");
+    sessionStorage.removeItem("challengeId");
+    router.push("/");
+  };
 
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center text-slate-600 font-medium">Đang tải dữ liệu...</div>;
@@ -44,7 +85,7 @@ export function ProfilePage() {
             <div className="h-8 w-8 rounded-full bg-[#d1d5db] flex items-center justify-center text-white">
               <UserOutlined />
             </div>
-            <Button type="text" icon={<LogoutOutlined />} onClick={logout}
+            <Button type="text" icon={<LogoutOutlined />} onClick={handleLogout}
               className="!text-[#4b5563] hover:!text-red-500 hover:!bg-red-50" title="Đăng xuất" />
           </div>
         </div>

@@ -1,7 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "antd";
 import Link from "next/link";
+import { api } from "@/utils/api";
 import {
   UserOutlined,
   FileTextOutlined,
@@ -9,12 +12,9 @@ import {
   FileAddOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
-import { useProfile } from "@/hooks/useAuth";
-import { useLandRecords } from "@/hooks/useLandRecords";
-import type { RecordStatus } from "@/types/land-record";
 
 /** Map blockchain status → label hiển thị */
-const STATUS_MAP: Record<RecordStatus, { label: string; className: string }> = {
+const STATUS_MAP: Record<string, { label: string; className: string }> = {
   pending: {
     label: "Đang chờ",
     className: "bg-yellow-50 text-yellow-700 border-yellow-200",
@@ -34,9 +34,83 @@ const STATUS_MAP: Record<RecordStatus, { label: string; className: string }> = {
 };
 
 export function DashboardPage() {
-  // ✅ Dùng hooks thay vì gọi axios trực tiếp
-  const { profile, loading, logout } = useProfile();
-  const { records, loading: recordsLoading } = useLandRecords();
+  const router = useRouter();
+  const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Dữ liệu UI-First (hardcoded) cho các hồ sơ vì BE chưa có API
+  const [records, setRecords] = useState<any[]>([
+    {
+      id: "lr_001",
+      documentCode: "GCN-2024-001",
+      documentType: "Giấy chứng nhận QSDĐ",
+      submittedAt: "2024-03-15T10:30:00Z",
+      blockchainStatus: "on_chain",
+      nftTokenId: "0x1234...abcd",
+    },
+    {
+      id: "lr_002",
+      documentCode: "GCN-2024-002",
+      documentType: "Hợp đồng chuyển nhượng",
+      submittedAt: "2024-04-01T14:00:00Z",
+      blockchainStatus: "pending",
+    }
+  ]);
+  const [recordsLoading, setRecordsLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        router.push("/login");
+        return;
+      }
+
+      try {
+        const response = await api.get("/auth/profile");
+        setProfile(response.data);
+      } catch (error) {
+        console.error("Failed to fetch profile", error);
+        localStorage.removeItem("accessToken");
+        router.push("/login");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [router]);
+
+  /* 
+   * TODO: Khi Backend viết xong API /land-records thì uncomment hàm này và gọi trong useEffect
+   */
+  const fetchRecords = async () => {
+    /*
+    setRecordsLoading(true);
+    try {
+      const res = await api.get("/land-records");
+      setRecords(res.data.data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setRecordsLoading(false);
+    }
+    */
+  };
+
+  const handleLogout = async () => {
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      try {
+        await api.post("/auth/logout");
+      } catch (error) {
+        console.error("Logout error", error);
+      }
+    }
+    localStorage.removeItem("accessToken");
+    sessionStorage.removeItem("challengeId");
+    router.push("/");
+  };
 
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center text-slate-600 font-medium">Đang tải dữ liệu...</div>;
@@ -72,7 +146,7 @@ export function DashboardPage() {
             <Button
               type="text"
               icon={<LogoutOutlined />}
-              onClick={logout}
+              onClick={handleLogout}
               className="!text-[#4b5563] hover:!text-red-500 hover:!bg-red-50"
               title="Đăng xuất"
             />

@@ -1,16 +1,37 @@
 "use client";
 
 import { useState } from "react";
-import { Button, Input } from "antd";
+import { useRouter } from "next/navigation";
+import { Button, Input, message } from "antd";
 import { SafetyCertificateOutlined } from "@ant-design/icons";
-import { useLogin } from "@/hooks/useAuth";
+import { api } from "@/utils/api";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [nationalId, setNationalId] = useState("");
-  const { login, loading } = useLogin();
+  const [loading, setLoading] = useState(false);
 
-  const handleContinue = () => {
-    login(nationalId);
+  const handleContinue = async () => {
+    if (!nationalId || nationalId.length !== 12) {
+      message.error("Vui lòng nhập đúng số CCCD (12 chữ số)");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await api.post(`/auth/login?nationalId=${nationalId}`);
+      if (response.data && response.data.challengeId) {
+        sessionStorage.setItem("challengeId", response.data.challengeId);
+        router.push(`/auth_otp`);
+      } else {
+        message.error("Lỗi: Không nhận được challengeId từ máy chủ.");
+      }
+    } catch (error: any) {
+      console.error("Login failed:", error);
+      message.error(error?.response?.data?.message || error?.message || "Đăng nhập thất bại");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
