@@ -92,13 +92,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
         <aside className="w-[260px] bg-[#f8f9fa] border-r border-[#e1e2e4] flex flex-col shrink-0">
-          <div className="p-6">
-            <h2 className="text-[1.05rem] font-bold leading-tight text-[#0052cc] mb-1">
-              Quản lý đô thị thông minh
-            </h2>
-          </div>
-
-          <nav className="flex flex-col gap-1 mt-2">
+          <nav className="flex flex-col gap-1 mt-4">
             <Link
               href="/dashboard"
               className={`flex items-center gap-3 px-6 py-3 font-medium text-[15px] transition-colors ${

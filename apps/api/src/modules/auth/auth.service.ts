@@ -161,6 +161,7 @@ export class AuthService {
           id: user.id,
           fullName: user.fullName,
           vneidNumber: user.vneidNumber,
+          roleCode: user.role?.roleCode || 'CITIZEN',
         }
       };
     } catch (error: any) {

@@ -102,7 +102,13 @@ export function AuthOtpPage() {
 
       if (response.data && response.data.accessToken) {
         localStorage.setItem("accessToken", response.data.accessToken);
-        router.push('/dashboard');
+        
+        const role = response.data.user?.roleCode;
+        if (role && role !== 'CITIZEN') {
+          router.push('/staff/dashboard');
+        } else {
+          router.push('/dashboard');
+        }
       } else {
         message.error("Xác thực thất bại");
       }

@@ -67,6 +67,13 @@ export class LandRecordController {
     return this.landRecordService.findAssignedRecords(user.sub);
   }
 
+  @Get('staff/stats')
+  @RequireRoles('CAN_BO')
+  @ApiOperation({ summary: 'Get stats for land records assigned to current staff' })
+  getStats(@CurrentUser() user: any) {
+    return this.landRecordService.getStaffStats(user.sub);
+  }
+
   @Post(':id/review')
   @RequireRoles('CAN_BO')
   @ApiOperation({ summary: 'Approve land record and freeze it' })

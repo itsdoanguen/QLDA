@@ -90,7 +90,7 @@ export class LandRecordService {
   async findOne(id: number): Promise<LandRecord> {
     const record = await this.landRecordRepository.findOne({
       where: { id },
-      relations: ['owner', 'assignedCb'],
+      relations: ['owner', 'assignedCb', 'files'],
     });
     if (!record) {
       throw new NotFoundException('Land record not found');
@@ -112,6 +112,20 @@ export class LandRecordService {
       relations: ['owner', 'files'],
       order: { updatedAt: 'DESC' },
     });
+  }
+
+  async getStaffStats(staffId: number) {
+    const records = await this.landRecordRepository.find({
+      where: { assignedCbId: staffId },
+    });
+
+    return {
+      total: records.length,
+      submitted: records.filter(r => r.status === 'Submitted').length,
+      approved: records.filter(r => r.status === 'CB_APPROVED').length,
+      rejected: records.filter(r => r.status === 'Rejected').length,
+      needsSupplement: records.filter(r => r.status === 'Needs Supplement').length,
+    };
   }
 
   async review(id: number, staffId: number, dto: ReviewLandRecordDto): Promise<LandRecord> {

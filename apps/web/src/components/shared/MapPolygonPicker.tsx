@@ -18,11 +18,13 @@ const icon = L.icon({
 interface MapPolygonPickerProps {
   value?: string;
   onChange?: (value: string) => void;
+  disabled?: boolean;
 }
 
-function LocationMarker({ points, setPoints }: { points: [number, number][], setPoints: (pts: [number, number][]) => void }) {
+function LocationMarker({ points, setPoints, disabled }: { points: [number, number][], setPoints: (pts: [number, number][]) => void, disabled?: boolean }) {
   useMapEvents({
     click(e) {
+      if (disabled) return;
       setPoints([...points, [e.latlng.lat, e.latlng.lng]]);
     },
   });
@@ -30,7 +32,7 @@ function LocationMarker({ points, setPoints }: { points: [number, number][], set
   return null;
 }
 
-export default function MapPolygonPicker({ value, onChange }: MapPolygonPickerProps) {
+export default function MapPolygonPicker({ value, onChange, disabled }: MapPolygonPickerProps) {
   const [points, setPoints] = useState<[number, number][]>([]);
 
   // Initialize points from value if provided
@@ -78,7 +80,7 @@ export default function MapPolygonPicker({ value, onChange }: MapPolygonPickerPr
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <LocationMarker points={points} setPoints={setPoints} />
+        <LocationMarker points={points} setPoints={setPoints} disabled={disabled} />
         
         {points.map((pt, idx) => (
           <Marker key={idx} position={pt} icon={icon} />
@@ -89,23 +91,27 @@ export default function MapPolygonPicker({ value, onChange }: MapPolygonPickerPr
         )}
       </MapContainer>
 
-      <div className="absolute top-2 right-2 z-[1000] flex gap-2">
-        {points.length > 0 && (
-          <>
-            <Button size="small" onClick={handleClearLast}>
-              Xóa điểm cuối
-            </Button>
-            <Button size="small" danger onClick={handleClearAll}>
-              Làm lại
-            </Button>
-          </>
-        )}
-      </div>
+      {!disabled && (
+        <>
+          <div className="absolute top-2 right-2 z-[1000] flex gap-2">
+            {points.length > 0 && (
+              <>
+                <Button size="small" onClick={handleClearLast}>
+                  Xóa điểm cuối
+                </Button>
+                <Button size="small" danger onClick={handleClearAll}>
+                  Làm lại
+                </Button>
+              </>
+            )}
+          </div>
 
-      {points.length === 0 && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[1000] bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm border border-white text-[12px] font-medium text-[#111827]">
-          Click trên bản đồ để chọn tọa độ các góc của thửa đất
-        </div>
+          {points.length === 0 && (
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[1000] bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm border border-white text-[12px] font-medium text-[#111827]">
+              Click trên bản đồ để chọn tọa độ các góc của thửa đất
+            </div>
+          )}
+        </>
       )}
     </div>
   );
