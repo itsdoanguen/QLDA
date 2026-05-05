@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Input, message } from "antd";
 import { SafetyCertificateOutlined } from "@ant-design/icons";
-import axios from "axios";
+import { api } from "@/utils/api";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -19,7 +19,7 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      const response = await axios.post(`http://localhost:3000/api/v1/auth/login?nationalId=${nationalId}`);
+      const response = await api.post(`/auth/login?nationalId=${nationalId}`);
       if (response.data && response.data.challengeId) {
         sessionStorage.setItem("challengeId", response.data.challengeId);
         router.push(`/auth_otp`);
@@ -28,7 +28,7 @@ export default function LoginPage() {
       }
     } catch (error: any) {
       console.error("Login failed:", error);
-      message.error(error?.message || "Đăng nhập thất bại");
+      message.error(error?.response?.data?.message || error?.message || "Đăng nhập thất bại");
     } finally {
       setLoading(false);
     }

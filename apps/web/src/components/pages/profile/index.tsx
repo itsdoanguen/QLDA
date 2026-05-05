@@ -1,10 +1,10 @@
 "use client";
 
-import { Button } from "antd";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "antd";
 import Link from "next/link";
-import axios from "axios";
+import { api } from "@/utils/api";
 import {
   UserOutlined,
   FileTextOutlined,
@@ -29,11 +29,7 @@ export function ProfilePage() {
       }
 
       try {
-        const response = await axios.get("http://localhost:3000/api/v1/auth/profile", {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+        const response = await api.get("/auth/profile");
         setProfile(response.data);
       } catch (error) {
         console.error("Failed to fetch profile", error);
@@ -51,11 +47,7 @@ export function ProfilePage() {
     const token = localStorage.getItem("accessToken");
     if (token) {
       try {
-        await axios.post("http://localhost:3000/api/v1/auth/logout", {}, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+        await api.post("/auth/logout");
       } catch (error) {
         console.error("Logout error", error);
       }
@@ -80,7 +72,6 @@ export function ProfilePage() {
 
   return (
     <div className="min-h-screen flex flex-col font-sans bg-white">
-      {/* Top Navbar */}
       <header className="h-16 border-b border-[#e1e2e4] flex items-center justify-between px-6 shrink-0 bg-white z-10 relative">
         <div className="text-[1.15rem] font-black tracking-tight text-[#0052cc]">
           Quản lý đô thị thông minh
@@ -94,70 +85,40 @@ export function ProfilePage() {
             <div className="h-8 w-8 rounded-full bg-[#d1d5db] flex items-center justify-center text-white">
               <UserOutlined />
             </div>
-            <Button 
-              type="text" 
-              icon={<LogoutOutlined />} 
-              onClick={handleLogout}
-              className="!text-[#4b5563] hover:!text-red-500 hover:!bg-red-50"
-              title="Đăng xuất"
-            />
+            <Button type="text" icon={<LogoutOutlined />} onClick={handleLogout}
+              className="!text-[#4b5563] hover:!text-red-500 hover:!bg-red-50" title="Đăng xuất" />
           </div>
         </div>
       </header>
 
-      {/* Main Layout */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
         <aside className="w-[260px] bg-[#f8f9fa] border-r border-[#e1e2e4] flex flex-col shrink-0">
           <div className="p-6">
-            <h2 className="text-[1.05rem] font-bold leading-tight text-[#0052cc] mb-1">
-              Quản lý đô thị thông minh
-            </h2>
+            <h2 className="text-[1.05rem] font-bold leading-tight text-[#0052cc] mb-1">Quản lý đô thị thông minh</h2>
           </div>
-
           <nav className="flex flex-col gap-1 mt-2">
-            <Link
-              href="/dashboard"
-              className="flex items-center gap-3 px-6 py-3 border-l-4 border-transparent text-[#4b5563] hover:bg-[#f3f4f6] font-medium text-[15px] transition-colors"
-            >
-              <FileTextOutlined className="text-lg" />
-              Hồ sơ của tôi
+            <Link href="/dashboard" className="flex items-center gap-3 px-6 py-3 border-l-4 border-transparent text-[#4b5563] hover:bg-[#f3f4f6] font-medium text-[15px] transition-colors">
+              <FileTextOutlined className="text-lg" /> Hồ sơ của tôi
             </Link>
-            <Link
-              href="/in-development"
-              className="flex items-center gap-3 px-6 py-3 border-l-4 border-transparent text-[#4b5563] hover:bg-[#f3f4f6] font-medium text-[15px] transition-colors"
-            >
-              <CloudUploadOutlined className="text-lg" />
-              Tạo mới hồ sơ
+            <Link href="/in-development" className="flex items-center gap-3 px-6 py-3 border-l-4 border-transparent text-[#4b5563] hover:bg-[#f3f4f6] font-medium text-[15px] transition-colors">
+              <CloudUploadOutlined className="text-lg" /> Tạo mới hồ sơ
             </Link>
-            <Link
-              href="/profile"
-              className="flex items-center gap-3 px-6 py-3 border-l-4 border-[#0b57d0] bg-white text-[#0b57d0] font-medium text-[15px]"
-            >
-              <UserOutlined className="text-lg" />
-              Thông tin cá nhân
+            <Link href="/profile" className="flex items-center gap-3 px-6 py-3 border-l-4 border-[#0b57d0] bg-white text-[#0b57d0] font-medium text-[15px]">
+              <UserOutlined className="text-lg" /> Thông tin cá nhân
             </Link>
           </nav>
         </aside>
 
-        {/* Main Content */}
         <main className="flex-1 overflow-auto p-10 bg-[#fafafa]">
           <div className="max-w-[1000px]">
-            {/* Header section */}
             <div className="mb-8">
-              <h1 className="text-3xl font-bold tracking-tight text-[#111827] mb-2">
-                Hồ sơ định danh
-              </h1>
-              <p className="text-[15px] text-[#4b5563]">
-                Quản lý thông tin cá nhân và thiết lập bảo mật hệ thống.
-              </p>
+              <h1 className="text-3xl font-bold tracking-tight text-[#111827] mb-2">Hồ sơ định danh</h1>
+              <p className="text-[15px] text-[#4b5563]">Quản lý thông tin cá nhân và thiết lập bảo mật hệ thống.</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Left Column: Identity Data */}
               <div className="lg:col-span-2">
                 <div className="bg-white border border-[#e1e2e4] rounded-lg p-8 shadow-sm">
-                  {/* Profile Header */}
                   <div className="flex items-start gap-5 mb-8">
                     <div className="w-20 h-20 bg-[#f3f4f6] rounded-md flex items-center justify-center text-[#9ca3af]">
                       <UserOutlined className="text-4xl" />
@@ -179,11 +140,7 @@ export function ProfilePage() {
                       </div>
                     </div>
                   </div>
-
-                  {/* Divider */}
                   <div className="h-px bg-[#e1e2e4] w-full mb-8"></div>
-
-                  {/* Info Grid */}
                   <div className="grid grid-cols-2 gap-y-8 gap-x-6">
                     <div>
                       <p className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wider mb-2">SỐ CCCD / ĐỊNH DANH</p>
@@ -193,24 +150,16 @@ export function ProfilePage() {
                     </div>
                     <div>
                       <p className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wider mb-2">NGÀY SINH</p>
-                      <div className="text-[15px] text-[#111827] font-medium py-2.5">
-                        {formatDate(vneid.dateOfBirth)}
-                      </div>
+                      <div className="text-[15px] text-[#111827] font-medium py-2.5">{formatDate(vneid.dateOfBirth)}</div>
                     </div>
-                    
                     <div>
                       <p className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wider mb-2">GIỚI TÍNH</p>
-                      <div className="text-[15px] text-[#111827] font-medium">
-                        {vneid.gender || "Chưa cập nhật"}
-                      </div>
+                      <div className="text-[15px] text-[#111827] font-medium">{vneid.gender || "Chưa cập nhật"}</div>
                     </div>
                     <div>
                       <p className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wider mb-2">QUỐC TỊCH</p>
-                      <div className="text-[15px] text-[#111827] font-medium">
-                        Việt Nam
-                      </div>
+                      <div className="text-[15px] text-[#111827] font-medium">Việt Nam</div>
                     </div>
-
                     <div className="col-span-2 mt-2">
                       <p className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wider mb-2">NƠI ĐĂNG KÝ THƯỜNG TRÚ</p>
                       <div className="bg-[#f9fafb] border border-[#e1e2e4] p-4 rounded-md text-[14px] text-[#374151] leading-relaxed">
@@ -221,16 +170,12 @@ export function ProfilePage() {
                 </div>
               </div>
 
-              {/* Right Column: Contact Info */}
               <div className="lg:col-span-1">
                 <div className="bg-white border border-[#e1e2e4] rounded-lg p-6 shadow-sm">
                   <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-[12px] font-semibold text-[#6b7280] uppercase tracking-wider">
-                      THÔNG TIN LIÊN LẠC
-                    </h3>
+                    <h3 className="text-[12px] font-semibold text-[#6b7280] uppercase tracking-wider">THÔNG TIN LIÊN LẠC</h3>
                     <IdcardOutlined className="text-lg text-[#9ca3af]" />
                   </div>
-
                   <div className="space-y-6">
                     <div>
                       <div className="flex justify-between items-center mb-1">
@@ -241,18 +186,14 @@ export function ProfilePage() {
                         {profile?.phone ? `+84 ${profile.phone.substring(1)}` : "+84 ••• ••• ••••"}
                       </p>
                     </div>
-
                     <div>
                       <p className="text-[12px] text-[#6b7280] mb-1">Thư điện tử</p>
-                      <p className="text-[15px] font-medium text-[#111827] truncate">
-                        {profile?.email || "Chưa cập nhật"}
-                      </p>
+                      <p className="text-[15px] font-medium text-[#111827] truncate">{profile?.email || "Chưa cập nhật"}</p>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-
           </div>
         </main>
       </div>

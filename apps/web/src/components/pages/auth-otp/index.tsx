@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { LockFilled, QuestionCircleFilled } from "@ant-design/icons";
 import { Button, message } from "antd";
 import { useRouter } from "next/navigation";
-import axios from "axios";
+import { api } from "@/utils/api";
 
 const OTP_LENGTH = 6;
 const RESEND_SECONDS = 59;
@@ -95,7 +95,7 @@ export function AuthOtpPage() {
 
     setIsSubmitting(true);
     try {
-      const response = await axios.post("http://localhost:3000/api/v1/auth/verify-otp", {
+      const response = await api.post("/auth/verify-otp", {
         challengeId,
         otp: otpValue
       });
