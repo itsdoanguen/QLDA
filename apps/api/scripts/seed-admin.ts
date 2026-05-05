@@ -15,8 +15,7 @@ async function seed() {
     // 1. Seed Roles
     const roles = [
       { roleCode: 'ADMIN', roleName: 'System Administrator', description: 'Full access to the system' },
-      { roleCode: 'CAN_BO_1', roleName: 'Cán bộ kiểm tra vòng 1', description: 'Reviewer for the first round' },
-      { roleCode: 'CAN_BO_2', roleName: 'Cán bộ kiểm tra vòng 2', description: 'Reviewer for the second round' },
+      { roleCode: 'CAN_BO', roleName: 'Cán bộ kiểm tra', description: 'Land record reviewer' },
       { roleCode: 'LANH_DAO', roleName: 'Lãnh đạo phê duyệt', description: 'Final approver and signer' },
       { roleCode: 'CITIZEN', roleName: 'Công dân', description: 'Standard user/citizen' },
     ];
