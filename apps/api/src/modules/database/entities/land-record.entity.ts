@@ -60,6 +60,9 @@ export class LandRecord {
   })
   status: LandRecordStatus;
 
+  @Column({ name: 'review_reason', type: 'text', nullable: true })
+  reviewReason: string;
+
   @OneToMany(() => LandFile, (file) => file.record)
   files: LandFile[];
 

@@ -14,10 +14,13 @@ import { CreateLandRecordDto } from './dto/create-land-record.dto';
 import { UpdateLandRecordDto } from './dto/update-land-record.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { RequireRoles } from '../../common/decorators/roles.decorator';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { ReviewLandRecordDto, UpdateGpsDto } from './dto/review-land-record.dto';
 
 @ApiTags('Land Records')
 @ApiBearerAuth()
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, RolesGuard)
 @Controller('land-records')
 export class LandRecordController {
   constructor(private readonly landRecordService: LandRecordService) {}
@@ -54,5 +57,57 @@ export class LandRecordController {
   @ApiOperation({ summary: 'Get details of a specific land record' })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.landRecordService.findOne(id);
+  }
+
+  // Staff endpoints
+  @Get('staff/tasks')
+  @RequireRoles('CAN_BO')
+  @ApiOperation({ summary: 'Get land records assigned to current staff' })
+  getTasks(@CurrentUser() user: any) {
+    return this.landRecordService.findAssignedRecords(user.sub);
+  }
+
+  @Post(':id/review')
+  @RequireRoles('CAN_BO')
+  @ApiOperation({ summary: 'Approve land record and freeze it' })
+  review(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: any,
+    @Body() dto: ReviewLandRecordDto,
+  ) {
+    return this.landRecordService.review(id, user.sub, dto);
+  }
+
+  @Post(':id/reject')
+  @RequireRoles('CAN_BO')
+  @ApiOperation({ summary: 'Reject land record with reason' })
+  reject(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: any,
+    @Body() dto: ReviewLandRecordDto,
+  ) {
+    return this.landRecordService.reject(id, user.sub, dto);
+  }
+
+  @Post(':id/request-supplement')
+  @RequireRoles('CAN_BO')
+  @ApiOperation({ summary: 'Request supplement for land record' })
+  requestSupplement(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: any,
+    @Body() dto: ReviewLandRecordDto,
+  ) {
+    return this.landRecordService.requestSupplement(id, user.sub, dto);
+  }
+
+  @Put(':id/update-gps')
+  @RequireRoles('CAN_BO')
+  @ApiOperation({ summary: 'Update GPS coordinates for land record' })
+  updateGps(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: any,
+    @Body() dto: UpdateGpsDto,
+  ) {
+    return this.landRecordService.updateGps(id, user.sub, dto);
   }
 }
