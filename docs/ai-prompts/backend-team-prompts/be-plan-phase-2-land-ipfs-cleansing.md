@@ -1,17 +1,17 @@
 ## Phase 2 Plan: Land Records + IPFS + Data Cleansing + RBAC (Cán bộ)
 
 ### Goal
-Implement Staff Role-Based Access Control (Admin, Cán bộ 1, Cán bộ 2). Let a user submit a land record draft, upload scan files to IPFS, and let Cán bộ perform a strict 2-round data cleansing and checking process before Lãnh đạo approval.
+Implement Staff Role-Based Access Control (Admin, Cán bộ). Let a user submit a land record draft, upload scan files to IPFS, and let Cán bộ perform a strict data cleansing and checking process before Lãnh đạo approval.
 
 ### Scope
 Must have:
-- RBAC Middleware (`RolesGuard`) for Staff roles (`ADMIN`, `CAN_BO_1`, `CAN_BO_2`).
+- RBAC Middleware (`RolesGuard`) for Staff roles (`ADMIN`, `CAN_BO`).
 - Staff Account Management CRUD (for Admin).
-- Draft creation (Citizen) and state transitions (`SUBMITTED` -> `CB1_APPROVED` -> `CB2_APPROVED` -> `NEEDS_SUPPLEMENT`).
+- Draft creation (Citizen) and state transitions (`SUBMITTED` -> `CB_APPROVED` -> `NEEDS_SUPPLEMENT`).
 - File upload to Pinata-backed IPFS with retry.
 - CID storage and retrieval.
 - Version history.
-- Staff actions: Cán bộ 1 checks (Round 1), Cán bộ 2 checks (Round 2), request supplement, reject with reason, update GPS.
+- Staff actions: Cán bộ checks, request supplement, reject with reason, update GPS.
 - Base pre-check query for planning/dispute/mortgage.
 
 Out of scope:
@@ -27,15 +27,15 @@ Out of scope:
 - EP05/US06: pre-check query core.
 
 ### API Contracts
-- `POST /api/v1/land-records/submit`
+- `POST /api/v1/land-records` (Create Draft)
+- `POST /api/v1/land-records/:id/submit` (Submit for Review & Random Assignment)
 - `PUT /api/v1/land-records/:id`
 - `GET /api/v1/land-records/:id/versions`
 - `GET /api/v1/land-records`
 - `POST /api/v1/files/upload`
 - `GET /api/v1/files/:id`
 - `DELETE /api/v1/files/:id`
-- `POST /api/v1/land-records/:id/review-round-1` (Cán bộ 1)
-- `POST /api/v1/land-records/:id/review-round-2` (Cán bộ 2 - Freezes record)
+- `POST /api/v1/land-records/:id/review` (Cán bộ - Freezes record upon approval)
 - `POST /api/v1/land-records/:id/request-supplement`
 - `POST /api/v1/land-records/:id/reject`
 - `PATCH /api/v1/land-records/:id/update-gps`
@@ -45,17 +45,20 @@ Out of scope:
 - `PATCH /api/v1/staff/:id/deactivate` (Admin)
 
 ### Required Rules
-- Only records with `SUBMITTED` status can be reviewed by `CAN_BO_1`.
-- Only records with `CB1_APPROVED` status can be reviewed by `CAN_BO_2`.
-- A record becomes frozen (`isFrozen = true`) and moves to `CB2_APPROVED` after Round 2 checking.
+- A new record is initially created with `DRAFT` status.
+- Upon calling the submit endpoint, the record transitions to `SUBMITTED` status and is randomly assigned to an active user with the `CAN_BO` role.
+- `CAN_BO` personnel can only view and interact with records that are explicitly assigned to them.
+- Only records with `SUBMITTED` status can be reviewed by `CAN_BO`.
+- Upon `CAN_BO` approval, the record becomes frozen (`isFrozen = true`) and moves to `CB_APPROVED` status.
 - A frozen record cannot be edited by the citizen.
 - Reject and supplement actions require a non-empty reason and return the record to `NEEDS_SUPPLEMENT`.
 - GPS update must pass format validation before saving.
 - Pinata upload should retry up to 3 times for retryable errors and then fail gracefully.
 - API response for file upload must expose normalized fields (`cid`, `fileName`, `mimeType`, `size`) only.
+- A background Cronjob should run periodically to find abandoned `DRAFT` records (e.g., inactive for > 7 days), call Pinata's `unpin` API to clean up junk files, and delete the draft from the database.
 
 ### Tables Touched
-- `Land_Records`
+- `Land_Records` (Requires adding `cb_id` to track random assignment)
 - `Land_Record_Versions`
 - `Land_Files`
 - `Planning_Zones`
