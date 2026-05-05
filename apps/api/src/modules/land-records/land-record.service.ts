@@ -98,6 +98,14 @@ export class LandRecordService {
     return record;
   }
 
+  async findAll(ownerId?: number): Promise<LandRecord[]> {
+    const where = ownerId ? { ownerId } : {};
+    return this.landRecordRepository.find({
+      where,
+      order: { createdAt: 'DESC' },
+    });
+  }
+
   async findAssignedRecords(staffId: number): Promise<LandRecord[]> {
     return this.landRecordRepository.find({
       where: { assignedCbId: staffId },

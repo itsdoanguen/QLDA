@@ -26,13 +26,13 @@ export class LandRecord {
   ownerId: number;
 
   @Column({ name: 'plot_number', type: 'varchar', length: 20, nullable: true })
-  plotNumber: string; // Số tờ bản đồ
+  plotNumber?: string; // Số tờ bản đồ
 
   @Column({ name: 'parcel_number', type: 'varchar', length: 20, nullable: true })
-  parcelNumber: string; // Số thửa đất
+  parcelNumber?: string; // Số thửa đất
 
   @Column({ name: 'land_type', type: 'varchar', length: 50, nullable: true })
-  landType: string; // Loại đất
+  landType?: string; // Loại đất
 
   @Column({ type: 'text' })
   address: string;
@@ -41,14 +41,14 @@ export class LandRecord {
   area: number;
 
   @Column({ name: 'gps_coordinates', type: 'text', nullable: true })
-  gpsCoordinates: string; // Tọa độ / Polygon hiện hành
+  gpsCoordinates?: string; // Tọa độ / Polygon hiện hành
 
   @Column({ name: 'assigned_cb_id', type: 'integer', nullable: true })
-  assignedCbId: number;
+  assignedCbId?: number;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'assigned_cb_id' })
-  assignedCb: User;
+  assignedCb?: User;
 
   @Column({ name: 'is_frozen', type: 'boolean', default: false })
   isFrozen: boolean;
@@ -61,7 +61,7 @@ export class LandRecord {
   status: LandRecordStatus;
 
   @Column({ name: 'review_reason', type: 'text', nullable: true })
-  reviewReason: string;
+  reviewReason?: string;
 
   @OneToMany(() => LandFile, (file) => file.record)
   files: LandFile[];
