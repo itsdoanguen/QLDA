@@ -1,72 +1,55 @@
 "use client";
 
 import { Button } from "antd";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import axios from "axios";
 import {
   UserOutlined,
   FileTextOutlined,
   CloudUploadOutlined,
   FileAddOutlined,
-  HomeOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
+import { useProfile } from "@/hooks/useAuth";
+import { useLandRecords } from "@/hooks/useLandRecords";
+import type { RecordStatus } from "@/types/land-record";
+
+/** Map blockchain status → label hiển thị */
+const STATUS_MAP: Record<RecordStatus, { label: string; className: string }> = {
+  pending: {
+    label: "Đang chờ",
+    className: "bg-yellow-50 text-yellow-700 border-yellow-200",
+  },
+  verified: {
+    label: "Đã xác thực",
+    className: "bg-blue-50 text-blue-700 border-blue-200",
+  },
+  rejected: {
+    label: "Từ chối",
+    className: "bg-red-50 text-red-700 border-red-200",
+  },
+  on_chain: {
+    label: "Trên Blockchain",
+    className: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  },
+};
 
 export function DashboardPage() {
-  const router = useRouter();
-  const [profile, setProfile] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      const token = localStorage.getItem("accessToken");
-      if (!token) {
-        router.push("/login");
-        return;
-      }
-
-      try {
-        const response = await axios.get("http://localhost:3000/api/v1/auth/profile", {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        setProfile(response.data);
-      } catch (error) {
-        console.error("Failed to fetch profile", error);
-        localStorage.removeItem("accessToken");
-        router.push("/login");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfile();
-  }, [router]);
-
-  const handleLogout = async () => {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      try {
-        await axios.post("http://localhost:3000/api/v1/auth/logout", {}, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-      } catch (error) {
-        console.error("Logout error", error);
-      }
-    }
-    localStorage.removeItem("accessToken");
-    sessionStorage.removeItem("challengeId");
-    router.push("/");
-  };
+  // ✅ Dùng hooks thay vì gọi axios trực tiếp
+  const { profile, loading, logout } = useProfile();
+  const { records, loading: recordsLoading } = useLandRecords();
 
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center text-slate-600 font-medium">Đang tải dữ liệu...</div>;
   }
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
 
   return (
     <div className="min-h-screen flex flex-col font-sans bg-white">
@@ -86,10 +69,10 @@ export function DashboardPage() {
             <div className="h-8 w-8 rounded-full bg-[#d1d5db] flex items-center justify-center text-white">
               <UserOutlined />
             </div>
-            <Button 
-              type="text" 
-              icon={<LogoutOutlined />} 
-              onClick={handleLogout}
+            <Button
+              type="text"
+              icon={<LogoutOutlined />}
+              onClick={logout}
               className="!text-[#4b5563] hover:!text-red-500 hover:!bg-red-50"
               title="Đăng xuất"
             />
@@ -184,9 +167,32 @@ export function DashboardPage() {
                   </a>
                 </div>
 
-                <div className="mt-4 flex flex-col items-center justify-center py-10 border border-dashed border-[#e1e2e4] rounded-md bg-[#f9fafb]">
-                  <p className="text-[#6b7280] font-medium text-[14px]">Chưa có dữ liệu sổ đỏ số</p>
-                </div>
+                {records.filter((r) => r.blockchainStatus === "on_chain").length === 0 ? (
+                  <div className="mt-4 flex flex-col items-center justify-center py-10 border border-dashed border-[#e1e2e4] rounded-md bg-[#f9fafb]">
+                    <p className="text-[#6b7280] font-medium text-[14px]">Chưa có dữ liệu sổ đỏ số</p>
+                  </div>
+                ) : (
+                  <div className="mt-4 grid gap-3">
+                    {records
+                      .filter((r) => r.blockchainStatus === "on_chain")
+                      .map((record) => (
+                        <div
+                          key={record.id}
+                          className="border border-[#e1e2e4] rounded-md p-4 bg-white hover:shadow-sm transition-shadow"
+                        >
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <p className="font-semibold text-[14px] text-[#111827]">{record.documentCode}</p>
+                              <p className="text-[13px] text-[#6b7280] mt-1">{record.documentType}</p>
+                            </div>
+                            <span className="text-[11px] font-mono text-[#0b57d0] bg-[#eef2ff] px-2 py-1 rounded">
+                              {record.nftTokenId}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -210,11 +216,41 @@ export function DashboardPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#e1e2e4]">
-                    <tr>
-                      <td colSpan={4} className="px-5 py-8 text-center text-[#6b7280] font-medium text-[14px]">
-                        Chưa có dữ liệu tài liệu
-                      </td>
-                    </tr>
+                    {recordsLoading ? (
+                      <tr>
+                        <td colSpan={4} className="px-5 py-8 text-center text-[#6b7280] font-medium text-[14px]">
+                          Đang tải hồ sơ...
+                        </td>
+                      </tr>
+                    ) : records.length === 0 ? (
+                      <tr>
+                        <td colSpan={4} className="px-5 py-8 text-center text-[#6b7280] font-medium text-[14px]">
+                          Chưa có dữ liệu tài liệu
+                        </td>
+                      </tr>
+                    ) : (
+                      records.map((record) => {
+                        const status = STATUS_MAP[record.blockchainStatus];
+                        return (
+                          <tr key={record.id} className="hover:bg-[#f9fafb] transition-colors">
+                            <td className="px-5 py-4 font-mono text-[#111827] font-medium">
+                              {record.documentCode}
+                            </td>
+                            <td className="px-5 py-4 text-[#374151]">
+                              {record.documentType}
+                            </td>
+                            <td className="px-5 py-4 text-[#6b7280]">
+                              {formatDate(record.submittedAt)}
+                            </td>
+                            <td className="px-5 py-4 text-right">
+                              <span className={`inline-block px-2.5 py-1 rounded-[4px] border text-[12px] font-semibold ${status.className}`}>
+                                {status.label}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
                   </tbody>
                 </table>
               </div>
