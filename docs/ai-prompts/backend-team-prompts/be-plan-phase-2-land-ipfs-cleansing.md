@@ -55,7 +55,6 @@ Out of scope:
 - GPS update must pass format validation before saving.
 - Pinata upload should retry up to 3 times for retryable errors and then fail gracefully.
 - API response for file upload must expose normalized fields (`cid`, `fileName`, `mimeType`, `size`) only.
-- A background Cronjob should run periodically to find abandoned `DRAFT` records (e.g., inactive for > 7 days), call Pinata's `unpin` API to clean up junk files, and delete the draft from the database.
 
 ### Tables Touched
 - `Land_Records` (Requires adding `cb_id` to track random assignment)
