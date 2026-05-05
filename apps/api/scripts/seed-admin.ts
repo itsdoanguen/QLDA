@@ -44,30 +44,43 @@ async function seed() {
       }
     }
 
-    // 3. Seed Admin User
-    const adminCCCD = '048086989861';
-    let admin = await userRepo.findOne({ where: { vneidNumber: adminCCCD } });
-    
-    if (!admin) {
-      const adminRole = await roleRepo.findOne({ where: { roleCode: 'ADMIN' } });
-      const dept = await deptRepo.findOne({ where: { departmentCode: 'SO_TNMT' } });
+    // 3. Seed Staff Users
+    const staffUsers = [
+      { vneidNumber: '048086989861', fullName: 'Cán bộ 1', roleCode: 'CAN_BO', email: 'canbo1@land-registry.gov.vn' },
+      { vneidNumber: '079198692074', fullName: 'Cán bộ 2', roleCode: 'CAN_BO', email: 'canbo2@land-registry.gov.vn' },
+      { vneidNumber: '079075718862', fullName: 'Cán bộ 3', roleCode: 'CAN_BO', email: 'canbo3@land-registry.gov.vn' },
+      { vneidNumber: '048097919583', fullName: 'Lãnh đạo Sở', roleCode: 'LANH_DAO', email: 'lanhdao@land-registry.gov.vn' },
+    ];
 
-      if (!adminRole || !dept) {
-        throw new Error('Required role or department not found. Please ensure roles and departments are seeded first.');
+    const defaultDept = await deptRepo.findOne({ where: { departmentCode: 'SO_TNMT' } });
+
+    for (const staff of staffUsers) {
+      let user = await userRepo.findOne({ where: { vneidNumber: staff.vneidNumber } });
+      const role = await roleRepo.findOne({ where: { roleCode: staff.roleCode } });
+
+      if (!role || !defaultDept) {
+        console.error(`Role ${staff.roleCode} or department SO_TNMT not found for ${staff.vneidNumber}`);
+        continue;
       }
 
-      admin = userRepo.create({
-        vneidNumber: adminCCCD,
-        fullName: 'Super Admin',
-        email: 'admin@land-registry.gov.vn',
-        status: 'Active',
-        roleId: adminRole.id,
-        departmentId: dept.id,
-      });
-      await userRepo.save(admin);
-      console.log(`Admin user created with CCCD: ${adminCCCD}`);
-    } else {
-      console.log(`Admin user with CCCD ${adminCCCD} already exists.`);
+      if (!user) {
+        user = userRepo.create({
+          vneidNumber: staff.vneidNumber,
+          fullName: staff.fullName,
+          email: staff.email,
+          status: 'Active',
+          roleId: role.id,
+          departmentId: defaultDept.id,
+        });
+        await userRepo.save(user);
+        console.log(`Staff user created: ${staff.fullName} (${staff.roleCode}) - ${staff.vneidNumber}`);
+      } else {
+        // Update role if user already exists
+        user.roleId = role.id;
+        user.fullName = staff.fullName;
+        await userRepo.save(user);
+        console.log(`Staff user updated: ${staff.fullName} (${staff.roleCode}) - ${staff.vneidNumber}`);
+      }
     }
 
     console.log('Seeding completed successfully.');
