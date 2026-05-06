@@ -59,6 +59,12 @@ export class LandRecordController {
     return this.landRecordService.findOne(id);
   }
 
+  @Get(':id/gps')
+  @ApiOperation({ summary: 'Get GPS coordinates of a specific land record' })
+  getGps(@Param('id', ParseIntPipe) id: number) {
+    return this.landRecordService.getGps(id);
+  }
+
   // Staff endpoints
   @Get('staff/tasks')
   @RequireRoles('CAN_BO')

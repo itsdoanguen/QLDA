@@ -6,9 +6,10 @@ import StatsChart from '@/components/staff/dashboard/StatsChart';
 import TasksTable from '@/components/staff/dashboard/TasksTable';
 import MapContext from '@/components/staff/dashboard/MapContext';
 import { api } from '@/utils/api';
-import { message } from 'antd';
+import { App } from 'antd';
 
 export default function StaffDashboardPage() {
+  const { message } = App.useApp();
   const [tasks, setTasks] = useState<any[]>([]);
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);

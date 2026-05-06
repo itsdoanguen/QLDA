@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button, Input, message } from "antd";
+import { Button, Input, App } from "antd";
 import { SafetyCertificateOutlined } from "@ant-design/icons";
 import { api } from "@/utils/api";
 
 export default function LoginPage() {
+  const { message } = App.useApp();
   const router = useRouter();
   const [nationalId, setNationalId] = useState("");
   const [loading, setLoading] = useState(false);
