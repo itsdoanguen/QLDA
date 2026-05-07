@@ -9,7 +9,8 @@
     "test": "node -e \"console.log('api: test baseline pending')\"",
     "db:migrate:up": "typeorm-ts-node-commonjs -d src/database/data-source.ts migration:run",
     "db:migrate:down": "typeorm-ts-node-commonjs -d src/database/data-source.ts migration:revert",
-    "db:migrate:status": "typeorm-ts-node-commonjs -d src/database/data-source.ts migration:show"
+    "db:migrate:status": "typeorm-ts-node-commonjs -d src/database/data-source.ts migration:show",
+    "seed:admin": "ts-node scripts/seed-admin.ts"
   },
   "dependencies": {
     "@land-registry/shared-types": "*",

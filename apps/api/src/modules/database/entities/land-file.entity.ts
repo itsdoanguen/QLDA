@@ -29,7 +29,7 @@ export class LandFile {
   @Column({ name: 'file_type', length: 50 })
   fileType: string; // JPG, PDF, PNG
 
-  @Column({ name: 'ipfs_cid', length: 255, unique: true })
+  @Column({ name: 'ipfs_cid', length: 255 })
   ipfsCid: string;
 
   @ManyToOne(() => User)

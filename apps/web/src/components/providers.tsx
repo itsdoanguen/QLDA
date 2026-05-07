@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 
-import { ConfigProvider, theme } from "antd";
+import { ConfigProvider, theme, App } from "antd";
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
@@ -22,7 +22,9 @@ export function Providers({ children }: { children: ReactNode }) {
         },
       }}
     >
-      {children}
+      <App>
+        {children}
+      </App>
     </ConfigProvider>
   );
 }

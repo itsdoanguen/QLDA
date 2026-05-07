@@ -36,7 +36,7 @@ export class AuthGuard implements CanActivate {
       });
       request['user'] = payload;
       this.logger.log(`User ${payload.sub} authenticated successfully`);
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Token verification failed: ${error.message}`);
       throw new UnauthorizedException();
     }

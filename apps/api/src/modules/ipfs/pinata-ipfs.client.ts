@@ -14,11 +14,13 @@ export class PinataIpfsClient implements IpfsClient {
     const jwt = this.configService.get<string>('PINATA_JWT');
     const baseURL = this.configService.get<string>('PINATA_API_BASE');
 
+    const https = require('https');
     this.axiosInstance = axios.create({
       baseURL,
       headers: {
         Authorization: `Bearer ${jwt}`,
       },
+      httpsAgent: new https.Agent({ family: 4 }), // Force IPv4 to prevent ENOTFOUND in Node 18+
     });
   }
 

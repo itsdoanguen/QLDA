@@ -95,7 +95,10 @@ export class AuthService {
       this.logger.log(`National ID from sandbox: ${nationalId}`);
 
       // 3. Find or Create User
-      let user = await this.userRepository.findOne({ where: { vneidNumber: nationalId } });
+      let user = await this.userRepository.findOne({ 
+        where: { vneidNumber: nationalId },
+        relations: ['role'] 
+      });
       if (!user) {
         this.logger.log(`Creating new user for national ID: ${nationalId}`);
 
@@ -118,6 +121,7 @@ export class AuthService {
           roleId: role.id,
         });
         user = await this.userRepository.save(user);
+        user.role = role; // Attach role for JWT payload below
         this.logger.log(`User created with ID: ${user.id}`);
       } else if (user.status !== 'Active') {
         throw new UnauthorizedException('User account is locked or inactive');
@@ -131,6 +135,7 @@ export class AuthService {
       const internalPayload = { 
         sub: user.id, 
         nationalId: user.vneidNumber,
+        role: user.role?.roleCode || 'CITIZEN',
         vneidAccessToken: result.accessToken // Mapping sandbox token here
       };
       const jwtExpiry = this.configService.get<string>('JWT_ACCESS_EXPIRES_IN') || '15m';
@@ -156,6 +161,7 @@ export class AuthService {
           id: user.id,
           fullName: user.fullName,
           vneidNumber: user.vneidNumber,
+          roleCode: user.role?.roleCode || 'CITIZEN',
         }
       };
     } catch (error: any) {

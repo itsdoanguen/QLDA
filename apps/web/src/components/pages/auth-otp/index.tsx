@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { LockFilled, QuestionCircleFilled } from "@ant-design/icons";
-import { Button, message } from "antd";
+import { Button, App } from "antd";
 import { useRouter } from "next/navigation";
 import { api } from "@/utils/api";
 
@@ -10,6 +10,7 @@ const OTP_LENGTH = 6;
 const RESEND_SECONDS = 59;
 
 export function AuthOtpPage() {
+  const { message } = App.useApp();
   const router = useRouter();
   const [challengeId, setChallengeId] = useState<string | null>(null);
   const [otp, setOtp] = useState<string[]>(() => ["", "", "", "", "", ""]);
@@ -102,7 +103,13 @@ export function AuthOtpPage() {
 
       if (response.data && response.data.accessToken) {
         localStorage.setItem("accessToken", response.data.accessToken);
-        router.push('/dashboard');
+        
+        const role = response.data.user?.roleCode;
+        if (role && role !== 'CITIZEN') {
+          router.push('/staff/dashboard');
+        } else {
+          router.push('/dashboard');
+        }
       } else {
         message.error("Xác thực thất bại");
       }

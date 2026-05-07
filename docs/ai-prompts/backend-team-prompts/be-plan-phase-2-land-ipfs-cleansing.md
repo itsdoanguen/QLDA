@@ -1,19 +1,21 @@
-## Phase 2 Plan: Land Records + IPFS + Data Cleansing
+## Phase 2 Plan: Land Records + IPFS + Data Cleansing + RBAC (Cán bộ)
 
 ### Goal
-Let a user create a land record draft, upload scan files through Pinata to IPFS, and let staff perform data cleansing before approval.
+Implement Staff Role-Based Access Control (Admin, Cán bộ). Let a user submit a land record draft, upload scan files to IPFS, and let Cán bộ perform a strict data cleansing and checking process before Lãnh đạo approval.
 
 ### Scope
 Must have:
-- Draft creation and update before freeze.
+- RBAC Middleware (`RolesGuard`) for Staff roles (`ADMIN`, `CAN_BO`).
+- Staff Account Management CRUD (for Admin).
+- Draft creation (Citizen) and state transitions (`SUBMITTED` -> `CB_APPROVED` -> `NEEDS_SUPPLEMENT`).
 - File upload to Pinata-backed IPFS with retry.
 - CID storage and retrieval.
 - Version history.
-- Staff actions: request supplement, reject with reason, update GPS.
+- Staff actions: Cán bộ checks, request supplement, reject with reason, update GPS.
 - Base pre-check query for planning/dispute/mortgage.
 
 Out of scope:
-- Multi-sig approval.
+- Lãnh đạo signing (Moved to Phase 3).
 - Minting NFT.
 - Transaction signing.
 - PDF export of cleansing report.
@@ -25,28 +27,37 @@ Out of scope:
 - EP05/US06: pre-check query core.
 
 ### API Contracts
-- `POST /api/v1/land-records`
+- `POST /api/v1/land-records` (Create Draft)
+- `POST /api/v1/land-records/:id/submit` (Submit for Review & Random Assignment)
 - `PUT /api/v1/land-records/:id`
-- `PATCH /api/v1/land-records/:id/freeze`
 - `GET /api/v1/land-records/:id/versions`
 - `GET /api/v1/land-records`
 - `POST /api/v1/files/upload`
 - `GET /api/v1/files/:id`
 - `DELETE /api/v1/files/:id`
+- `POST /api/v1/land-records/:id/review` (Cán bộ - Freezes record upon approval)
 - `POST /api/v1/land-records/:id/request-supplement`
 - `POST /api/v1/land-records/:id/reject`
 - `PATCH /api/v1/land-records/:id/update-gps`
 - `POST /api/v1/compliance/pre-check`
+- `POST /api/v1/staff` (Admin)
+- `GET /api/v1/staff` (Admin)
+- `PATCH /api/v1/staff/:id/deactivate` (Admin)
 
 ### Required Rules
-- A frozen record cannot be edited.
-- Reject and supplement actions require a non-empty reason.
+- A new record is initially created with `DRAFT` status.
+- Upon calling the submit endpoint, the record transitions to `SUBMITTED` status and is randomly assigned to an active user with the `CAN_BO` role.
+- `CAN_BO` personnel can only view and interact with records that are explicitly assigned to them.
+- Only records with `SUBMITTED` status can be reviewed by `CAN_BO`.
+- Upon `CAN_BO` approval, the record becomes frozen (`isFrozen = true`) and moves to `CB_APPROVED` status.
+- A frozen record cannot be edited by the citizen.
+- Reject and supplement actions require a non-empty reason and return the record to `NEEDS_SUPPLEMENT`.
 - GPS update must pass format validation before saving.
 - Pinata upload should retry up to 3 times for retryable errors and then fail gracefully.
 - API response for file upload must expose normalized fields (`cid`, `fileName`, `mimeType`, `size`) only.
 
 ### Tables Touched
-- `Land_Records`
+- `Land_Records` (Requires adding `cb_id` to track random assignment)
 - `Land_Record_Versions`
 - `Land_Files`
 - `Planning_Zones`

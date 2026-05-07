@@ -26,6 +26,7 @@ const env = validateEnv(process.env);
 import { Role } from '../modules/database/entities/role.entity';
 import { SystemLog } from '../modules/database/entities/system-log.entity';
 import { User } from '../modules/database/entities/user.entity';
+import { Department } from '../modules/database/entities/department.entity';
 import { WalletRecoveryRequest } from '../modules/database/entities/wallet-recovery-request.entity';
 import { WalletSecret } from '../modules/database/entities/wallet-secret.entity';
 import { Wallet } from '../modules/database/entities/wallet.entity';
@@ -64,6 +65,7 @@ const appDataSource = new DataSource({
   entities: [
     Role,
     User,
+    Department,
     Wallet,
     WalletSecret,
     WalletRecoveryRequest,

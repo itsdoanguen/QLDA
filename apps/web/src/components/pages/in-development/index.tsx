@@ -9,7 +9,7 @@ export function InDevelopmentPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 flex items-center justify-center px-4 py-20">
-      <div className="text-center max-w-md">
+      <div className="text-center max-w-2xl w-full">
         {/* Illustration */}
         <div className="mb-8 flex justify-center">
           <div className="relative">
@@ -21,7 +21,7 @@ export function InDevelopmentPage() {
         </div>
 
         {/* Content */}
-        <h1 className="text-4xl font-black tracking-[-0.04em] text-slate-950 mb-4">
+        <h1 className="text-4xl font-black tracking-tight text-slate-950 mb-4 sm:text-5xl">
           Đang phát triển
         </h1>
 

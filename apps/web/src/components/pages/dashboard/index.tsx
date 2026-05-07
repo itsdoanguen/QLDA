@@ -6,28 +6,31 @@ import { Button } from "antd";
 import Link from "next/link";
 import { api } from "@/utils/api";
 import {
-  UserOutlined,
-  FileTextOutlined,
-  CloudUploadOutlined,
   FileAddOutlined,
-  LogoutOutlined,
 } from "@ant-design/icons";
 
-/** Map blockchain status → label hiển thị */
 const STATUS_MAP: Record<string, { label: string; className: string }> = {
-  pending: {
-    label: "Đang chờ",
+  Draft: {
+    label: "Bản nháp",
+    className: "bg-gray-50 text-gray-700 border-gray-200",
+  },
+  Submitted: {
+    label: "Đang chờ duyệt",
     className: "bg-yellow-50 text-yellow-700 border-yellow-200",
   },
-  verified: {
-    label: "Đã xác thực",
+  CB_APPROVED: {
+    label: "Đã duyệt (Cán bộ)",
     className: "bg-blue-50 text-blue-700 border-blue-200",
   },
-  rejected: {
+  "Needs Supplement": {
+    label: "Cần bổ sung",
+    className: "bg-orange-50 text-orange-700 border-orange-200",
+  },
+  Rejected: {
     label: "Từ chối",
     className: "bg-red-50 text-red-700 border-red-200",
   },
-  on_chain: {
+  Minted: {
     label: "Trên Blockchain",
     className: "bg-emerald-50 text-emerald-700 border-emerald-200",
   },
@@ -35,86 +38,22 @@ const STATUS_MAP: Record<string, { label: string; className: string }> = {
 
 export function DashboardPage() {
   const router = useRouter();
-  const [profile, setProfile] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-
-  // Dữ liệu UI-First (hardcoded) cho các hồ sơ vì BE chưa có API
-  const [records, setRecords] = useState<any[]>([
-    {
-      id: "lr_001",
-      documentCode: "GCN-2024-001",
-      documentType: "Giấy chứng nhận QSDĐ",
-      submittedAt: "2024-03-15T10:30:00Z",
-      blockchainStatus: "on_chain",
-      nftTokenId: "0x1234...abcd",
-    },
-    {
-      id: "lr_002",
-      documentCode: "GCN-2024-002",
-      documentType: "Hợp đồng chuyển nhượng",
-      submittedAt: "2024-04-01T14:00:00Z",
-      blockchainStatus: "pending",
-    }
-  ]);
-  const [recordsLoading, setRecordsLoading] = useState(false);
+  const [records, setRecords] = useState<any[]>([]);
+  const [recordsLoading, setRecordsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      const token = localStorage.getItem("accessToken");
-      if (!token) {
-        router.push("/login");
-        return;
-      }
-
+    const fetchRecords = async () => {
       try {
-        const response = await api.get("/auth/profile");
-        setProfile(response.data);
+        const res = await api.get("/land-records");
+        setRecords(res.data);
       } catch (error) {
-        console.error("Failed to fetch profile", error);
-        localStorage.removeItem("accessToken");
-        router.push("/login");
+        console.error(error);
       } finally {
-        setLoading(false);
+        setRecordsLoading(false);
       }
     };
-
-    fetchProfile();
-  }, [router]);
-
-  /* 
-   * TODO: Khi Backend viết xong API /land-records thì uncomment hàm này và gọi trong useEffect
-   */
-  const fetchRecords = async () => {
-    /*
-    setRecordsLoading(true);
-    try {
-      const res = await api.get("/land-records");
-      setRecords(res.data.data);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setRecordsLoading(false);
-    }
-    */
-  };
-
-  const handleLogout = async () => {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      try {
-        await api.post("/auth/logout");
-      } catch (error) {
-        console.error("Logout error", error);
-      }
-    }
-    localStorage.removeItem("accessToken");
-    sessionStorage.removeItem("challengeId");
-    router.push("/");
-  };
-
-  if (loading) {
-    return <div className="min-h-screen flex items-center justify-center text-slate-600 font-medium">Đang tải dữ liệu...</div>;
-  }
+    fetchRecords();
+  }, []);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -126,72 +65,7 @@ export function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col font-sans bg-white">
-      {/* Top Navbar */}
-      <header className="h-16 border-b border-[#e1e2e4] flex items-center justify-between px-6 shrink-0 bg-white z-10 relative">
-        <div className="text-[1.15rem] font-black tracking-tight text-[#0052cc]">
-          Quản lý đô thị thông minh
-        </div>
-        <div className="flex items-center gap-6">
-          <Link href="/wallet">
-            <Button className="!rounded-sm !border-[#d1d5db] !text-[#374151] hover:!text-[#0052cc] hover:!border-[#0052cc] !font-medium">
-              Check Wallet
-            </Button>
-          </Link>
-          <div className="flex items-center gap-3">
-            <span className="text-[14px] text-[#4b5563]">Xin chào, {profile?.fullName || "Bạn"}</span>
-            <div className="h-8 w-8 rounded-full bg-[#d1d5db] flex items-center justify-center text-white">
-              <UserOutlined />
-            </div>
-            <Button
-              type="text"
-              icon={<LogoutOutlined />}
-              onClick={handleLogout}
-              className="!text-[#4b5563] hover:!text-red-500 hover:!bg-red-50"
-              title="Đăng xuất"
-            />
-          </div>
-        </div>
-      </header>
-
-      {/* Main Layout */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
-        <aside className="w-[260px] bg-[#f8f9fa] border-r border-[#e1e2e4] flex flex-col shrink-0">
-          <div className="p-6">
-            <h2 className="text-[1.05rem] font-bold leading-tight text-[#0052cc] mb-1">
-              Quản lý đô thị thông minh
-            </h2>
-          </div>
-
-          <nav className="flex flex-col gap-1 mt-2">
-            <Link
-              href="/dashboard"
-              className="flex items-center gap-3 px-6 py-3 border-l-4 border-[#0b57d0] bg-white text-[#0b57d0] font-medium text-[15px]"
-            >
-              <FileTextOutlined className="text-lg" />
-              Hồ sơ của tôi
-            </Link>
-            <Link
-              href="/in-development"
-              className="flex items-center gap-3 px-6 py-3 border-l-4 border-transparent text-[#4b5563] hover:bg-[#f3f4f6] font-medium text-[15px] transition-colors"
-            >
-              <CloudUploadOutlined className="text-lg" />
-              Tạo mới hồ sơ
-            </Link>
-            <Link
-              href="/profile"
-              className="flex items-center gap-3 px-6 py-3 border-l-4 border-transparent text-[#4b5563] hover:bg-[#f3f4f6] font-medium text-[15px] transition-colors"
-            >
-              <UserOutlined className="text-lg" />
-              Thông tin cá nhân
-            </Link>
-          </nav>
-        </aside>
-
-        {/* Main Content */}
-        <main className="flex-1 overflow-auto p-10 bg-white">
-          <div className="max-w-[1000px]">
+    <>
             {/* Header section */}
             <div className="mb-10">
               <h1 className="text-3xl font-bold tracking-tight text-[#111827] mb-2">
@@ -218,12 +92,14 @@ export function DashboardPage() {
                   <h3 className="text-[16px] font-bold text-[#111827] mb-4">
                     Tạo hồ sơ đất đai
                   </h3>
-                  <Button
-                    type="primary"
-                    className="!bg-[#0b57d0] hover:!bg-[#0842a0] !border-0 !rounded-sm !px-6 !font-medium"
-                  >
-                    Tạo mới
-                  </Button>
+                  <Link href="/dashboard/create">
+                    <Button
+                      type="primary"
+                      className="!bg-[#0b57d0] hover:!bg-[#0842a0] !border-0 !rounded-sm !px-6 !font-medium"
+                    >
+                      Tạo mới
+                    </Button>
+                  </Link>
                 </div>
               </div>
 
@@ -241,30 +117,42 @@ export function DashboardPage() {
                   </a>
                 </div>
 
-                {records.filter((r) => r.blockchainStatus === "on_chain").length === 0 ? (
+                {recordsLoading ? (
+                  <div className="mt-4 flex flex-col items-center justify-center py-10 border border-[#e1e2e4] rounded-md bg-[#f9fafb]">
+                    <p className="text-[#6b7280] font-medium text-[14px]">Đang tải dữ liệu...</p>
+                  </div>
+                ) : records.length === 0 ? (
                   <div className="mt-4 flex flex-col items-center justify-center py-10 border border-dashed border-[#e1e2e4] rounded-md bg-[#f9fafb]">
-                    <p className="text-[#6b7280] font-medium text-[14px]">Chưa có dữ liệu sổ đỏ số</p>
+                    <p className="text-[#6b7280] font-medium text-[14px]">Chưa có dữ liệu hồ sơ</p>
                   </div>
                 ) : (
                   <div className="mt-4 grid gap-3">
                     {records
-                      .filter((r) => r.blockchainStatus === "on_chain")
-                      .map((record) => (
-                        <div
-                          key={record.id}
-                          className="border border-[#e1e2e4] rounded-md p-4 bg-white hover:shadow-sm transition-shadow"
-                        >
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <p className="font-semibold text-[14px] text-[#111827]">{record.documentCode}</p>
-                              <p className="text-[13px] text-[#6b7280] mt-1">{record.documentType}</p>
+                      .filter((r) => r.status === 'CB_APPROVED' || r.status === 'Minted')
+                      .map((record) => {
+                        const status = STATUS_MAP[record.status] || STATUS_MAP.Draft;
+                        return (
+                          <Link href={`/dashboard/records/${record.id}`} key={record.id}>
+                            <div className="border border-[#e1e2e4] rounded-md p-4 bg-white hover:shadow-md transition-shadow cursor-pointer">
+                              <div className="flex justify-between items-start mb-2">
+                                <div className="max-w-[70%]">
+                                  <p className="font-semibold text-[14px] text-[#111827] truncate" title={record.address}>
+                                    {record.address}
+                                  </p>
+                                </div>
+                                <span className={`text-[11px] font-semibold px-2 py-1 rounded border ${status.className}`}>
+                                  {status.label}
+                                </span>
+                              </div>
+                              <div className="flex gap-4 text-[12px] text-[#6b7280]">
+                                <span>Tờ bản đồ: {record.plotNumber || 'N/A'}</span>
+                                <span>Thửa đất: {record.parcelNumber || 'N/A'}</span>
+                                <span>Diện tích: {record.area} m²</span>
+                              </div>
                             </div>
-                            <span className="text-[11px] font-mono text-[#0b57d0] bg-[#eef2ff] px-2 py-1 rounded">
-                              {record.nftTokenId}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
+                          </Link>
+                        );
+                      })}
                   </div>
                 )}
               </div>
@@ -281,11 +169,13 @@ export function DashboardPage() {
                 <table className="w-full text-left text-[13.5px]">
                   <thead className="bg-[#f9fafb] text-[11px] font-semibold text-[#6b7280] uppercase tracking-wider border-b border-[#e1e2e4]">
                     <tr>
-                      <th className="px-5 py-4 font-semibold">MÃ TÀI LIỆU</th>
-                      <th className="px-5 py-4 font-semibold">LOẠI GIẤY TỜ</th>
-                      <th className="px-5 py-4 font-semibold">NGÀY NỘP</th>
+                      <th className="px-5 py-4 font-semibold">ĐỊA CHỈ THỬA ĐẤT</th>
+                      <th className="px-5 py-4 font-semibold">SỐ TỜ</th>
+                      <th className="px-5 py-4 font-semibold">SỐ THỬA</th>
+                      <th className="px-5 py-4 font-semibold">LOẠI ĐẤT</th>
+                      <th className="px-5 py-4 font-semibold">NGÀY CẬP NHẬT</th>
                       <th className="px-5 py-4 font-semibold text-right">
-                        TRẠNG THÁI BLOCKCHAIN
+                        TRẠNG THÁI
                       </th>
                     </tr>
                   </thead>
@@ -299,22 +189,32 @@ export function DashboardPage() {
                     ) : records.length === 0 ? (
                       <tr>
                         <td colSpan={4} className="px-5 py-8 text-center text-[#6b7280] font-medium text-[14px]">
-                          Chưa có dữ liệu tài liệu
+                          Chưa có tài liệu nào
                         </td>
                       </tr>
                     ) : (
                       records.map((record) => {
-                        const status = STATUS_MAP[record.blockchainStatus];
+                        const status = STATUS_MAP[record.status] || STATUS_MAP.Draft;
                         return (
-                          <tr key={record.id} className="hover:bg-[#f9fafb] transition-colors">
-                            <td className="px-5 py-4 font-mono text-[#111827] font-medium">
-                              {record.documentCode}
+                          <tr 
+                            key={record.id} 
+                            className="hover:bg-[#f9fafb] transition-colors cursor-pointer group"
+                            onClick={() => router.push(`/dashboard/records/${record.id}`)}
+                          >
+                            <td className="px-5 py-4 text-[#111827] font-medium max-w-[200px] truncate group-hover:text-[#0b57d0]" title={record.address}>
+                              {record.address}
                             </td>
                             <td className="px-5 py-4 text-[#374151]">
-                              {record.documentType}
+                              {record.plotNumber || "—"}
+                            </td>
+                            <td className="px-5 py-4 text-[#374151]">
+                              {record.parcelNumber || "—"}
+                            </td>
+                            <td className="px-5 py-4 text-[#374151]">
+                              {record.landType || "—"}
                             </td>
                             <td className="px-5 py-4 text-[#6b7280]">
-                              {formatDate(record.submittedAt)}
+                              {formatDate(record.updatedAt || record.createdAt)}
                             </td>
                             <td className="px-5 py-4 text-right">
                               <span className={`inline-block px-2.5 py-1 rounded-[4px] border text-[12px] font-semibold ${status.className}`}>
@@ -336,9 +236,6 @@ export function DashboardPage() {
                 © 2024 CIVIC UTILITY SYSTEM | WEB3 REGISTRY PROTOCOL
               </p>
             </footer>
-          </div>
-        </main>
-      </div>
-    </div>
+    </>
   );
 }

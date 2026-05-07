@@ -75,18 +75,18 @@ function LandingHeader({ onLogin }: { onLogin: () => void }) {
 
 function HeroSection({ router }: { router: ReturnType<typeof useRouter> }) {
   return (
-    <section className="mx-auto grid max-w-6xl gap-12 px-4 py-14 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-20">
-      <div className="flex flex-col justify-center">
-        <div className="inline-flex w-fit items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-blue-700 ring-1 ring-blue-100">
+    <section className="mx-auto grid max-w-6xl gap-12 px-4 py-14 sm:px-6 lg:grid-cols-2 lg:px-8 lg:py-20">
+      <div className="flex flex-col justify-center items-start">
+        <div className="flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-blue-700 ring-1 ring-blue-100">
           <ShieldIcon />
           Hệ thống chính phủ số
         </div>
 
-        <h1 className="mt-6 max-w-xl text-4xl font-black leading-tight tracking-[-0.04em] text-slate-950 sm:text-5xl lg:text-6xl">
+        <h1 className="mt-6 text-4xl font-black leading-tight tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
           Minh bạch hóa quản lý đất đai với công nghệ blockchain
         </h1>
 
-        <p className="mt-5 max-w-xl text-base leading-8 text-slate-600 sm:text-lg">
+        <p className="mt-5 text-base leading-8 text-slate-600 sm:text-lg">
           Hệ thống quản lý, lưu trữ và xác thực quyền sử dụng đất an toàn, nhanh chóng và hiện đại. Xây dựng niềm tin thông qua dữ liệu không thể thay đổi.
         </p>
 
