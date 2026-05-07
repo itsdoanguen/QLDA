@@ -69,22 +69,34 @@ export class LandRecordService {
     }
 
     // Randomly assign to a CAN_BO
-    const randomCb = await this.userRepository
+    const randomCb = await this.getRandomStaff();
+
+    record.status = LandRecordStatus.SUBMITTED;
+    record.assignedCbId = randomCb.id;
+    record.isFrozen = false;
+    record.reviewedByFirstId = null;
+
+    return this.landRecordRepository.save(record);
+  }
+
+  private async getRandomStaff(excludeId?: number): Promise<User> {
+    const query = this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.role', 'role')
       .where('role.roleCode = :roleCode', { roleCode: 'CAN_BO' })
-      .andWhere('user.status = :status', { status: 'Active' })
-      .orderBy('RANDOM()')
-      .getOne();
+      .andWhere('user.status = :status', { status: 'Active' });
+
+    if (excludeId) {
+      query.andWhere('user.id != :excludeId', { excludeId });
+    }
+
+    const randomCb = await query.orderBy('RANDOM()').getOne();
 
     if (!randomCb) {
       throw new BadRequestException('No available staff to assign');
     }
 
-    record.status = LandRecordStatus.SUBMITTED;
-    record.assignedCbId = randomCb.id;
-
-    return this.landRecordRepository.save(record);
+    return randomCb;
   }
 
   async findOne(id: number): Promise<LandRecord> {
@@ -132,10 +144,10 @@ export class LandRecordService {
 
     return {
       total: records.length,
-      submitted: records.filter(r => r.status === 'Submitted').length,
-      approved: records.filter(r => r.status === 'CB_APPROVED').length,
-      rejected: records.filter(r => r.status === 'Rejected').length,
-      needsSupplement: records.filter(r => r.status === 'Needs Supplement').length,
+      submitted: records.filter(r => r.status === LandRecordStatus.SUBMITTED || r.status === LandRecordStatus.PENDING_SECOND_REVIEW).length,
+      approved: records.filter(r => r.status === LandRecordStatus.CB_APPROVED).length,
+      rejected: records.filter(r => r.status === LandRecordStatus.REJECTED).length,
+      needsSupplement: records.filter(r => r.status === LandRecordStatus.NEEDS_SUPPLEMENT).length,
     };
   }
 
@@ -145,13 +157,21 @@ export class LandRecordService {
       throw new NotFoundException('Land record not assigned to you or not found');
     }
 
-    if (record.status !== LandRecordStatus.SUBMITTED) {
-      throw new BadRequestException('Only submitted records can be reviewed');
+    if (record.status === LandRecordStatus.SUBMITTED) {
+      // First review done, assign to second staff
+      const secondStaff = await this.getRandomStaff(staffId);
+      record.status = LandRecordStatus.PENDING_SECOND_REVIEW;
+      record.assignedCbId = secondStaff.id;
+      record.reviewedByFirstId = staffId;
+      record.reviewReason = dto.reason;
+    } else if (record.status === LandRecordStatus.PENDING_SECOND_REVIEW) {
+      // Second review done, fully approved
+      record.status = LandRecordStatus.CB_APPROVED;
+      record.reviewReason = dto.reason;
+      record.isFrozen = true;
+    } else {
+      throw new BadRequestException('Only submitted or pending second review records can be reviewed');
     }
-
-    record.status = LandRecordStatus.CB_APPROVED;
-    record.reviewReason = dto.reason;
-    record.isFrozen = true;
 
     return this.landRecordRepository.save(record);
   }
@@ -168,6 +188,9 @@ export class LandRecordService {
 
     record.status = LandRecordStatus.REJECTED;
     record.reviewReason = dto.reason;
+    record.isFrozen = false;
+    record.reviewedByFirstId = null;
+    record.assignedCbId = null;
 
     return this.landRecordRepository.save(record);
   }
@@ -184,6 +207,9 @@ export class LandRecordService {
 
     record.status = LandRecordStatus.NEEDS_SUPPLEMENT;
     record.reviewReason = dto.reason;
+    record.isFrozen = false;
+    record.reviewedByFirstId = null;
+    record.assignedCbId = null;
 
     return this.landRecordRepository.save(record);
   }

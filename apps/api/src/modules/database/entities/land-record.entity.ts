@@ -49,6 +49,9 @@ export class LandRecord {
   @ManyToOne(() => User)
   @JoinColumn({ name: 'assigned_cb_id' })
   assignedCb?: User;
+  
+  @Column({ name: 'reviewed_by_first_id', type: 'integer', nullable: true })
+  reviewedByFirstId?: number;
 
   @Column({ name: 'is_frozen', type: 'boolean', default: false })
   isFrozen: boolean;
