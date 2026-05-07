@@ -3,7 +3,12 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Form, Input, InputNumber, Select, Upload, Button, Space, App, Modal, Image } from "antd";
-import { InboxOutlined, DeleteOutlined, InfoCircleOutlined, UserOutlined, SendOutlined } from "@ant-design/icons";
+import { 
+  InboxOutlined, DeleteOutlined, InfoCircleOutlined, UserOutlined, SendOutlined,
+  CheckOutlined, BookOutlined, CloudUploadOutlined, FileTextOutlined,
+  PartitionOutlined, ContainerOutlined, FileDoneOutlined, UploadOutlined, ArrowRightOutlined,
+  EnvironmentOutlined
+} from "@ant-design/icons";
 import { api } from "@/utils/api";
 import type { UploadProps } from "antd";
 import dynamic from "next/dynamic";
@@ -181,15 +186,38 @@ export function CreateRecordPage() {
   };
 
   return (
-    <div className="pb-24">
+    <div className="max-w-[900px] mx-auto pb-24">
       {/* Header */}
       <header className="mb-8">
-        <h1 className="text-[32px] font-semibold leading-[40px] tracking-[-0.02em] text-[#191c1e] mb-2">
-          Tạo Mới Hồ Sơ Đất Đai
+        <h1 className="text-[28px] font-bold text-[#191c1e] mb-8">
+          Tạo hồ sơ đất đai mới
         </h1>
-        <p className="text-[14px] leading-[20px] text-[#434654]">
-          Vui lòng cung cấp đầy đủ thông tin và tải lên các tài liệu pháp lý tương ứng.
-        </p>
+        
+        {/* Stepper */}
+        <div className="flex items-center w-full mb-8 relative">
+          <div className="flex flex-col items-center flex-1 relative z-10">
+            <div className="w-8 h-8 rounded-full bg-[#0c56d0] text-white flex items-center justify-center mb-2">
+              <CheckOutlined />
+            </div>
+            <span className="text-[12px] font-bold text-[#0c56d0]">Thông tin thửa đất</span>
+          </div>
+          <div className="absolute top-4 left-[15%] right-[50%] h-[2px] bg-[#c3c6d6] -z-0"></div>
+          
+          <div className="flex flex-col items-center flex-1 relative z-10">
+            <div className="w-8 h-8 rounded-full bg-[#0c56d0] text-white flex items-center justify-center mb-2">
+              2
+            </div>
+            <span className="text-[12px] font-bold text-[#0c56d0]">Tải lên tài liệu</span>
+          </div>
+          <div className="absolute top-4 left-[50%] right-[15%] h-[2px] bg-[#e1e2e4] -z-0"></div>
+
+          <div className="flex flex-col items-center flex-1 relative z-10">
+            <div className="w-8 h-8 rounded-full bg-[#f3f4f6] text-[#737685] flex items-center justify-center mb-2">
+              3
+            </div>
+            <span className="text-[12px] font-medium text-[#737685]">Ký số & Xác nhận</span>
+          </div>
+        </div>
       </header>
 
       <Form
@@ -198,85 +226,48 @@ export function CreateRecordPage() {
         onFinish={onFinish}
         requiredMark={false}
       >
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Left Column: Upload Area */}
-          <div className="lg:col-span-5 space-y-6">
-            <div className="bg-white border border-[#c3c6d6] p-6 rounded-lg">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-[18px] font-semibold leading-[24px]">Tài liệu đính kèm</h3>
-                <span className="text-[12px] font-medium tracking-[0.02em] text-[#003d9b] uppercase">Bản quét gốc</span>
-              </div>
-              
-              <Form.Item name="files" className="mb-0">
-                <Dragger {...uploadProps} className="!bg-[#fcfdff] hover:!border-[#0c56d0] !rounded-xl !border-2 !border-[#c3c6d6]">
-                  <p className="ant-upload-drag-icon">
-                    <InboxOutlined className="!text-[#737685] !text-4xl" />
-                  </p>
-                  <p className="ant-upload-text !text-[#191c1e] !font-medium !text-[14px]">
-                    Tải lên hoặc quét 'Sổ đỏ'
-                  </p>
-                  <p className="ant-upload-hint !text-[#737685] !text-[12px]">
-                    Định dạng hỗ trợ: PDF, JPG, PNG (Max 5MB)
-                  </p>
-                </Dragger>
+        {/* Hidden fields to keep BE mappings */}
+        <Form.Item name="landType" hidden><Input /></Form.Item>
+
+        <div className="space-y-6">
+          {/* Thông tin thửa đất */}
+          <div className="bg-white border border-[#c3c6d6] rounded-xl overflow-hidden">
+            <div className="flex items-center gap-3 p-4 border-b border-[#e1e2e4]">
+              <BookOutlined className="text-[#0c56d0] text-lg" />
+              <h3 className="text-[16px] font-bold text-[#191c1e] mb-0">Thông tin thửa đất</h3>
+            </div>
+            <div className="p-6 grid grid-cols-2 gap-x-8 gap-y-6">
+              <Form.Item
+                name="plotNumber"
+                label={<span className="text-[12px] font-bold text-[#737685] uppercase">SỐ TỜ BẢN ĐỒ</span>}
+                className="mb-0"
+              >
+                <Input
+                  className="!rounded !border-[#c3c6d6] hover:!border-[#0c56d0] focus:!border-[#0c56d0] focus:!shadow-none !p-3 !text-[14px]"
+                  placeholder="Nhập số tờ bản đồ"
+                />
               </Form.Item>
 
-              <Modal
-                open={previewOpen}
-                title={previewTitle}
-                footer={null}
-                onCancel={handleCancelPreview}
+              <Form.Item
+                name="parcelNumber"
+                label={<span className="text-[12px] font-bold text-[#737685] uppercase">SỐ THỬA ĐẤT</span>}
+                className="mb-0"
               >
-                <img alt="preview" style={{ width: "100%" }} src={previewImage} />
-              </Modal>
-            </div>
-
-            <div className="bg-[#f0f4ff] border border-[#d6e4ff] p-4 rounded-lg flex gap-4">
-              <InfoCircleOutlined className="text-[#0c56d0] text-lg mt-0.5" />
-              <p className="text-[12px] text-[#0040a2] leading-relaxed font-medium">
-                Đảm bảo rằng bản quét rõ nét, không bị mất góc và hiển thị đầy đủ con dấu pháp lý để hệ thống có thể lưu trữ minh bạch.
-              </p>
-            </div>
-          </div>
-
-          {/* Right Column: Form Details */}
-          <div className="lg:col-span-7 space-y-8">
-            <div className="bg-white border border-[#c3c6d6] p-8 rounded-lg">
-              <h3 className="text-[18px] font-semibold leading-[24px] mb-6 text-[#191c1e]">
-                Thông tin chi tiết thửa đất
-              </h3>
-
-              <div className="grid grid-cols-2 gap-6">
-                <Form.Item
-                  name="plotNumber"
-                  label={<span className="text-[12px] font-medium tracking-[0.02em] text-[#434654] uppercase">Số tờ bản đồ</span>}
-                >
-                  <Input
-                    className="!rounded !border-[#c3c6d6] hover:!border-[#0052cc] focus:!border-[#0052cc] focus:!shadow-none !p-3 !text-[14px]"
-                    placeholder="Nhập số tờ..."
-                  />
-                </Form.Item>
-
-                <Form.Item
-                  name="parcelNumber"
-                  label={<span className="text-[12px] font-medium tracking-[0.02em] text-[#434654] uppercase">Số thửa đất</span>}
-                >
-                  <Input
-                    className="!rounded !border-[#c3c6d6] hover:!border-[#0052cc] focus:!border-[#0052cc] focus:!shadow-none !p-3 !text-[14px]"
-                    placeholder="Nhập số thửa..."
-                  />
-                </Form.Item>
-              </div>
+                <Input
+                  className="!rounded !border-[#c3c6d6] hover:!border-[#0c56d0] focus:!border-[#0c56d0] focus:!shadow-none !p-3 !text-[14px]"
+                  placeholder="Nhập số thửa đất"
+                />
+              </Form.Item>
 
               <Form.Item
                 name="area"
-                label={<span className="text-[12px] font-medium tracking-[0.02em] text-[#434654] uppercase">Diện tích <span className="text-[#ba1a1a]">*</span></span>}
+                label={<span className="text-[12px] font-bold text-[#737685] uppercase">DIỆN TÍCH (m²)</span>}
+                className="mb-0"
                 rules={[{ required: true, message: "Vui lòng nhập diện tích" }]}
               >
                 <InputNumber
-                  size="large"
-                  className="w-full !rounded !border-[#c3c6d6] hover:!border-[#0052cc] focus:!border-[#0052cc] focus:!shadow-none !text-[14px]"
-                  suffix={<span className="text-[#737685] text-[12px] font-bold">m²</span>}
+                  className="w-full !rounded !border-[#c3c6d6] hover:!border-[#0c56d0] focus:!border-[#0c56d0] focus:!shadow-none !text-[14px]"
+                  style={{ padding: '6px 0' }}
                   placeholder="Ví dụ: 125.5"
                   min={0}
                   step={0.1}
@@ -285,75 +276,114 @@ export function CreateRecordPage() {
 
               <Form.Item
                 name="address"
-                label={<span className="text-[12px] font-medium tracking-[0.02em] text-[#434654] uppercase">Địa chỉ thửa đất <span className="text-[#ba1a1a]">*</span></span>}
+                label={<span className="text-[12px] font-bold text-[#737685] uppercase">ĐỊA CHỈ THỬA ĐẤT</span>}
+                className="mb-0"
                 rules={[{ required: true, message: "Vui lòng nhập địa chỉ" }]}
               >
-                <TextArea
-                  className="!rounded !border-[#c3c6d6] hover:!border-[#0052cc] focus:!border-[#0052cc] focus:!shadow-none !p-3 !text-[14px]"
-                  placeholder="Số nhà, tên đường, phường/xã, quận/huyện..."
-                  rows={2}
+                <Input
+                  className="!rounded !border-[#c3c6d6] hover:!border-[#0c56d0] focus:!border-[#0c56d0] focus:!shadow-none !p-3 !text-[14px]"
+                  placeholder="Số nhà, đường, phường/xã..."
                 />
               </Form.Item>
+            </div>
+          </div>
 
-              <Form.Item
-                name="landType"
-                label={<span className="text-[12px] font-medium tracking-[0.02em] text-[#434654] uppercase">Loại đất</span>}
-              >
-                <Select
-                  placeholder="Chọn loại đất"
-                  className="!h-12 [&_.ant-select-selector]:!rounded [&_.ant-select-selector]:!border-[#c3c6d6] hover:[&_.ant-select-selector]:!border-[#0052cc]"
-                >
-                  <Option value="Đất ở tại đô thị">Đất ở tại đô thị</Option>
-                  <Option value="Đất ở tại nông thôn">Đất ở tại nông thôn</Option>
-                  <Option value="Đất nông nghiệp">Đất nông nghiệp</Option>
-                  <Option value="Đất thương mại, dịch vụ">Đất thương mại, dịch vụ</Option>
-                </Select>
-              </Form.Item>
-
-              <div className="pt-6 border-t border-[#f3f4f6]">
-                <div className="space-y-1">
-                  <label className="text-[12px] font-medium tracking-[0.02em] text-[#434654] uppercase mb-2 block">
-                    Thông tin chủ sở hữu (Hiển thị)
-                  </label>
-                  <Input
-                    prefix={<UserOutlined className="text-[#737685] mr-2" />}
-                    value={profile?.fullName || ""}
-                    disabled
-                    className="!rounded !border-[#c3c6d6] !bg-[#f3f4f6] !text-[#434654] !p-3 !text-[14px]"
-                  />
-                  <div className="text-[12px] text-[#737685] mt-2">
-                    Lưu ý: Thông tin chủ sở hữu được liên kết tự động qua tài khoản định danh VNeID của bạn.
+          {/* Danh mục tài lên hồ sơ */}
+          <div className="bg-white border border-[#c3c6d6] rounded-xl overflow-hidden">
+            <div className="flex items-center gap-3 p-4 border-b border-[#e1e2e4]">
+              <CloudUploadOutlined className="text-[#0c56d0] text-lg" />
+              <h3 className="text-[16px] font-bold text-[#191c1e] mb-0">Danh mục tài lên hồ sơ</h3>
+            </div>
+            <div className="p-6">
+              <div className="grid grid-cols-2 gap-4">
+                {/* Box 1 */}
+                <div className="flex items-center justify-between p-4 border border-[#e1e2e4] rounded-lg bg-[#fcfdff]">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-[#f0f4ff] rounded flex items-center justify-center text-[#0c56d0]">
+                      <FileTextOutlined className="text-xl" />
+                    </div>
+                    <div>
+                      <div className="text-[14px] font-semibold text-[#191c1e]">Giấy chứng nhận (Sổ đỏ)</div>
+                      <div className="text-[12px] text-[#737685]">Định dạng: PDF, JPG</div>
+                    </div>
                   </div>
+                  <Upload {...uploadProps} showUploadList={false}>
+                    <Button icon={<UploadOutlined />} className="!text-[12px] !font-medium">Tải lên</Button>
+                  </Upload>
+                </div>
+                
+                {/* Box 2 */}
+                <div className="flex items-center justify-between p-4 border border-[#e1e2e4] rounded-lg bg-[#fcfdff]">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-[#f0f4ff] rounded flex items-center justify-center text-[#0c56d0]">
+                      <PartitionOutlined className="text-xl" />
+                    </div>
+                    <div>
+                      <div className="text-[14px] font-semibold text-[#191c1e]">Sơ đồ thửa đất (VN-2000)</div>
+                      <div className="text-[12px] text-[#737685]">Định dạng: JSON, XML</div>
+                    </div>
+                  </div>
+                  <Upload {...uploadProps} showUploadList={false}>
+                    <Button icon={<UploadOutlined />} className="!text-[12px] !font-medium">Tải lên</Button>
+                  </Upload>
+                </div>
+
+                {/* Box 3 */}
+                <div className="flex items-center justify-between p-4 border border-[#e1e2e4] rounded-lg bg-[#fcfdff]">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-[#f0f4ff] rounded flex items-center justify-center text-[#0c56d0]">
+                      <ContainerOutlined className="text-xl" />
+                    </div>
+                    <div>
+                      <div className="text-[14px] font-semibold text-[#191c1e]">Chứng từ thuế</div>
+                      <div className="text-[12px] text-[#737685]">Định dạng: PDF</div>
+                    </div>
+                  </div>
+                  <Upload {...uploadProps} showUploadList={false}>
+                    <Button icon={<UploadOutlined />} className="!text-[12px] !font-medium">Tải lên</Button>
+                  </Upload>
+                </div>
+
+                {/* Box 4 */}
+                <div className="flex items-center justify-between p-4 border border-[#e1e2e4] rounded-lg bg-[#fcfdff]">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-[#f0f4ff] rounded flex items-center justify-center text-[#0c56d0]">
+                      <FileDoneOutlined className="text-xl" />
+                    </div>
+                    <div>
+                      <div className="text-[14px] font-semibold text-[#191c1e]">Hợp đồng công chứng</div>
+                      <div className="text-[12px] text-[#737685]">Định dạng: PDF</div>
+                    </div>
+                  </div>
+                  <Upload {...uploadProps} showUploadList={false}>
+                    <Button icon={<UploadOutlined />} className="!text-[12px] !font-medium">Tải lên</Button>
+                  </Upload>
                 </div>
               </div>
-            </div>
 
-            {/* Map Section */}
-            <div className="bg-white border border-[#c3c6d6] rounded-lg overflow-hidden relative">
-              <div className="p-4 border-b border-[#e1e2e4] bg-[#f8f9fb]">
-                <h4 className="text-[14px] font-semibold text-[#191c1e]">Xác nhận tọa độ địa lý</h4>
-                <p className="text-[12px] text-[#737685]">Click trên bản đồ để vẽ ranh giới thửa đất</p>
-              </div>
-              <Form.Item name="gpsCoordinates" className="mb-0">
-                <MapPolygonPicker />
-              </Form.Item>
+              {/* Uploaded Files List */}
+              {fileList.length > 0 && (
+                <div className="mt-6 border-t border-[#e1e2e4] pt-4">
+                  <h4 className="text-[13px] font-bold text-[#434654] uppercase mb-3">Tệp đã tải lên</h4>
+                  <div className="grid grid-cols-2 gap-3">
+                    {fileList.map((file) => (
+                      <div key={file.uid} className="flex items-center justify-between p-3 border border-[#e1e2e4] rounded-lg bg-white shadow-sm">
+                        <span className="text-[13px] text-[#0c56d0] font-medium truncate max-w-[80%]">{file.name}</span>
+                        <Button type="text" icon={<DeleteOutlined />} size="small" className="text-red-500" onClick={() => setFileList(prev => prev.filter(f => f.uid !== file.uid))} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-        </div>
 
-        {/* Floating Footer */}
-        <footer className="fixed bottom-0 left-0 lg:left-[260px] right-0 bg-white border-t border-[#e1e2e4] px-8 py-4 z-40 flex justify-between items-center shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-          <div className="flex items-center gap-4 text-[12px] font-medium text-[#737685]">
-            <span className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-green-500"></span> 
-              Hệ thống trực tuyến
-            </span>
-          </div>
-          <div className="flex gap-4">
+          {/* Buttons block */}
+          <div className="flex items-center justify-end gap-4 py-4 border-t border-[#e1e2e4]">
             <Button
               type="default"
               onClick={() => router.push("/dashboard")}
-              className="!px-6 !h-10 !border-[#c3c6d6] !text-[#191c1e] !font-medium !rounded-lg hover:!bg-[#f8f9fb]"
+              className="!px-6 !h-10 !border-[#c3c6d6] !text-[#191c1e] !font-medium !rounded-lg"
             >
               Hủy
             </Button>
@@ -361,22 +391,56 @@ export function CreateRecordPage() {
               type="default"
               onClick={handleSaveDraft}
               loading={drafting}
-              className="!px-6 !h-10 !border-[#003d9b] !text-[#003d9b] !font-medium !rounded-lg hover:!bg-[#f0f4ff]"
+              className="!px-6 !h-10 !border-[#c3c6d6] !text-[#191c1e] !font-medium !rounded-lg"
             >
-              Lưu bản thảo
+              Lưu nháp
             </Button>
             <Button
               type="primary"
               htmlType="submit"
               loading={submitting}
-              className="!px-8 !h-10 !bg-[#0052cc] !text-white !font-bold !rounded-lg hover:!bg-[#0040a2] shadow-lg shadow-blue-500/20 flex items-center gap-2"
+              className="!px-8 !h-10 !bg-[#0c56d0] !text-white !font-bold !rounded-lg flex items-center gap-2"
             >
-              <SendOutlined />
               Nộp hồ sơ
+              <ArrowRightOutlined />
             </Button>
           </div>
-        </footer>
+
+          {/* GIS */}
+          <div className="bg-white border border-[#c3c6d6] rounded-xl overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-[#e1e2e4]">
+              <div className="flex items-center gap-3">
+                <EnvironmentOutlined className="text-[#0c56d0] text-lg" />
+                <h3 className="text-[16px] font-bold text-[#191c1e] mb-0">Vị trí & Hình dạng thửa đất (GIS)</h3>
+              </div>
+              <div className="flex items-center gap-4 text-[12px] font-medium text-[#434654]">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#0c56d0]"></span> Ranh giới thửa đất
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#737685]"></span> Tọa độ VN-2000
+                </div>
+              </div>
+            </div>
+            <div className="p-4">
+              <div className="border border-[#e1e2e4] rounded-lg overflow-hidden h-[450px]">
+                <Form.Item name="gpsCoordinates" className="mb-0 h-full">
+                  <MapPolygonPicker />
+                </Form.Item>
+              </div>
+            </div>
+          </div>
+        </div>
       </Form>
+
+      <Modal
+        open={previewOpen}
+        title={previewTitle}
+        footer={null}
+        onCancel={handleCancelPreview}
+      >
+        <img alt="preview" style={{ width: "100%" }} src={previewImage} />
+      </Modal>
     </div>
   );
 }
