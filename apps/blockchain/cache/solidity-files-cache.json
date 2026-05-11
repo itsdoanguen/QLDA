@@ -117,8 +117,8 @@
       ]
     },
     "E:\\CODE\\QLDA\\LandContractQLDA\\apps\\blockchain\\contracts\\MultiSigWorkflow.sol": {
-      "lastModificationDate": 1777287675965,
-      "contentHash": "704a5407b126a12403ac4b0097c423a3",
+      "lastModificationDate": 1778490247257,
+      "contentHash": "5600b91582ec71c31c0b7048d0587a4a",
       "sourceName": "contracts/MultiSigWorkflow.sol",
       "solcConfig": {
         "version": "0.8.24",
