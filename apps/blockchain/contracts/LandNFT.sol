@@ -34,4 +34,17 @@ contract LandNFT is ERC721URIStorage, Ownable {
     function getTotalSupply() external view returns (uint256) {
         return _tokenIds.current();
     }
+
+    /**
+     * @dev Admin-level forced transfer for wallet recovery (Task T15.2).
+     * Bypasses standard approval mechanism — only callable by owner (WalletOverride contract or Admin).
+     * @param from The current owner (old wallet).
+     * @param to The new wallet address.
+     * @param tokenId The NFT token ID to transfer.
+     */
+    function adminTransfer(address from, address to, uint256 tokenId) external onlyOwner {
+        require(ownerOf(tokenId) == from, "Token not owned by specified address");
+        require(to != address(0), "Invalid target address");
+        _transfer(from, to, tokenId);
+    }
 }
