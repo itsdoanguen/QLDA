@@ -12,6 +12,8 @@ import {
 import { api } from "@/utils/api";
 import type { UploadProps } from "antd";
 import dynamic from "next/dynamic";
+import { ServiceSelection } from "./ServiceSelection";
+import { SuccessView } from "./SuccessView";
 
 const MapPolygonPicker = dynamic(() => import("@/components/shared/MapPolygonPicker"), { ssr: false });
 
@@ -22,6 +24,8 @@ const { TextArea } = Input;
 export function CreateRecordPage() {
   const router = useRouter();
   const [form] = Form.useForm();
+  const [step, setStep] = useState(1);
+  const [serviceType, setServiceType] = useState('tai-len');
   const [submitting, setSubmitting] = useState(false);
   const [drafting, setDrafting] = useState(false);
   const [fileList, setFileList] = useState<any[]>([]);
@@ -176,7 +180,7 @@ export function CreateRecordPage() {
       await api.post(`/land-records/${recordId}/submit`);
       
       message.success("Nộp hồ sơ xét duyệt thành công!");
-      router.push("/dashboard");
+      setStep(3); // Go to success view
     } catch (error: any) {
       console.error("Submit error", error);
       message.error(error.response?.data?.message || "Có lỗi xảy ra khi nộp hồ sơ");
@@ -185,40 +189,40 @@ export function CreateRecordPage() {
     }
   };
 
-  return (
-    <div className="max-w-[900px] mx-auto pb-24">
-      {/* Header */}
-      <header className="mb-8">
-        <h1 className="text-[28px] font-bold text-[#191c1e] mb-8">
-          Tạo hồ sơ đất đai mới
-        </h1>
-        
-        {/* Stepper */}
-        <div className="flex items-center w-full mb-8 relative">
-          <div className="flex flex-col items-center flex-1 relative z-10">
-            <div className="w-8 h-8 rounded-full bg-[#0c56d0] text-white flex items-center justify-center mb-2">
-              <CheckOutlined />
-            </div>
-            <span className="text-[12px] font-bold text-[#0c56d0]">Thông tin thửa đất</span>
-          </div>
-          <div className="absolute top-4 left-[15%] right-[50%] h-[2px] bg-[#c3c6d6] -z-0"></div>
-          
-          <div className="flex flex-col items-center flex-1 relative z-10">
-            <div className="w-8 h-8 rounded-full bg-[#0c56d0] text-white flex items-center justify-center mb-2">
-              2
-            </div>
-            <span className="text-[12px] font-bold text-[#0c56d0]">Tải lên tài liệu</span>
-          </div>
-          <div className="absolute top-4 left-[50%] right-[15%] h-[2px] bg-[#e1e2e4] -z-0"></div>
+  const renderStepper = () => {
+    // Nếu ở bước 3 (thành công) thì không hiện stepper trên này nữa vì trang success có stepper riêng
+    if (step === 3) return null;
 
-          <div className="flex flex-col items-center flex-1 relative z-10">
-            <div className="w-8 h-8 rounded-full bg-[#f3f4f6] text-[#737685] flex items-center justify-center mb-2">
-              3
-            </div>
-            <span className="text-[12px] font-medium text-[#737685]">Ký số & Xác nhận</span>
+    return (
+      <div className="flex items-center w-full mb-10 relative">
+        <div className="flex flex-col items-center flex-1 relative z-10">
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 ${step >= 1 ? 'bg-[#0c56d0] text-white' : 'bg-[#f3f4f6] text-[#737685]'}`}>
+            {step > 1 ? <CheckOutlined /> : 1}
           </div>
+          <span className={`text-[12px] font-bold ${step >= 1 ? 'text-[#0c56d0]' : 'text-[#737685]'}`}>Dịch vụ</span>
         </div>
-      </header>
+        <div className={`absolute top-4 left-[15%] right-[50%] h-[2px] -z-0 ${step >= 2 ? 'bg-[#0c56d0]' : 'bg-[#e1e2e4]'}`}></div>
+        
+        <div className="flex flex-col items-center flex-1 relative z-10">
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 ${step >= 2 ? 'bg-[#0c56d0] text-white' : 'bg-[#f3f4f6] text-[#737685]'}`}>
+            {step > 2 ? <CheckOutlined /> : 2}
+          </div>
+          <span className={`text-[12px] font-bold ${step >= 2 ? 'text-[#0c56d0]' : 'text-[#737685]'}`}>Tải lên tài liệu</span>
+        </div>
+        <div className={`absolute top-4 left-[50%] right-[15%] h-[2px] -z-0 ${step >= 3 ? 'bg-[#0c56d0]' : 'bg-[#e1e2e4]'}`}></div>
+
+        <div className="flex flex-col items-center flex-1 relative z-10">
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 ${step >= 3 ? 'bg-[#0c56d0] text-white' : 'bg-[#f3f4f6] text-[#737685]'}`}>
+            3
+          </div>
+          <span className={`text-[12px] font-medium ${step >= 3 ? 'text-[#0c56d0]' : 'text-[#737685]'}`}>Ký số & Xác nhận</span>
+        </div>
+      </div>
+    );
+  };
+
+  const renderUploadForm = () => (
+    <div className="animate-fade-in">
 
       <Form
         form={form}
@@ -432,7 +436,7 @@ export function CreateRecordPage() {
           </div>
         </div>
       </Form>
-
+      
       <Modal
         open={previewOpen}
         title={previewTitle}
@@ -441,6 +445,31 @@ export function CreateRecordPage() {
       >
         <img alt="preview" style={{ width: "100%" }} src={previewImage} />
       </Modal>
+    </div>
+  );
+
+  return (
+    <div className="max-w-[1000px] mx-auto pb-24 pt-6">
+      {/* Header (Chỉ hiện khi chưa thành công) */}
+      {step !== 3 && (
+        <header className="mb-8">
+          {renderStepper()}
+        </header>
+      )}
+
+      {/* Render Steps */}
+      {step === 1 && (
+        <ServiceSelection 
+          onNext={(serviceId) => {
+            setServiceType(serviceId);
+            setStep(2);
+          }} 
+        />
+      )}
+
+      {step === 2 && renderUploadForm()}
+
+      {step === 3 && <SuccessView />}
     </div>
   );
 }

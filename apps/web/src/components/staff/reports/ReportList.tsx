@@ -20,9 +20,10 @@ interface ReportItem {
 
 interface ReportListProps {
   data: ReportItem[];
+  hidePdf?: boolean;
 }
 
-export default function ReportList({ data }: ReportListProps) {
+export default function ReportList({ data, hidePdf }: ReportListProps) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
       <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-white">
@@ -62,7 +63,9 @@ export default function ReportList({ data }: ReportListProps) {
               <td className="px-6 py-4 text-gray-500 font-medium">{report.updated}</td>
               <td className="px-6 py-4 text-right">
                 <span className="text-[#0052cc] font-bold mr-4 cursor-pointer hover:underline">Excel</span>
-                <span className="text-[#0052cc] font-bold cursor-pointer hover:underline">PDF</span>
+                {!hidePdf && (
+                  <span className="text-[#0052cc] font-bold cursor-pointer hover:underline">PDF</span>
+                )}
               </td>
             </tr>
           ))}
