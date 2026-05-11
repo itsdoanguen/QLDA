@@ -145,6 +145,72 @@ contract MultiSigWorkflow {
         emit TransactionSigned(_txId, msg.sender, role, _isApproved);
     }
     
+    event BatchSignError(uint256 indexed transactionId, string reason);
+
+    /**
+     * @dev Batch sign multiple transactions with local revert handling (Task T37.5 & T37.7).
+     * If one transaction fails validation, it emits an error and continues with the next one.
+     */
+    function batchSignTransactions(
+        uint256[] calldata _txIds,
+        bool[] calldata _isApproved,
+        string[] calldata _reasons
+    ) external {
+        require(_txIds.length == _isApproved.length && _txIds.length == _reasons.length, "Array lengths mismatch");
+
+        SignerRole role = userRoles[msg.sender];
+        require(role == SignerRole.CAN_BO || role == SignerRole.LANH_DAO, "Unauthorized role");
+
+        for (uint256 i = 0; i < _txIds.length; i++) {
+            uint256 txId = _txIds[i];
+            Transaction storage txn = transactions[txId];
+
+            // Local revert mechanism: check and continue instead of revert
+            if (txn.transactionId == 0) {
+                emit BatchSignError(txId, "Transaction does not exist");
+                continue;
+            }
+            if (txn.status != TransactionStatus.PENDING) {
+                emit BatchSignError(txId, "Transaction is not pending");
+                continue;
+            }
+            if (transactionSignatures[txId][msg.sender].timestamp != 0) {
+                emit BatchSignError(txId, "Already signed");
+                continue;
+            }
+
+            // Ghi nhận chữ ký
+            transactionSignatures[txId][msg.sender] = Signature({
+                signer: msg.sender,
+                role: role,
+                timestamp: block.timestamp,
+                isApproved: _isApproved[i],
+                reason: _reasons[i]
+            });
+            
+            transactionSigners[txId].push(msg.sender);
+
+            if (_isApproved[i]) {
+                if (role == SignerRole.CAN_BO) {
+                    txn.cbSignaturesCount++;
+                } else if (role == SignerRole.LANH_DAO) {
+                    txn.ldSignaturesCount++;
+                }
+                
+                // Check threshold
+                if (txn.cbSignaturesCount >= REQUIRED_CB_SIGS && txn.ldSignaturesCount >= REQUIRED_LD_SIGS) {
+                    txn.status = TransactionStatus.APPROVED;
+                    emit TransactionStatusChanged(txId, TransactionStatus.APPROVED);
+                }
+            } else {
+                txn.status = TransactionStatus.REJECTED;
+                emit TransactionStatusChanged(txId, TransactionStatus.REJECTED);
+            }
+
+            emit TransactionSigned(txId, msg.sender, role, _isApproved[i]);
+        }
+    }
+
     // Function để get danh sách người ký của 1 transaction
     function getTransactionSigners(uint256 _txId) external view returns (address[] memory) {
         return transactionSigners[_txId];

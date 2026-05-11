@@ -40,26 +40,34 @@ async function uploadImageToIPFS(filePath) {
   return response.data.IpfsHash;
 }
 
-async function uploadMetadataToIPFS(name, breed, birthYear, imageCID) {
+async function uploadMetadataToIPFS(ownerName, location, area, landType, imageCID) {
   const metadata = {
-    name,
-    description: `Race horse profile NFT for ${name}`,
+    name: `Land Record - ${ownerName}`,
+    description: `Official Land Registry NFT for property located at ${location}`,
     image: `ipfs://${imageCID}`,
     attributes: [
       {
-        trait_type: "breed",
-        value: breed
+        trait_type: "ownerName",
+        value: ownerName
       },
       {
-        trait_type: "birthYear",
-        value: birthYear
+        trait_type: "location",
+        value: location
+      },
+      {
+        trait_type: "area",
+        value: area
+      },
+      {
+        trait_type: "landType",
+        value: landType
       }
     ]
   };
 
   const body = {
     pinataMetadata: {
-      name: `${name.replace(/\s+/g, '_')}_metadata.json`
+      name: `${ownerName.replace(/\s+/g, '_')}_land_metadata.json`
     },
     pinataContent: metadata
   };
