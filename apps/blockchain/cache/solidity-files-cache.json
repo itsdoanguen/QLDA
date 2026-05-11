@@ -42,8 +42,8 @@
       ]
     },
     "E:\\CODE\\QLDA\\LandContractQLDA\\apps\\blockchain\\contracts\\LandRegistry.sol": {
-      "lastModificationDate": 1778490030739,
-      "contentHash": "3e5b237aaa3588cb2200f52726270f6d",
+      "lastModificationDate": 1778490564746,
+      "contentHash": "91661f80f8d788a561536ad455dacf17",
       "sourceName": "contracts/LandRegistry.sol",
       "solcConfig": {
         "version": "0.8.24",
