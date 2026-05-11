@@ -1,14 +1,37 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-contract LandNFT {
-    // Basic LandNFT structure for smoke tests and compilation
-    uint256 public totalSupply;
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
 
-    event NFTMinted(uint256 indexed tokenId, address indexed to);
+contract LandNFT is ERC721URIStorage, Ownable {
+    using Counters for Counters.Counter;
+    Counters.Counter private _tokenIds;
 
-    function mint(address to) external {
-        totalSupply++;
-        emit NFTMinted(totalSupply, to);
+    event LandNFTMinted(uint256 indexed tokenId, address indexed to, string tokenURI);
+
+    constructor() ERC721("Land Registry Token", "LRT") {}
+
+    /**
+     * @dev Mints a new Land NFT. Only the owner (or the LandRegistry contract) can mint.
+     * @param to The address of the land owner.
+     * @param uri The IPFS CID or metadata URI containing the land details.
+     * @return tokenId The newly generated Token ID.
+     */
+    function mintLandNFT(address to, string memory uri) external onlyOwner returns (uint256) {
+        _tokenIds.increment();
+        uint256 newItemId = _tokenIds.current();
+
+        _mint(to, newItemId);
+        _setTokenURI(newItemId, uri);
+
+        emit LandNFTMinted(newItemId, to, uri);
+
+        return newItemId;
+    }
+    
+    function getTotalSupply() external view returns (uint256) {
+        return _tokenIds.current();
     }
 }
