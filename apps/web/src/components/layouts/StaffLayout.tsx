@@ -117,17 +117,7 @@ export function StaffLayout({ children }: { children: React.ReactNode }) {
               <DashboardOutlined className="text-lg" />
               Tổng quan hồ sơ
             </Link>
-            <Link
-              href="/staff/processing"
-              className={`flex items-center gap-3 px-6 py-3.5 font-semibold text-[14px] transition-all ${
-                pathname === "/staff/processing"
-                  ? "border-l-4 border-[#0b57d0] bg-[#f0f7ff] text-[#0b57d0]"
-                  : "border-l-4 border-transparent text-[#4b5563] hover:bg-[#f8f9fa] hover:text-[#111827]"
-              }`}
-            >
-              <ContainerOutlined className="text-lg" />
-              Xử lý hồ sơ
-            </Link>
+
             <Link
               href="/staff/search"
               className={`flex items-center gap-3 px-6 py-3.5 font-semibold text-[14px] transition-all ${
