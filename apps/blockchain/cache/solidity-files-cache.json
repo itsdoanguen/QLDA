@@ -867,6 +867,44 @@
       "artifacts": [
         "Pausable"
       ]
+    },
+    "E:\\CODE\\QLDA\\LandContractQLDA\\apps\\blockchain\\contracts\\AuditLog.sol": {
+      "lastModificationDate": 1778563443360,
+      "contentHash": "bd256905ef2740cc54b60f5afd0c95a2",
+      "sourceName": "contracts/AuditLog.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/access/Ownable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.24"
+      ],
+      "artifacts": [
+        "AuditLog"
+      ]
     }
   }
 }
