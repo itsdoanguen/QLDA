@@ -6,8 +6,13 @@ import { PlanningZone } from '../database/entities/planning-zone.entity';
 import { ComplianceController } from './compliance.controller';
 import { ComplianceService } from './compliance.service';
 
+import { AuthModule } from '../auth/auth.module';
+
 @Module({
-  imports: [TypeOrmModule.forFeature([Dispute, Mortgage, PlanningZone])],
+  imports: [
+    TypeOrmModule.forFeature([Dispute, Mortgage, PlanningZone]),
+    AuthModule,
+  ],
   controllers: [ComplianceController],
   providers: [ComplianceService],
   exports: [ComplianceService],

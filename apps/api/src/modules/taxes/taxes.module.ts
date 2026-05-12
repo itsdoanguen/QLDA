@@ -7,10 +7,12 @@ import { Transaction } from '../database/entities/transaction.entity';
 import { SystemConfig } from '../database/entities/system-config.entity';
 import { TaxesController } from './taxes.controller';
 import { TaxesService } from './taxes.service';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([TaxFee, Receipt, LandRecord, Transaction, SystemConfig]),
+    AuthModule,
   ],
   controllers: [TaxesController],
   providers: [TaxesService],
