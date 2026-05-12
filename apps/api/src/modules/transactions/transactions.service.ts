@@ -5,6 +5,7 @@ import { Transaction } from '../database/entities/transaction.entity';
 import { LandNFT } from '../database/entities/land-nft.entity';
 import { Wallet } from '../database/entities/wallet.entity';
 import { ComplianceService } from '../compliance/compliance.service';
+import { TaxesService } from '../taxes/taxes.service';
 
 @Injectable()
 export class TransactionsService {
@@ -16,6 +17,7 @@ export class TransactionsService {
     @InjectRepository(Wallet)
     private readonly walletRepository: Repository<Wallet>,
     private readonly complianceService: ComplianceService,
+    private readonly taxesService: TaxesService,
   ) {}
 
   async createDraft(tokenId: string, buyerId: number, sellerId: number, salePrice: number) {
@@ -69,10 +71,13 @@ export class TransactionsService {
       throw new BadRequestException('User is not a party to this transaction');
     }
 
-    // If both signed, move to Completed (or Pending_Tax depending on workflow)
+    // If both signed, move to Pending_Tax and calculate taxes
     if (transaction.sellerSigned && transaction.buyerSigned) {
-      transaction.status = 'Completed';
+      transaction.status = 'Pending_Tax';
       
+      // Calculate and save taxes
+      await this.taxesService.calculateAndSaveTransferTaxes(transaction.id);
+
       // Update NFT owner (Simulating blockchain transfer locally for now)
       const buyerWallet = await this.walletRepository.findOne({ where: { userId: transaction.buyerId } });
       if (buyerWallet) {

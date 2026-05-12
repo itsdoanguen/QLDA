@@ -21,6 +21,7 @@ import { TransactionsModule } from './modules/transactions/transactions.module';
 import { ComplianceModule } from './modules/compliance/compliance.module';
 import { FraudReportsModule } from './modules/fraud-reports/fraud-reports.module';
 import { SystemConfigModule } from './modules/system-config/system-config.module';
+import { TaxesModule } from './modules/taxes/taxes.module';
 
 
 @Module({
@@ -48,6 +49,7 @@ import { SystemConfigModule } from './modules/system-config/system-config.module
 		ComplianceModule,
 		FraudReportsModule,
 		SystemConfigModule,
+		TaxesModule,
 	],
 
 })
