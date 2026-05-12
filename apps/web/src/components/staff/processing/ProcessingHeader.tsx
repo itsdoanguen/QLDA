@@ -1,5 +1,4 @@
 import { FileTextOutlined } from '@ant-design/icons';
-import { Progress } from 'antd';
 
 export default function ProcessingHeader({ data }: { data: any }) {
   return (
@@ -17,14 +16,6 @@ export default function ProcessingHeader({ data }: { data: any }) {
           </div>
           <h1 className="text-xl font-bold text-gray-900 m-0">{data.title}</h1>
         </div>
-      </div>
-      
-      <div className="w-64 text-right">
-        <div className="flex justify-between text-xs font-bold mb-1">
-          <span className="text-gray-500">Tiến độ làm sạch:</span>
-          <span className="text-gray-900">{data.progress}%</span>
-        </div>
-        <Progress percent={data.progress} showInfo={false} size="small" strokeColor="#0052cc" className="m-0" />
       </div>
     </div>
   );

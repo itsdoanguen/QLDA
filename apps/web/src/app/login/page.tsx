@@ -23,6 +23,9 @@ export default function LoginPage() {
       const response = await api.post(`/auth/login?nationalId=${nationalId}`);
       if (response.data && response.data.challengeId) {
         sessionStorage.setItem("challengeId", response.data.challengeId);
+        if (response.data._testOtp) {
+          sessionStorage.setItem("testOtp", response.data._testOtp);
+        }
         router.push(`/auth_otp`);
       } else {
         message.error("Lỗi: Không nhận được challengeId từ máy chủ.");

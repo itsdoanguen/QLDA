@@ -10,8 +10,10 @@ import {
   EditOutlined
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import { useRouter } from 'next/navigation';
 
 export default function TasksTable({ tasks, loading, onRefresh, onSelectRecord, selectedId }: any) {
+  const router = useRouter();
   const [searchText, setSearchText] = useState("");
 
   const filteredTasks = tasks.filter((t: any) => 
@@ -108,7 +110,7 @@ export default function TasksTable({ tasks, loading, onRefresh, onSelectRecord, 
                         className="text-[#0052cc]"
                         onClick={(e) => {
                           e.stopPropagation();
-                          // Navigation to detail could go here
+                          router.push(`/staff/processing/${record.id}`);
                         }}
                       >
                         Xử lý

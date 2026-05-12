@@ -6,7 +6,7 @@ const MapPolygonPicker = dynamic(() => import('@/components/shared/MapPolygonPic
 
 export default function GisMapBlock({ data }: { data: any }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm flex flex-col min-h-[400px]">
+    <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm flex flex-col min-h-[600px]">
       <div className="flex justify-between items-center mb-6 shrink-0">
         <h3 className="font-bold text-gray-900 m-0 flex items-center gap-2 text-base">
           <span className="text-[#0052cc]"><GlobalOutlined /></span> 
@@ -18,9 +18,9 @@ export default function GisMapBlock({ data }: { data: any }) {
         </div>
       </div>
 
-      <div className="flex-1 bg-[#e5e7eb] rounded-lg border border-gray-200 relative overflow-hidden min-h-[300px]">
+      <div className="flex-1 bg-[#e5e7eb] rounded-lg border border-gray-200 relative overflow-hidden min-h-[500px]">
         <div className="absolute inset-0">
-          <MapPolygonPicker disabled={true} value="[[10.762622,106.660172],[10.762800,106.660500],[10.762400,106.660600]]" />
+          <MapPolygonPicker disabled={true} value={data.center} />
         </div>
         
         {/* Mock map controls */}

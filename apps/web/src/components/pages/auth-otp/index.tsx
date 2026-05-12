@@ -21,6 +21,10 @@ export function AuthOtpPage() {
 
   useEffect(() => {
     setChallengeId(sessionStorage.getItem("challengeId"));
+    const testOtp = sessionStorage.getItem("testOtp");
+    if (testOtp && testOtp.length === OTP_LENGTH) {
+      setOtp(testOtp.split(""));
+    }
   }, []);
 
   const otpValue = useMemo(() => otp.join(""), [otp]);
