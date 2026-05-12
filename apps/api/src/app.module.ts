@@ -15,6 +15,8 @@ import { BlockchainModule } from './modules/blockchain/blockchain.module';
 import { FilesModule } from './modules/files/files.module';
 import { StaffModule } from './modules/staff/staff.module';
 import { LandRecordModule } from './modules/land-records/land-record.module';
+import { ApprovalsModule } from './modules/approvals/approvals.module';
+import { NftModule } from './modules/nft/nft.module';
 
 
 @Module({
@@ -36,6 +38,8 @@ import { LandRecordModule } from './modules/land-records/land-record.module';
 		FilesModule,
 		StaffModule,
 		LandRecordModule,
+		ApprovalsModule,
+		NftModule,
 	],
 
 })
