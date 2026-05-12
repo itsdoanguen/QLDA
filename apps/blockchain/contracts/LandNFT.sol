@@ -3,9 +3,10 @@ pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract LandNFT is ERC721URIStorage, Ownable {
+contract LandNFT is ERC721URIStorage, Ownable, Pausable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
@@ -46,5 +47,32 @@ contract LandNFT is ERC721URIStorage, Ownable {
         require(ownerOf(tokenId) == from, "Token not owned by specified address");
         require(to != address(0), "Invalid target address");
         _transfer(from, to, tokenId);
+    }
+
+    /**
+     * @dev Emergency stop for all token transfers (Task T46.5)
+     */
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    /**
+     * @dev Unpause the contract
+     */
+    function unpause() external onlyOwner {
+        _unpause();
+    }
+
+    /**
+     * @dev Hook that is called before any token transfer. This includes minting and burning.
+     * Overridden to implement the Pausable mechanism.
+     */
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId,
+        uint256 batchSize
+    ) internal override whenNotPaused {
+        super._beforeTokenTransfer(from, to, tokenId, batchSize);
     }
 }

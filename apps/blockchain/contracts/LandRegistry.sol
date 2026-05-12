@@ -3,6 +3,7 @@ pragma solidity ^0.8.24;
 
 import "./LandNFT.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 
 /**
  * @title LandRegistry
@@ -22,7 +23,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  *   DA_CAP_SO   --> TRANH_CHAP     : Có đơn kiện
  *   TRANH_CHAP  --> DA_CAP_SO      : Giải quyết xong
  */
-contract LandRegistry is Ownable {
+contract LandRegistry is Ownable, Pausable {
     LandNFT public landNFTContract;
 
     // --- Enums ---
@@ -77,12 +78,28 @@ contract LandRegistry is Ownable {
         emit LandStatusChanged(tokenId, old, newStatus);
     }
 
+    // --- Admin Emergency Pause (Task T46.5) ---
+
+    /**
+     * @dev Emergency stop for all state transitions
+     */
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    /**
+     * @dev Unpause the contract
+     */
+    function unpause() external onlyOwner {
+        _unpause();
+    }
+
     // --- Core Functions ---
 
     /**
      * @dev Mints an NFT and initialises land record at KHOI_TAO state.
      */
-    function createLandRecord(address to, string memory tokenURI) external onlyOwner returns (uint256) {
+    function createLandRecord(address to, string memory tokenURI) external onlyOwner whenNotPaused returns (uint256) {
         uint256 tokenId = landNFTContract.mintLandNFT(to, tokenURI);
 
         lands[tokenId] = LandData({
@@ -102,7 +119,7 @@ contract LandRegistry is Ownable {
     /**
      * @dev KHOI_TAO → CHO_DUYET: Người dân nộp hồ sơ chính thức.
      */
-    function submitForApproval(uint256 tokenId) external onlyOwner {
+    function submitForApproval(uint256 tokenId) external onlyOwner whenNotPaused {
         _requireRegistered(tokenId);
         require(lands[tokenId].status == LandStatus.KHOI_TAO, "Must be in KHOI_TAO state");
         _transition(tokenId, LandStatus.CHO_DUYET);
@@ -111,7 +128,7 @@ contract LandRegistry is Ownable {
     /**
      * @dev CHO_DUYET → DA_CAP_SO: Lãnh đạo ký duyệt (đủ chữ ký Multi-sig).
      */
-    function approveLand(uint256 tokenId) external onlyOwner {
+    function approveLand(uint256 tokenId) external onlyOwner whenNotPaused {
         _requireRegistered(tokenId);
         require(lands[tokenId].status == LandStatus.CHO_DUYET, "Must be in CHO_DUYET state");
         _transition(tokenId, LandStatus.DA_CAP_SO);
@@ -120,7 +137,7 @@ contract LandRegistry is Ownable {
     /**
      * @dev CHO_DUYET → TU_CHOI: Hồ sơ bị từ chối.
      */
-    function rejectLand(uint256 tokenId, string calldata reason) external onlyOwner {
+    function rejectLand(uint256 tokenId, string calldata reason) external onlyOwner whenNotPaused {
         _requireRegistered(tokenId);
         require(lands[tokenId].status == LandStatus.CHO_DUYET, "Must be in CHO_DUYET state");
         lands[tokenId].rejectReason = reason;
@@ -130,7 +147,7 @@ contract LandRegistry is Ownable {
     /**
      * @dev DA_CAP_SO → DANG_GIAO_DICH: Chủ đất tạo lệnh bán.
      */
-    function startTransaction(uint256 tokenId) external onlyOwner {
+    function startTransaction(uint256 tokenId) external onlyOwner whenNotPaused {
         _requireRegistered(tokenId);
         require(lands[tokenId].status == LandStatus.DA_CAP_SO, "Must be in DA_CAP_SO state");
         _transition(tokenId, LandStatus.DANG_GIAO_DICH);
@@ -139,7 +156,7 @@ contract LandRegistry is Ownable {
     /**
      * @dev DANG_GIAO_DICH → DA_CAP_SO: Huỷ lệnh bán.
      */
-    function cancelTransaction(uint256 tokenId) external onlyOwner {
+    function cancelTransaction(uint256 tokenId) external onlyOwner whenNotPaused {
         _requireRegistered(tokenId);
         require(lands[tokenId].status == LandStatus.DANG_GIAO_DICH, "Must be in DANG_GIAO_DICH state");
         _transition(tokenId, LandStatus.DA_CAP_SO);
@@ -148,7 +165,7 @@ contract LandRegistry is Ownable {
     /**
      * @dev DANG_GIAO_DICH → CHUYEN_NHUONG: Hoàn tất mua bán.
      */
-    function completeTransfer(uint256 tokenId) external onlyOwner {
+    function completeTransfer(uint256 tokenId) external onlyOwner whenNotPaused {
         _requireRegistered(tokenId);
         require(lands[tokenId].status == LandStatus.DANG_GIAO_DICH, "Must be in DANG_GIAO_DICH state");
         _transition(tokenId, LandStatus.CHUYEN_NHUONG);
@@ -157,7 +174,7 @@ contract LandRegistry is Ownable {
     /**
      * @dev DA_CAP_SO → THE_CHAP: Cầm cố ngân hàng.
      */
-    function mortgage(uint256 tokenId) external onlyOwner {
+    function mortgage(uint256 tokenId) external onlyOwner whenNotPaused {
         _requireRegistered(tokenId);
         require(lands[tokenId].status == LandStatus.DA_CAP_SO, "Must be in DA_CAP_SO state");
         _transition(tokenId, LandStatus.THE_CHAP);
@@ -166,7 +183,7 @@ contract LandRegistry is Ownable {
     /**
      * @dev THE_CHAP → DA_CAP_SO: Giải chấp.
      */
-    function releaseMortgage(uint256 tokenId) external onlyOwner {
+    function releaseMortgage(uint256 tokenId) external onlyOwner whenNotPaused {
         _requireRegistered(tokenId);
         require(lands[tokenId].status == LandStatus.THE_CHAP, "Must be in THE_CHAP state");
         _transition(tokenId, LandStatus.DA_CAP_SO);
@@ -175,7 +192,7 @@ contract LandRegistry is Ownable {
     /**
      * @dev DA_CAP_SO → TRANH_CHAP: Có đơn kiện.
      */
-    function raiseDispute(uint256 tokenId) external onlyOwner {
+    function raiseDispute(uint256 tokenId) external onlyOwner whenNotPaused {
         _requireRegistered(tokenId);
         require(lands[tokenId].status == LandStatus.DA_CAP_SO, "Must be in DA_CAP_SO state");
         _transition(tokenId, LandStatus.TRANH_CHAP);
@@ -184,7 +201,7 @@ contract LandRegistry is Ownable {
     /**
      * @dev TRANH_CHAP → DA_CAP_SO: Giải quyết xong.
      */
-    function resolveDispute(uint256 tokenId) external onlyOwner {
+    function resolveDispute(uint256 tokenId) external onlyOwner whenNotPaused {
         _requireRegistered(tokenId);
         require(lands[tokenId].status == LandStatus.TRANH_CHAP, "Must be in TRANH_CHAP state");
         _transition(tokenId, LandStatus.DA_CAP_SO);
