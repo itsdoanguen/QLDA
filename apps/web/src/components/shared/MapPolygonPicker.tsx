@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Polygon, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Polygon, useMapEvents, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { Button } from "antd";
@@ -19,6 +19,23 @@ interface MapPolygonPickerProps {
   value?: string;
   onChange?: (value: string) => void;
   disabled?: boolean;
+}
+
+function ChangeView({ points }: { points: [number, number][] }) {
+  const map = useMap();
+  useEffect(() => {
+    if (points.length > 0) {
+      try {
+        const bounds = L.latLngBounds(points);
+        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 18 });
+      } catch (e) {
+        if (points.length === 1) {
+          map.setView(points[0], 18);
+        }
+      }
+    }
+  }, [points, map]);
+  return null;
 }
 
 function LocationMarker({ points, setPoints, disabled }: { points: [number, number][], setPoints: (pts: [number, number][]) => void, disabled?: boolean }) {
@@ -80,6 +97,7 @@ export default function MapPolygonPicker({ value, onChange, disabled }: MapPolyg
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+        <ChangeView points={points} />
         <LocationMarker points={points} setPoints={setPoints} disabled={disabled} />
         
         {points.map((pt, idx) => (

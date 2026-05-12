@@ -21,8 +21,17 @@ export class Receipt {
   @Column({ name: 'tax_id' })
   taxId: number;
 
+  @Column({ type: 'decimal', precision: 20, scale: 2 })
+  amount: number;
+
+  @Column({ name: 'payer_id' })
+  payerId: number;
+
   @Column({ name: 'payment_method', length: 100, nullable: true })
   paymentMethod: string;
+
+  @Column({ name: 'status', length: 50, default: 'Success' })
+  status: string;
 
   @Column({ name: 'blockchain_tx_hash', length: 255, nullable: true })
   blockchainTxHash: string;

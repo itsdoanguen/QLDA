@@ -15,6 +15,14 @@ import { BlockchainModule } from './modules/blockchain/blockchain.module';
 import { FilesModule } from './modules/files/files.module';
 import { StaffModule } from './modules/staff/staff.module';
 import { LandRecordModule } from './modules/land-records/land-record.module';
+import { ApprovalsModule } from './modules/approvals/approvals.module';
+import { NftModule } from './modules/nft/nft.module';
+import { TransactionsModule } from './modules/transactions/transactions.module';
+import { ComplianceModule } from './modules/compliance/compliance.module';
+import { FraudReportsModule } from './modules/fraud-reports/fraud-reports.module';
+import { SystemConfigModule } from './modules/system-config/system-config.module';
+import { AuditModule } from './modules/audit/audit.module';
+import { TaxesModule } from './modules/taxes/taxes.module';
 
 
 @Module({
@@ -36,6 +44,14 @@ import { LandRecordModule } from './modules/land-records/land-record.module';
 		FilesModule,
 		StaffModule,
 		LandRecordModule,
+		ApprovalsModule,
+		NftModule,
+		TransactionsModule,
+		ComplianceModule,
+		FraudReportsModule,
+		SystemConfigModule,
+		TaxesModule,
+		AuditModule,
 	],
 
 })

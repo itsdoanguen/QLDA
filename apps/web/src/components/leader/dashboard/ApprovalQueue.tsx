@@ -4,7 +4,8 @@ import { Button } from 'antd';
 import { useRouter } from 'next/navigation';
 
 interface ApprovalItem {
-  id: string;
+  id: number;
+  displayId: string;
   type: string;
   officer: string;
   status: string;
@@ -22,7 +23,10 @@ export default function ApprovalQueue({ data }: ApprovalQueueProps) {
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm flex-1">
       <div className="flex justify-between items-center p-6 border-b border-gray-200">
         <h3 className="font-bold text-gray-900 text-base m-0">Hàng Đợi Phê Duyệt Ưu Tiên</h3>
-        <span className="text-[#0c56d0] text-xs font-bold cursor-pointer hover:underline flex items-center gap-1">
+        <span 
+          className="text-[#0c56d0] text-xs font-bold cursor-pointer hover:underline flex items-center gap-1"
+          onClick={() => router.push('/leader/records')}
+        >
           Xem tất cả &rarr;
         </span>
       </div>
@@ -40,7 +44,7 @@ export default function ApprovalQueue({ data }: ApprovalQueueProps) {
         <tbody>
           {data.map((item, index) => (
             <tr key={index} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-              <td className="px-6 py-5 font-mono text-gray-500 text-xs">{item.id}</td>
+              <td className="px-6 py-5 font-mono text-gray-500 text-xs">{item.displayId}</td>
               <td className="px-6 py-5 font-medium text-gray-900">{item.type}</td>
               <td className="px-6 py-5 text-gray-700">{item.officer}</td>
               <td className="px-6 py-5">

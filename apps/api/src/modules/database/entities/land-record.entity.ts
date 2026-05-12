@@ -53,6 +53,10 @@ export class LandRecord {
   @Column({ name: 'reviewed_by_first_id', type: 'integer', nullable: true })
   reviewedByFirstId?: number;
 
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'reviewed_by_first_id' })
+  reviewedByFirst?: User;
+
   @Column({ name: 'is_frozen', type: 'boolean', default: false })
   isFrozen: boolean;
 

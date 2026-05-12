@@ -102,7 +102,7 @@ export class LandRecordService {
   async findOne(id: number): Promise<LandRecord> {
     const record = await this.landRecordRepository.findOne({
       where: { id },
-      relations: ['owner', 'assignedCb', 'files'],
+      relations: ['owner', 'assignedCb', 'reviewedByFirst', 'files'],
     });
     if (!record) {
       throw new NotFoundException('Land record not found');

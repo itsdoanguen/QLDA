@@ -203,7 +203,10 @@ export class AuthService {
   }
 
   async getProfile(userId: number) {
-    const user = await this.userRepository.findOne({ where: { id: userId } });
+    const user = await this.userRepository.findOne({ 
+      where: { id: userId },
+      relations: ['role']
+    });
     
     if (!user) {
       throw new HttpException('User not found', 404);
@@ -226,6 +229,7 @@ export class AuthService {
       email: user.email,
       phone: user.phone,
       status: user.status,
+      role: user.role,
       vneid,
     };
   }
