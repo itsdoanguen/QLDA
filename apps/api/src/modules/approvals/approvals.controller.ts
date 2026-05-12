@@ -20,6 +20,13 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator';
 @Controller('approvals')
 export class ApprovalsController {
   constructor(private readonly approvalsService: ApprovalsService) {}
+  
+  @Get('stats')
+  @RequireRoles('LANH_DAO', 'ADMIN')
+  @ApiOperation({ summary: 'Get dashboard statistics for Lãnh đạo' })
+  getStats() {
+    return this.approvalsService.getStats();
+  }
 
   @Get('pending')
   @RequireRoles('LANH_DAO')

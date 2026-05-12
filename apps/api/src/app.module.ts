@@ -17,6 +17,10 @@ import { StaffModule } from './modules/staff/staff.module';
 import { LandRecordModule } from './modules/land-records/land-record.module';
 import { ApprovalsModule } from './modules/approvals/approvals.module';
 import { NftModule } from './modules/nft/nft.module';
+import { TransactionsModule } from './modules/transactions/transactions.module';
+import { ComplianceModule } from './modules/compliance/compliance.module';
+import { FraudReportsModule } from './modules/fraud-reports/fraud-reports.module';
+import { SystemConfigModule } from './modules/system-config/system-config.module';
 
 
 @Module({
@@ -40,6 +44,10 @@ import { NftModule } from './modules/nft/nft.module';
 		LandRecordModule,
 		ApprovalsModule,
 		NftModule,
+		TransactionsModule,
+		ComplianceModule,
+		FraudReportsModule,
+		SystemConfigModule,
 	],
 
 })

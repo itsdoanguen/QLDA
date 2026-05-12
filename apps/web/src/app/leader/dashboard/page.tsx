@@ -5,6 +5,7 @@ import StatsCards from '@/components/leader/dashboard/StatsCards';
 import ApprovalQueue from '@/components/leader/dashboard/ApprovalQueue';
 import ProcessingSpeed from '@/components/leader/dashboard/ProcessingSpeed';
 import DisputeWarnings from '@/components/leader/dashboard/DisputeWarnings';
+import { api } from '@/utils/api';
 
 const mockDashboardData = {
   stats: {
@@ -31,11 +32,52 @@ const mockDashboardData = {
 
 export default function LeaderDashboardPage() {
   const [data, setData] = useState<any | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const [pendingRes, statsRes] = await Promise.all([
+        api.get('/approvals/pending'),
+        api.get('/approvals/stats')
+      ]);
+      
+      const pendingData = pendingRes.data;
+      const statsData = statsRes.data;
+      
+      setData({
+        stats: statsData,
+        queue: pendingData.map((item: any) => ({
+          id: item.id,
+          displayId: `HS-${item.id.toString().padStart(4, '0')}`,
+          type: item.landType || "Cấp mới GCN",
+          officer: item.assignedCb?.fullName || "Chưa gán",
+          status: "CHỜ DUYỆT",
+          isUrgent: false
+        })),
+        speeds: [
+          { name: "Phòng Hành chính 1", progress: 92, color: "#0c56d0" },
+          { name: "Phòng Kỹ thuật Địa chính", progress: 78, color: "#0c56d0" },
+          { name: "Phòng Pháp chế", progress: 45, color: "#dc2626" }
+        ],
+        warnings: []
+      });
+    } catch (error) {
+      console.error("Failed to fetch dashboard data", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // Simulate API fetch
-    setData(mockDashboardData);
+    fetchData();
   }, []);
+
+  if (loading) return (
+    <div className="h-64 flex items-center justify-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0c56d0]"></div>
+    </div>
+  );
 
   if (!data) return null;
 

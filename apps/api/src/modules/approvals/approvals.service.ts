@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, MoreThanOrEqual } from 'typeorm';
 import { LandRecord } from '../database/entities/land-record.entity';
 import { ApprovalRequest } from '../database/entities/approval-request.entity';
 import { Signature } from '../database/entities/signature.entity';
@@ -114,5 +114,32 @@ export class ApprovalsService {
     record.isFrozen = false; // Unfreeze for editing
     
     return this.landRecordRepository.save(record);
+  }
+
+  async getStats() {
+    const pendingApproval = await this.landRecordRepository.count({
+      where: { status: LandRecordStatus.CB_APPROVED }
+    });
+
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+    const signedToday = await this.landRecordRepository.count({
+      where: [
+        { status: LandRecordStatus.LEADER_SIGNED, updatedAt: MoreThanOrEqual(startOfToday) },
+        { status: LandRecordStatus.MINTED, updatedAt: MoreThanOrEqual(startOfToday) }
+      ]
+    });
+
+    const returned = await this.landRecordRepository.count({
+      where: { status: LandRecordStatus.NEEDS_SUPPLEMENT }
+    });
+
+    return {
+      pendingApproval: { count: pendingApproval, change: "+0 từ hôm qua" },
+      signedToday: { count: signedToday, kpi: "KPI theo ngày" },
+      returned: { count: returned, percent: "Tỉ lệ trả về" },
+      overdueWarnings: { count: 0, status: "Bình thường" }
+    };
   }
 }

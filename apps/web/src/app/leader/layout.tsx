@@ -26,9 +26,15 @@ export default function LeaderLayout({
         const response = await api.get("/auth/profile");
         const data = response.data;
         
-        // Security check: Only allow Staff or Admin (or Leader if there's a specific role)
-        if (data.role?.roleCode === 'CITIZEN') {
+        const role = data.role?.roleCode;
+        if (role === 'CITIZEN') {
           router.push("/dashboard");
+          return;
+        } else if (role === 'CAN_BO') {
+          router.push("/staff/dashboard");
+          return;
+        } else if (role !== 'LANH_DAO' && role !== 'ADMIN') {
+          router.push("/login");
           return;
         }
       } catch (error) {

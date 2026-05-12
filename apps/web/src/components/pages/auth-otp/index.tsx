@@ -109,7 +109,9 @@ export function AuthOtpPage() {
         localStorage.setItem("accessToken", response.data.accessToken);
         
         const role = response.data.user?.roleCode;
-        if (role && role !== 'CITIZEN') {
+        if (role === 'LANH_DAO') {
+          router.push('/leader/dashboard');
+        } else if (role === 'ADMIN' || role === 'CAN_BO') {
           router.push('/staff/dashboard');
         } else {
           router.push('/dashboard');

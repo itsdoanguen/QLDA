@@ -32,9 +32,15 @@ export function StaffLayout({ children }: { children: React.ReactNode }) {
         const response = await api.get("/auth/profile");
         const data = response.data;
         
-        // Security check: If not staff/admin, redirect to citizen dashboard
-        if (data.role?.roleCode === 'CITIZEN') {
+        const role = data.role?.roleCode;
+        if (role === 'CITIZEN') {
           router.push("/dashboard");
+          return;
+        } else if (role === 'LANH_DAO') {
+          router.push("/leader/dashboard");
+          return;
+        } else if (role !== 'CAN_BO' && role !== 'ADMIN') {
+          router.push("/login");
           return;
         }
         

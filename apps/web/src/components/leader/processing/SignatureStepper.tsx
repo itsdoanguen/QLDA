@@ -17,7 +17,7 @@ export default function SignatureStepper({ data }: SignatureStepperProps) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm mb-6">
       <h3 className="font-bold text-gray-900 text-lg flex items-center gap-3 mb-8 m-0">
-        <FormOutlined className="text-[#0c56d0]" /> Chữ ký số đa tầng
+        <FormOutlined className="text-[#0c56d0]" /> Các bước ký duyệt
       </h3>
       
       <div className="relative pl-4 border-l-2 border-gray-100 space-y-8">
