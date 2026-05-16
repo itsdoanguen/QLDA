@@ -21,6 +21,7 @@ export type AppEnv = {
   CHAIN_ID: number;
   LAND_REGISTRY_CONTRACT_ADDRESS: string;
   LAND_NFT_CONTRACT_ADDRESS: string;
+  MULTI_SIG_CONTRACT_ADDRESS?: string;
   VNEID_BASE_URL: string;
   VNEID_API_KEY: string;
   PAYMENT_CALLBACK_URL: string;
@@ -98,6 +99,7 @@ export function validateEnv(rawEnv: RawEnv): AppEnv {
     CHAIN_ID: toNumber(getString(rawEnv, 'CHAIN_ID'), 'CHAIN_ID'),
     LAND_REGISTRY_CONTRACT_ADDRESS: getString(rawEnv, 'LAND_REGISTRY_CONTRACT_ADDRESS'),
     LAND_NFT_CONTRACT_ADDRESS: getString(rawEnv, 'LAND_NFT_CONTRACT_ADDRESS'),
+    MULTI_SIG_CONTRACT_ADDRESS: getString(rawEnv, 'MULTI_SIG_CONTRACT_ADDRESS'),
     VNEID_BASE_URL: getString(rawEnv, 'VNEID_BASE_URL'),
     VNEID_API_KEY: getString(rawEnv, 'VNEID_API_KEY'),
     PAYMENT_CALLBACK_URL: getString(rawEnv, 'PAYMENT_CALLBACK_URL'),

@@ -5,6 +5,7 @@ import { LandRecord } from '../database/entities/land-record.entity';
 import { ApprovalRequest } from '../database/entities/approval-request.entity';
 import { Signature } from '../database/entities/signature.entity';
 import { LandRecordStatus } from '../../common/enums/land-record-status.enum';
+import { BlockchainService } from '../blockchain/blockchain.service';
 
 @Injectable()
 export class ApprovalsService {
@@ -15,6 +16,7 @@ export class ApprovalsService {
     private readonly approvalRequestRepository: Repository<ApprovalRequest>,
     @InjectRepository(Signature)
     private readonly signatureRepository: Repository<Signature>,
+    private readonly blockchainService: BlockchainService,
   ) {}
 
   async findPendingApprovals(): Promise<LandRecord[]> {
@@ -62,6 +64,15 @@ export class ApprovalsService {
     });
     await this.signatureRepository.save(signature);
 
+    // Task A4: Tích hợp Multi-sig on-chain
+    try {
+      const txId = await this.blockchainService.getOrCreateMultiSigTx(recordId.toString());
+      await this.blockchainService.signMultiSig(txId, true, reason || 'Lãnh đạo phê duyệt');
+    } catch (error) {
+      // In production, we should rollback or throw error. We'll throw to abort the transaction.
+      throw new BadRequestException('Lỗi khi ký Multi-sig trên blockchain: ' + (error as Error).message);
+    }
+
     // 3. Update record status
     record.status = LandRecordStatus.LEADER_SIGNED;
     return this.landRecordRepository.save(record);
@@ -107,6 +118,14 @@ export class ApprovalsService {
       signedAt: new Date(),
     });
     await this.signatureRepository.save(signature);
+
+    // Task A4: Tích hợp Multi-sig on-chain
+    try {
+      const txId = await this.blockchainService.getOrCreateMultiSigTx(recordId.toString());
+      await this.blockchainService.signMultiSig(txId, false, reason);
+    } catch (error) {
+      throw new BadRequestException('Lỗi khi từ chối Multi-sig trên blockchain: ' + (error as Error).message);
+    }
 
     // 3. Update record status - return to Needs Supplement so Cán bộ or Citizen can fix
     record.status = LandRecordStatus.NEEDS_SUPPLEMENT;

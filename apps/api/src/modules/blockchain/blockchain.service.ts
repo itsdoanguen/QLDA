@@ -12,6 +12,7 @@ export class BlockchainService {
   private signer: ethers.Wallet;
   public landRegistryContract: ethers.Contract;
   public landNFTContract: ethers.Contract;
+  public multiSigContract: ethers.Contract;
 
   constructor(private configService: ConfigService<AppEnv>) {
     this.initProvider();
@@ -30,6 +31,7 @@ export class BlockchainService {
 
     const registryAddress = this.configService.get<string>('LAND_REGISTRY_CONTRACT_ADDRESS');
     const nftAddress = this.configService.get<string>('LAND_NFT_CONTRACT_ADDRESS');
+    const multiSigAddress = this.configService.get<string>('MULTI_SIG_CONTRACT_ADDRESS');
 
     if (registryAddress) {
       const registryAbi = this.getAbiLoader('LandRegistry');
@@ -41,6 +43,12 @@ export class BlockchainService {
       const nftAbi = this.getAbiLoader('LandNFT');
       this.landNFTContract = new ethers.Contract(nftAddress, nftAbi, this.signer);
       this.logger.log(`Initialized LandNFT contract at: ${nftAddress}`);
+    }
+
+    if (multiSigAddress) {
+      const multiSigAbi = this.getAbiLoader('MultiSigWorkflow');
+      this.multiSigContract = new ethers.Contract(multiSigAddress, multiSigAbi, this.signer);
+      this.logger.log(`Initialized MultiSigWorkflow contract at: ${multiSigAddress}`);
     }
   }
 
@@ -155,6 +163,50 @@ export class BlockchainService {
   public async completeTransfer(tokenId: string): Promise<string> {
     this.logger.log(`Calling completeTransfer on-chain for token ${tokenId}`);
     const tx = await this.landRegistryContract.completeTransfer(tokenId);
+    await tx.wait();
+    return tx.hash;
+  }
+
+  // --- Task A4: Multi-sig Transitions ---
+
+  public async getOrCreateMultiSigTx(documentCID: string): Promise<number> {
+    this.logger.log(`Getting or creating MultiSig transaction for documentCID: ${documentCID}`);
+    if (!this.multiSigContract) throw new Error("MultiSig contract not initialized");
+
+    // Fetch existing events to see if it's already created
+    const filter = this.multiSigContract.filters.TransactionCreated();
+    const events = await this.multiSigContract.queryFilter(filter);
+    
+    for (const event of events) {
+      const args = (event as any).args;
+      if (args && args[1] === documentCID) {
+        return Number(args[0]);
+      }
+    }
+
+    // If not found, create it
+    const tx = await this.multiSigContract.createTransaction(documentCID);
+    const receipt = await tx.wait();
+    
+    // Parse logs
+    if (receipt && receipt.logs) {
+      for (const log of receipt.logs) {
+        try {
+          const parsedLog = this.multiSigContract.interface.parseLog(log);
+          if (parsedLog && parsedLog.name === 'TransactionCreated') {
+            return Number(parsedLog.args[0]);
+          }
+        } catch (e) {}
+      }
+    }
+    
+    throw new Error("Failed to create MultiSig transaction");
+  }
+
+  public async signMultiSig(txId: number, isApproved: boolean, reason: string): Promise<string> {
+    this.logger.log(`Signing MultiSig tx ${txId}: approved=${isApproved}`);
+    if (!this.multiSigContract) throw new Error("MultiSig contract not initialized");
+    const tx = await this.multiSigContract.signTransaction(txId, isApproved, reason || '');
     await tx.wait();
     return tx.hash;
   }
