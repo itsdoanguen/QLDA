@@ -67,6 +67,17 @@ export class NftService {
     }
     const { tokenId, txHash } = mintResult;
 
+    // 2.5 Sync State Machine: KHOI_TAO -> CHO_DUYET -> DA_CAP_SO
+    // Because the off-chain record is already LEADER_SIGNED (fully approved)
+    try {
+      this.logger.log(`Syncing state machine for token ${tokenId} to DA_CAP_SO...`);
+      await this.blockchainService.submitForApproval(tokenId);
+      await this.blockchainService.approveLand(tokenId);
+    } catch (error) {
+      this.logger.error(`Failed to sync state machine on-chain for token ${tokenId}`, error);
+      // We don't block the rest of the flow, but it should be logged/alerted
+    }
+
     // 3. Create Blockchain Log
     const log = this.blockchainLogRepository.create({
       txHash,

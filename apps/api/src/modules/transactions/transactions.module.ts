@@ -8,6 +8,7 @@ import { TransactionsService } from './transactions.service';
 import { ComplianceModule } from '../compliance/compliance.module';
 import { TaxesModule } from '../taxes/taxes.module';
 import { AuthModule } from '../auth/auth.module';
+import { BlockchainModule } from '../blockchain/blockchain.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { AuthModule } from '../auth/auth.module';
     ComplianceModule,
     TaxesModule,
     AuthModule,
+    BlockchainModule,
   ],
   controllers: [TransactionsController],
   providers: [TransactionsService],

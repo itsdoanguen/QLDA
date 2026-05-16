@@ -115,6 +115,50 @@ export class BlockchainService {
     }
   }
 
+  // --- Task A3: State Machine Transitions ---
+
+  public async submitForApproval(tokenId: string): Promise<string> {
+    this.logger.log(`Calling submitForApproval on-chain for token ${tokenId}`);
+    const tx = await this.landRegistryContract.submitForApproval(tokenId);
+    await tx.wait();
+    return tx.hash;
+  }
+
+  public async approveLand(tokenId: string): Promise<string> {
+    this.logger.log(`Calling approveLand on-chain for token ${tokenId}`);
+    const tx = await this.landRegistryContract.approveLand(tokenId);
+    await tx.wait();
+    return tx.hash;
+  }
+
+  public async rejectLand(tokenId: string, reason: string): Promise<string> {
+    this.logger.log(`Calling rejectLand on-chain for token ${tokenId}`);
+    const tx = await this.landRegistryContract.rejectLand(tokenId, reason);
+    await tx.wait();
+    return tx.hash;
+  }
+
+  public async startTransaction(tokenId: string): Promise<string> {
+    this.logger.log(`Calling startTransaction on-chain for token ${tokenId}`);
+    const tx = await this.landRegistryContract.startTransaction(tokenId);
+    await tx.wait();
+    return tx.hash;
+  }
+
+  public async cancelTransaction(tokenId: string): Promise<string> {
+    this.logger.log(`Calling cancelTransaction on-chain for token ${tokenId}`);
+    const tx = await this.landRegistryContract.cancelTransaction(tokenId);
+    await tx.wait();
+    return tx.hash;
+  }
+
+  public async completeTransfer(tokenId: string): Promise<string> {
+    this.logger.log(`Calling completeTransfer on-chain for token ${tokenId}`);
+    const tx = await this.landRegistryContract.completeTransfer(tokenId);
+    await tx.wait();
+    return tx.hash;
+  }
+
   public registerEventSyncHook(eventName: string, callback: (eventData: any) => void) {
     this.logger.log(`Registering sync hook for event: ${eventName}`);
     if (this.landRegistryContract) {
