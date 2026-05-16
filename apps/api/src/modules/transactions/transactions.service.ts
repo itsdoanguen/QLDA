@@ -6,6 +6,7 @@ import { LandNFT } from '../database/entities/land-nft.entity';
 import { Wallet } from '../database/entities/wallet.entity';
 import { ComplianceService } from '../compliance/compliance.service';
 import { TaxesService } from '../taxes/taxes.service';
+import { BlockchainService } from '../blockchain/blockchain.service';
 
 @Injectable()
 export class TransactionsService {
@@ -18,6 +19,7 @@ export class TransactionsService {
     private readonly walletRepository: Repository<Wallet>,
     private readonly complianceService: ComplianceService,
     private readonly taxesService: TaxesService,
+    private readonly blockchainService: BlockchainService,
   ) {}
 
   async createDraft(tokenId: string, buyerId: number, sellerId: number, salePrice: number) {
@@ -47,6 +49,9 @@ export class TransactionsService {
       status: 'Draft',
       salePrice,
     });
+
+    // 4. Update on-chain state: DA_CAP_SO -> DANG_GIAO_DICH
+    await this.blockchainService.startTransaction(tokenId);
 
     return this.transactionRepository.save(transaction);
   }
@@ -79,6 +84,9 @@ export class TransactionsService {
       await this.taxesService.calculateAndSaveTransferTaxes(transaction.id);
 
       // Update NFT owner (Simulating blockchain transfer locally for now)
+      // Task A3: Sync state machine: DANG_GIAO_DICH -> CHUYEN_NHUONG
+      await this.blockchainService.completeTransfer(transaction.tokenId);
+
       const buyerWallet = await this.walletRepository.findOne({ where: { userId: transaction.buyerId } });
       if (buyerWallet) {
         await this.landNftRepository.update({ tokenId: transaction.tokenId }, { ownerWallet: buyerWallet.walletAddress });
@@ -103,6 +111,10 @@ export class TransactionsService {
     }
 
     transaction.status = 'Cancelled';
+    
+    // Task A3: Sync state machine: DANG_GIAO_DICH -> DA_CAP_SO
+    await this.blockchainService.cancelTransaction(transaction.tokenId);
+    
     return this.transactionRepository.save(transaction);
   }
 

@@ -7,11 +7,13 @@ import { User } from '../database/entities/user.entity';
 import { ApprovalsService } from './approvals.service';
 import { ApprovalsController } from './approvals.controller';
 import { AuthModule } from '../auth/auth.module';
+import { BlockchainModule } from '../blockchain/blockchain.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([LandRecord, ApprovalRequest, Signature, User]),
     AuthModule,
+    BlockchainModule,
   ],
   controllers: [ApprovalsController],
   providers: [ApprovalsService],

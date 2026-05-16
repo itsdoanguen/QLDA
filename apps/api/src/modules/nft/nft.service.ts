@@ -54,11 +54,29 @@ export class NftService {
 
     this.logger.log(`Starting minting process for Record ${recordId}`);
 
-    // 1. Prepare Metadata (Placeholder URL for now)
+    // 1. Prepare Metadata (IPFS URL - will be updated when Pinata is fully integrated)
     const metadataUrl = `ipfs://placeholder_metadata_${recordId}`;
 
-    // 2. Call Blockchain Service (Stub)
-    const { tokenId, txHash } = await this.blockchainService.mintNFT(wallet.walletAddress, metadataUrl);
+    // 2. Call Blockchain Service to Mint NFT via LandRegistry (Real on-chain transaction)
+    let mintResult: { tokenId: string; txHash: string };
+    try {
+      mintResult = await this.blockchainService.mintNFT(wallet.walletAddress, metadataUrl);
+    } catch (error) {
+      this.logger.error(`Failed to mint NFT on-chain for record ${recordId}`, error);
+      throw new BadRequestException('Blockchain transaction failed. Please try again.');
+    }
+    const { tokenId, txHash } = mintResult;
+
+    // 2.5 Sync State Machine: KHOI_TAO -> CHO_DUYET -> DA_CAP_SO
+    // Because the off-chain record is already LEADER_SIGNED (fully approved)
+    try {
+      this.logger.log(`Syncing state machine for token ${tokenId} to DA_CAP_SO...`);
+      await this.blockchainService.submitForApproval(tokenId);
+      await this.blockchainService.approveLand(tokenId);
+    } catch (error) {
+      this.logger.error(`Failed to sync state machine on-chain for token ${tokenId}`, error);
+      // We don't block the rest of the flow, but it should be logged/alerted
+    }
 
     // 3. Create Blockchain Log
     const log = this.blockchainLogRepository.create({
@@ -69,14 +87,14 @@ export class NftService {
     });
     await this.blockchainLogRepository.save(log);
 
-    // 4. Generate QR Code URL (using public API for aesthetics)
+    // 4. Generate QR Code URL
     const qrCode = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://landregistry.gov.vn/verify/${tokenId}`;
 
     // 5. Create Land NFT record
     const nft = this.landNftRepository.create({
       tokenId,
       recordId,
-      contractAddress: this.configService.get('LAND_NFT_CONTRACT_ADDRESS') || '0xstub_nft_contract',
+      contractAddress: this.configService.get('LAND_NFT_CONTRACT_ADDRESS'),
       ownerWallet: wallet.walletAddress,
       metadataUri: metadataUrl,
       mintTxHash: txHash,
