@@ -56,4 +56,14 @@ export class ApprovalsController {
   ) {
     return this.approvalsService.reject(id, user.sub, body.reason);
   }
+
+  @Post('batch-sign')
+  @RequireRoles('LANH_DAO')
+  @ApiOperation({ summary: 'Lãnh đạo batch sign and approve/reject multiple records' })
+  batchSign(
+    @CurrentUser() user: any,
+    @Body() body: { records: { recordId: number; isApproved: boolean; reason?: string }[] },
+  ) {
+    return this.approvalsService.batchSign(body.records, user.sub);
+  }
 }

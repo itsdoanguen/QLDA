@@ -211,6 +211,14 @@ export class BlockchainService {
     return tx.hash;
   }
 
+  public async batchSignMultiSig(txIds: number[], isApproved: boolean[], reasons: string[]): Promise<string> {
+    this.logger.log(`Batch signing MultiSig txs: count=${txIds.length}`);
+    if (!this.multiSigContract) throw new Error("MultiSig contract not initialized");
+    const tx = await this.multiSigContract.batchSignTransactions(txIds, isApproved, reasons);
+    await tx.wait();
+    return tx.hash;
+  }
+
   public registerEventSyncHook(eventName: string, callback: (eventData: any) => void) {
     this.logger.log(`Registering sync hook for event: ${eventName}`);
     if (this.landRegistryContract) {

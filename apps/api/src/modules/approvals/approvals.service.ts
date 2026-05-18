@@ -130,9 +130,87 @@ export class ApprovalsService {
     // 3. Update record status - return to Needs Supplement so Cán bộ or Citizen can fix
     record.status = LandRecordStatus.NEEDS_SUPPLEMENT;
     record.reviewReason = `Lãnh đạo Reject: ${reason}`;
-    record.isFrozen = false; // Unfreeze for editing
-    
     return this.landRecordRepository.save(record);
+  }
+
+  async batchSign(
+    batchData: { recordId: number; isApproved: boolean; reason?: string }[],
+    userId: number,
+  ): Promise<any[]> {
+    const results = [];
+    const txIds: number[] = [];
+    const isApprovedArr: boolean[] = [];
+    const reasonsArr: string[] = [];
+
+    for (const item of batchData) {
+      try {
+        if (!item.isApproved && !item.reason) {
+          throw new BadRequestException('Reason is required for rejection');
+        }
+
+        const record = await this.landRecordRepository.findOne({ where: { id: item.recordId } });
+        if (!record) {
+          throw new NotFoundException(`Land record ${item.recordId} not found`);
+        }
+        if (record.status !== LandRecordStatus.CB_APPROVED) {
+          throw new BadRequestException(`Record ${item.recordId} is not in a state that can be signed`);
+        }
+
+        let request = await this.approvalRequestRepository.findOne({ 
+          where: { recordId: item.recordId, requestType: 'Mint_NFT', status: 'Pending' } 
+        });
+        
+        const requestStatus = item.isApproved ? 'Approved' : 'Rejected';
+        if (!request) {
+          request = this.approvalRequestRepository.create({
+            recordId: item.recordId,
+            requestType: 'Mint_NFT',
+            status: requestStatus,
+          });
+          await this.approvalRequestRepository.save(request);
+        } else {
+          request.status = requestStatus;
+          await this.approvalRequestRepository.save(request);
+        }
+
+        const signature = this.signatureRepository.create({
+          requestId: request.id,
+          userId,
+          decision: requestStatus,
+          reason: item.reason || (item.isApproved ? 'Lãnh đạo phê duyệt hàng loạt' : ''),
+          signedAt: new Date(),
+        });
+        await this.signatureRepository.save(signature);
+
+        const txId = await this.blockchainService.getOrCreateMultiSigTx(item.recordId.toString());
+        txIds.push(txId);
+        isApprovedArr.push(item.isApproved);
+        reasonsArr.push(item.reason || (item.isApproved ? 'Lãnh đạo phê duyệt hàng loạt' : ''));
+
+        if (item.isApproved) {
+          record.status = LandRecordStatus.LEADER_SIGNED;
+        } else {
+          record.status = LandRecordStatus.NEEDS_SUPPLEMENT;
+          record.reviewReason = `Lãnh đạo Reject: ${item.reason}`;
+          record.isFrozen = false;
+        }
+        await this.landRecordRepository.save(record);
+        
+        results.push({ recordId: item.recordId, success: true });
+      } catch (error) {
+        results.push({ recordId: item.recordId, success: false, error: (error as Error).message });
+      }
+    }
+
+    if (txIds.length > 0) {
+      try {
+        await this.blockchainService.batchSignMultiSig(txIds, isApprovedArr, reasonsArr);
+      } catch (error) {
+        throw new BadRequestException('Lỗi khi ký hàng loạt trên blockchain: ' + (error as Error).message);
+      }
+    }
+
+    return results;
   }
 
   async getStats() {
