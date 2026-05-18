@@ -13,6 +13,7 @@ export class BlockchainService {
   public landRegistryContract: ethers.Contract;
   public landNFTContract: ethers.Contract;
   public multiSigContract: ethers.Contract;
+  public walletOverrideContract: ethers.Contract;
 
   constructor(private configService: ConfigService<AppEnv>) {
     this.initProvider();
@@ -49,6 +50,13 @@ export class BlockchainService {
       const multiSigAbi = this.getAbiLoader('MultiSigWorkflow');
       this.multiSigContract = new ethers.Contract(multiSigAddress, multiSigAbi, this.signer);
       this.logger.log(`Initialized MultiSigWorkflow contract at: ${multiSigAddress}`);
+    }
+
+    const walletOverrideAddress = this.configService.get<string>('WALLET_OVERRIDE_CONTRACT_ADDRESS');
+    if (walletOverrideAddress) {
+      const walletOverrideAbi = this.getAbiLoader('WalletOverride');
+      this.walletOverrideContract = new ethers.Contract(walletOverrideAddress, walletOverrideAbi, this.signer);
+      this.logger.log(`Initialized WalletOverride contract at: ${walletOverrideAddress}`);
     }
   }
 
@@ -228,6 +236,46 @@ export class BlockchainService {
     this.logger.log(`Batch signing MultiSig txs: count=${txIds.length}`);
     if (!this.multiSigContract) throw new Error("MultiSig contract not initialized");
     const tx = await this.multiSigContract.batchSignTransactions(txIds, isApproved, reasons);
+    await tx.wait();
+    return tx.hash;
+  }
+
+  // --- Task A7: Wallet Override ---
+
+  public async requestWalletOverride(citizenIdHash: string, newWallet: string): Promise<number> {
+    this.logger.log(`Requesting wallet override on-chain for citizen ${citizenIdHash}`);
+    if (!this.walletOverrideContract) throw new Error("WalletOverride contract not initialized");
+    
+    const tx = await this.walletOverrideContract.requestWalletOverride(citizenIdHash, newWallet);
+    const receipt = await tx.wait();
+    
+    if (receipt && receipt.logs) {
+      for (const log of receipt.logs) {
+        try {
+          const parsedLog = this.walletOverrideContract.interface.parseLog(log);
+          if (parsedLog && parsedLog.name === 'RecoveryRequested') {
+            return Number(parsedLog.args[0]);
+          }
+        } catch (e) {}
+      }
+    }
+    throw new Error("Failed to get requestId from RecoveryRequested event");
+  }
+
+  public async approveWalletOverride(requestId: number, tokenIds: string[]): Promise<string> {
+    this.logger.log(`Approving wallet override on-chain for requestId ${requestId}`);
+    if (!this.walletOverrideContract) throw new Error("WalletOverride contract not initialized");
+    
+    const tx = await this.walletOverrideContract.approveWalletOverride(requestId, tokenIds);
+    await tx.wait();
+    return tx.hash;
+  }
+
+  public async rejectWalletOverride(requestId: number, reason: string): Promise<string> {
+    this.logger.log(`Rejecting wallet override on-chain for requestId ${requestId}`);
+    if (!this.walletOverrideContract) throw new Error("WalletOverride contract not initialized");
+    
+    const tx = await this.walletOverrideContract.rejectWalletOverride(requestId, reason);
     await tx.wait();
     return tx.hash;
   }

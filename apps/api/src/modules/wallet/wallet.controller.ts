@@ -41,4 +41,16 @@ export class WalletController {
   async getDetails(@Req() req: any) {
     return this.walletService.getWalletDetails(req.user.sub);
   }
+
+  @Post('recovery-request/:id/approve')
+  @ApiOperation({ summary: 'Approve wallet recovery (Admin/Lãnh đạo)' })
+  async approveRecovery(@Param('id') id: number, @Req() req: any) {
+    return this.walletService.approveRecovery(id, req.user.sub);
+  }
+
+  @Post('recovery-request/:id/reject')
+  @ApiOperation({ summary: 'Reject wallet recovery (Admin/Lãnh đạo)' })
+  async rejectRecovery(@Param('id') id: number, @Body() body: { reason: string }, @Req() req: any) {
+    return this.walletService.rejectRecovery(id, req.user.sub, body.reason);
+  }
 }

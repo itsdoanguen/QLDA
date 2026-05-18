@@ -8,7 +8,8 @@ import { Wallet } from '../database/entities/wallet.entity';
 import { WalletSecret } from '../database/entities/wallet-secret.entity';
 import { WalletRecoveryRequest } from '../database/entities/wallet-recovery-request.entity';
 import { User } from '../database/entities/user.entity';
-import { WalletLinkRequest, WalletRecoveryRequestDto } from '@land-registry/shared-types';
+import { LandNFT } from '../database/entities/land-nft.entity';
+import { BlockchainService } from '../blockchain/blockchain.service';
 
 @Injectable()
 export class WalletService {
@@ -21,6 +22,9 @@ export class WalletService {
     private recoveryRepository: Repository<WalletRecoveryRequest>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(LandNFT)
+    private landNftRepository: Repository<LandNFT>,
+    private readonly blockchainService: BlockchainService,
   ) {}
 
   private getMasterKey(): Buffer {
@@ -129,16 +133,87 @@ export class WalletService {
       throw new BadRequestException('User already has a pending recovery request');
     }
 
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    const citizenIdHash = ethers.sha256(ethers.toUtf8Bytes(user.vneidNumber));
+    
+    // Task A7: Tích hợp Wallet Override request on-chain
+    const chainRequestId = await this.blockchainService.requestWalletOverride(citizenIdHash, payload.newWalletAddress);
+
     const request = this.recoveryRepository.create({
       userId,
       oldWalletAddress: payload.oldWalletAddress,
       newWalletAddress: payload.newWalletAddress,
       status: 'Pending',
+      chainRequestId,
     });
 
     await this.recoveryRepository.save(request);
     
     return { message: 'Recovery request submitted successfully' };
+  }
+
+  async approveRecovery(requestId: number, adminUserId: number) {
+    const request = await this.recoveryRepository.findOne({ where: { id: requestId }, relations: ['user'] });
+    if (!request || request.status !== 'Pending') {
+      throw new BadRequestException('Request not found or not pending');
+    }
+
+    // Find all NFTs owned by the old wallet
+    const nfts = await this.landNftRepository.find({ where: { ownerWallet: request.oldWalletAddress } });
+    const tokenIds = nfts.map(nft => nft.tokenId);
+
+    // Task A7: Tích hợp Wallet Override approve on-chain
+    await this.blockchainService.approveWalletOverride(request.chainRequestId, tokenIds);
+
+    // Update local DB
+    request.status = 'Approved';
+    request.approvedBy = adminUserId;
+    request.resolvedAt = new Date();
+    await this.recoveryRepository.save(request);
+
+    // Update wallet records
+    const oldWallet = await this.walletRepository.findOne({ where: { walletAddress: request.oldWalletAddress } });
+    if (oldWallet) {
+      oldWallet.status = 'Inactive';
+      await this.walletRepository.save(oldWallet);
+    }
+
+    let newWallet = await this.walletRepository.findOne({ where: { walletAddress: request.newWalletAddress } });
+    if (!newWallet) {
+      newWallet = this.walletRepository.create({
+        userId: request.userId,
+        walletAddress: request.newWalletAddress,
+        status: 'Active',
+      });
+      await this.walletRepository.save(newWallet);
+    } else {
+      newWallet.status = 'Active';
+      await this.walletRepository.save(newWallet);
+    }
+
+    // Update NFTs local owner
+    for (const nft of nfts) {
+      nft.ownerWallet = request.newWalletAddress;
+      await this.landNftRepository.save(nft);
+    }
+
+    return { message: 'Recovery approved and executed' };
+  }
+
+  async rejectRecovery(requestId: number, adminUserId: number, reason: string) {
+    const request = await this.recoveryRepository.findOne({ where: { id: requestId } });
+    if (!request || request.status !== 'Pending') {
+      throw new BadRequestException('Request not found or not pending');
+    }
+
+    await this.blockchainService.rejectWalletOverride(request.chainRequestId, reason);
+
+    request.status = 'Rejected';
+    request.approvedBy = adminUserId;
+    request.resolvedAt = new Date();
+    await this.recoveryRepository.save(request);
+
+    return { message: 'Recovery rejected' };
   }
 
   async getStatus(userId: number) {
