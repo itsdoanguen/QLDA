@@ -14,6 +14,7 @@ export class BlockchainService {
   public landNFTContract: ethers.Contract;
   public multiSigContract: ethers.Contract;
   public walletOverrideContract: ethers.Contract;
+  public auditLogContract: ethers.Contract;
 
   constructor(private configService: ConfigService<AppEnv>) {
     this.initProvider();
@@ -57,6 +58,13 @@ export class BlockchainService {
       const walletOverrideAbi = this.getAbiLoader('WalletOverride');
       this.walletOverrideContract = new ethers.Contract(walletOverrideAddress, walletOverrideAbi, this.signer);
       this.logger.log(`Initialized WalletOverride contract at: ${walletOverrideAddress}`);
+    }
+
+    const auditLogAddress = this.configService.get<string>('AUDIT_LOG_CONTRACT_ADDRESS');
+    if (auditLogAddress) {
+      const auditLogAbi = this.getAbiLoader('AuditLog');
+      this.auditLogContract = new ethers.Contract(auditLogAddress, auditLogAbi, this.signer);
+      this.logger.log(`Initialized AuditLog contract at: ${auditLogAddress}`);
     }
   }
 
@@ -276,6 +284,16 @@ export class BlockchainService {
     if (!this.walletOverrideContract) throw new Error("WalletOverride contract not initialized");
     
     const tx = await this.walletOverrideContract.rejectWalletOverride(requestId, reason);
+    await tx.wait();
+    return tx.hash;
+  }
+
+  // --- Task A8: Audit Log ---
+  public async recordLogHash(logHash: string): Promise<string> {
+    this.logger.log(`Recording audit log hash on-chain: ${logHash}`);
+    if (!this.auditLogContract) throw new Error("AuditLog contract not initialized");
+    
+    const tx = await this.auditLogContract.recordLogHash(logHash);
     await tx.wait();
     return tx.hash;
   }
