@@ -298,6 +298,19 @@ export class BlockchainService {
     return tx.hash;
   }
 
+  // --- Task A9: Pre-check ---
+  public async canTransact(tokenId: string): Promise<boolean> {
+    this.logger.log(`Checking canTransact on-chain for token ${tokenId}`);
+    if (!this.landRegistryContract) throw new Error("LandRegistry contract not initialized");
+    return this.landRegistryContract.canTransact(tokenId);
+  }
+
+  public async isBlocked(tokenId: string): Promise<boolean> {
+    this.logger.log(`Checking isBlocked on-chain for token ${tokenId}`);
+    if (!this.landRegistryContract) throw new Error("LandRegistry contract not initialized");
+    return this.landRegistryContract.isBlocked(tokenId);
+  }
+
   public registerEventSyncHook(eventName: string, callback: (eventData: any) => void) {
     this.logger.log(`Registering sync hook for event: ${eventName}`);
     if (this.landRegistryContract) {
