@@ -95,12 +95,16 @@ export class TransactionsService {
       // Calculate and save taxes
       await this.taxesService.calculateAndSaveTransferTaxes(transaction.id);
 
-      // Update NFT owner (Simulating blockchain transfer locally for now)
+      // Update NFT owner on blockchain
       // Task A3: Sync state machine: DANG_GIAO_DICH -> CHUYEN_NHUONG
       await this.blockchainService.completeTransfer(transaction.tokenId);
 
       const buyerWallet = await this.walletRepository.findOne({ where: { userId: transaction.buyerId } });
-      if (buyerWallet) {
+      const sellerWallet = await this.walletRepository.findOne({ where: { userId: transaction.sellerId } });
+      if (buyerWallet && sellerWallet) {
+        // Task A6: Tích hợp Transfer NFT
+        await this.blockchainService.transferNFT(sellerWallet.walletAddress, buyerWallet.walletAddress, transaction.tokenId);
+
         await this.landNftRepository.update({ tokenId: transaction.tokenId }, { ownerWallet: buyerWallet.walletAddress });
       }
     }

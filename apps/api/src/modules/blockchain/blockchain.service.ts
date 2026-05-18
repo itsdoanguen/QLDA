@@ -123,6 +123,19 @@ export class BlockchainService {
     }
   }
 
+  public async transferNFT(from: string, to: string, tokenId: string): Promise<string> {
+    this.logger.log(`Transferring NFT ${tokenId} from ${from} to ${to} on-chain`);
+    if (!this.landNFTContract) {
+      throw new Error("LandNFT contract is not initialized");
+    }
+    
+    // Using adminTransfer since backend is the owner of the contract 
+    // and standard transferFrom requires prior user approval on-chain.
+    const tx = await this.landNFTContract.adminTransfer(from, to, tokenId);
+    await tx.wait();
+    return tx.hash;
+  }
+
   // --- Task A3: State Machine Transitions ---
 
   public async submitForApproval(tokenId: string): Promise<string> {
