@@ -8,6 +8,7 @@ import { RedisModule } from '../redis/redis.module';
 import { Wallet } from '../database/entities/wallet.entity';
 import { WalletSecret } from '../database/entities/wallet-secret.entity';
 import { WalletRecoveryRequest } from '../database/entities/wallet-recovery-request.entity';
+import { User } from '../database/entities/user.entity';
 import { BlockchainModule } from '../blockchain/blockchain.module';
 import { LandNFT } from '../database/entities/land-nft.entity';
 

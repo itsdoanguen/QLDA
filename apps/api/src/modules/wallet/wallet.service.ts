@@ -10,6 +10,7 @@ import { WalletRecoveryRequest } from '../database/entities/wallet-recovery-requ
 import { User } from '../database/entities/user.entity';
 import { LandNFT } from '../database/entities/land-nft.entity';
 import { BlockchainService } from '../blockchain/blockchain.service';
+import { WalletLinkRequest, WalletRecoveryRequestDto } from '@land-registry/shared-types';
 
 @Injectable()
 export class WalletService {
@@ -134,6 +135,9 @@ export class WalletService {
     }
 
     const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
     const citizenIdHash = ethers.sha256(ethers.toUtf8Bytes(user.vneidNumber));
     
     // Task A7: Tích hợp Wallet Override request on-chain
