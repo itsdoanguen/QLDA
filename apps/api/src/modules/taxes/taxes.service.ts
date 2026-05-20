@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TaxFee } from '../database/entities/tax-fee.entity';
@@ -6,9 +6,12 @@ import { Receipt } from '../database/entities/receipt.entity';
 import { LandRecord } from '../database/entities/land-record.entity';
 import { Transaction } from '../database/entities/transaction.entity';
 import { SystemConfig } from '../database/entities/system-config.entity';
+import { BlockchainService } from '../blockchain/blockchain.service';
 
 @Injectable()
 export class TaxesService {
+  private readonly logger = new Logger(TaxesService.name);
+
   constructor(
     @InjectRepository(TaxFee)
     private readonly taxFeeRepository: Repository<TaxFee>,
@@ -20,6 +23,7 @@ export class TaxesService {
     private readonly transactionRepository: Repository<Transaction>,
     @InjectRepository(SystemConfig)
     private readonly configRepository: Repository<SystemConfig>,
+    private readonly blockchainService: BlockchainService,
   ) {}
 
   /**
@@ -120,6 +124,40 @@ export class TaxesService {
       status: 'Success',
     });
 
-    return this.receiptRepository.save(receipt);
+    const savedReceipt = await this.receiptRepository.save(receipt);
+
+    // Update on-chain EContract tax status if initialized
+    try {
+      const transaction = await this.transactionRepository.findOne({ where: { id: tax.transactionId } });
+      if (transaction && this.blockchainService.eContractContract) {
+        // Query active contract ID for this token
+        const activeContractId = await this.blockchainService.eContractContract.activeContractByToken(transaction.tokenId);
+        if (activeContractId > 0n) {
+          this.logger.log(`Invoking payTax on-chain for EContract ID: ${activeContractId}`);
+          const tx = await this.blockchainService.eContractContract.payTax(activeContractId);
+          await tx.wait();
+          savedReceipt.blockchainTxHash = tx.hash;
+          await this.receiptRepository.save(savedReceipt);
+          this.logger.log(`Successfully updated tax payment status on-chain. TxHash: ${tx.hash}`);
+        }
+      }
+    } catch (error) {
+      this.logger.error(`Failed to update tax paid status on-chain:`, error);
+    }
+
+    // Check if all taxes for the transaction are paid, and if so, transition transaction to Completed
+    const allTaxes = await this.taxFeeRepository.find({ where: { transactionId: tax.transactionId } });
+    const allPaid = allTaxes.every(t => t.status === 'Paid');
+    if (allPaid) {
+      const transaction = await this.transactionRepository.findOne({ where: { id: tax.transactionId } });
+      if (transaction && transaction.status !== 'Completed') {
+        transaction.status = 'Completed';
+        transaction.completedAt = new Date();
+        await this.transactionRepository.save(transaction);
+        this.logger.log(`Transaction ${transaction.id} is fully paid and transitioned to Completed`);
+      }
+    }
+
+    return savedReceipt;
   }
 }

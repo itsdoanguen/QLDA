@@ -35,12 +35,20 @@ contract EContract is Ownable {
         ContractStatus status;
         uint256 createdAt;
         uint256 updatedAt;
+        // Tax details
+        uint256 taxTNCN;
+        uint256 feePreBa;
+        bool isTaxPaid;
     }
 
     // --- State Variables ---
 
     LandRegistry public landRegistryContract;
     uint256 public contractCount;
+
+    // tax rates in basis points (10000 = 100%)
+    uint256 public taxRateTNCN = 200; // default 2%
+    uint256 public feeRatePreBa = 50; // default 0.5%
 
     // contractId => PurchaseContract
     mapping(uint256 => PurchaseContract) public contracts;
@@ -68,6 +76,17 @@ contract EContract is Ownable {
     event ContractStatusChanged(
         uint256 indexed contractId,
         ContractStatus newStatus
+    );
+
+    event TaxPaid(
+        uint256 indexed contractId,
+        uint256 taxTNCN,
+        uint256 feePreBa
+    );
+
+    event TaxRatesUpdated(
+        uint256 newTaxRateTNCN,
+        uint256 newFeeRatePreBa
     );
 
     // --- Constructor ---
@@ -113,6 +132,9 @@ contract EContract is Ownable {
         contractCount++;
         uint256 newContractId = contractCount;
 
+        uint256 calculatedTaxTNCN = (_price * taxRateTNCN) / 10000;
+        uint256 calculatedFeePreBa = (_price * feeRatePreBa) / 10000;
+
         contracts[newContractId] = PurchaseContract({
             contractId: newContractId,
             tokenId: _tokenId,
@@ -125,7 +147,10 @@ contract EContract is Ownable {
             certifierSigned: false,
             status: ContractStatus.PENDING,
             createdAt: block.timestamp,
-            updatedAt: block.timestamp
+            updatedAt: block.timestamp,
+            taxTNCN: calculatedTaxTNCN,
+            feePreBa: calculatedFeePreBa,
+            isTaxPaid: false
         });
 
         activeContractByToken[_tokenId] = newContractId;
@@ -198,5 +223,29 @@ contract EContract is Ownable {
     function getContract(uint256 _contractId) external view returns (PurchaseContract memory) {
         require(contracts[_contractId].contractId != 0, "Contract does not exist");
         return contracts[_contractId];
+    }
+
+    /**
+     * @dev Updates tax payment status to paid.
+     */
+    function payTax(uint256 _contractId) external onlyOwner {
+        PurchaseContract storage c = contracts[_contractId];
+        require(c.contractId != 0, "Contract does not exist");
+        require(c.status != ContractStatus.CANCELLED, "Contract is cancelled");
+        require(!c.isTaxPaid, "Tax already paid");
+
+        c.isTaxPaid = true;
+        c.updatedAt = block.timestamp;
+
+        emit TaxPaid(_contractId, c.taxTNCN, c.feePreBa);
+    }
+
+    /**
+     * @dev Sets dynamic tax/fee rates.
+     */
+    function setTaxRates(uint256 _taxRateTNCN, uint256 _feeRatePreBa) external onlyOwner {
+        taxRateTNCN = _taxRateTNCN;
+        feeRatePreBa = _feeRatePreBa;
+        emit TaxRatesUpdated(_taxRateTNCN, _feeRatePreBa);
     }
 }

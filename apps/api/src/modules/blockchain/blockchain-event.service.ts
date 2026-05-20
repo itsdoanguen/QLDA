@@ -35,7 +35,7 @@ export class BlockchainEventService implements OnModuleInit {
     this.registerListeners();
   }
 
-  private async ensureBlockchainLog(eventLog: any, eventName: string): Promise<string> {
+  private async ensureBlockchainLog(eventLog: any, eventName: string): Promise<string | null> {
     const txHash = eventLog.transactionHash;
     if (!txHash) return null;
 
@@ -147,6 +147,30 @@ export class BlockchainEventService implements OnModuleInit {
       this.logger.log(`Received RecoveryApproved event: reqId=${reqId}, citizen=${citizenIdHash}, newWallet=${newWallet}`);
       
       await this.ensureBlockchainLog(data.eventLog, 'RecoveryApproved');
+    });
+
+    // 5. TaxPaid (from EContract)
+    this.blockchainService.registerEContractSyncHook('TaxPaid', async (data) => {
+      const [contractIdBigInt, taxTNCN, feePreBa] = data.args;
+      const contractId = Number(contractIdBigInt);
+      this.logger.log(`Received TaxPaid event: contractId=${contractId}, taxTNCN=${taxTNCN}, feePreBa=${feePreBa}`);
+      
+      try {
+        if (this.blockchainService.eContractContract) {
+          const purchaseContract = await this.blockchainService.eContractContract.getContract(contractIdBigInt);
+          const tokenId = purchaseContract.tokenId.toString();
+          
+          await this.createProvenanceLog(
+            'TaxPaid', 
+            tokenId, 
+            { contractId, taxTNCN: taxTNCN.toString(), feePreBa: feePreBa.toString() }, 
+            data.eventLog
+          );
+        }
+      } catch (error) {
+        this.logger.error(`Error processing TaxPaid event for contractId ${contractId}:`, error);
+        await this.ensureBlockchainLog(data.eventLog, 'TaxPaid');
+      }
     });
   }
 }

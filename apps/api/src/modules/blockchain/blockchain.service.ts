@@ -15,6 +15,7 @@ export class BlockchainService {
   public multiSigContract: ethers.Contract;
   public walletOverrideContract: ethers.Contract;
   public auditLogContract: ethers.Contract;
+  public eContractContract: ethers.Contract;
 
   constructor(private configService: ConfigService<AppEnv>) {
     this.initProvider();
@@ -65,6 +66,13 @@ export class BlockchainService {
       const auditLogAbi = this.getAbiLoader('AuditLog');
       this.auditLogContract = new ethers.Contract(auditLogAddress, auditLogAbi, this.signer);
       this.logger.log(`Initialized AuditLog contract at: ${auditLogAddress}`);
+    }
+
+    const eContractAddress = this.configService.get<string>('ECONTRACT_CONTRACT_ADDRESS');
+    if (eContractAddress) {
+      const eContractAbi = this.getAbiLoader('EContract');
+      this.eContractContract = new ethers.Contract(eContractAddress, eContractAbi, this.signer);
+      this.logger.log(`Initialized EContract contract at: ${eContractAddress}`);
     }
   }
 
@@ -315,6 +323,17 @@ export class BlockchainService {
     this.logger.log(`Registering sync hook for event: ${eventName}`);
     if (this.landRegistryContract) {
       this.landRegistryContract.on(eventName, (...args) => {
+        // Last argument in ethers v6 event callback is the EventLog object
+        const eventLog = args[args.length - 1];
+        callback({ args: args.slice(0, args.length - 1), eventLog });
+      });
+    }
+  }
+
+  public registerEContractSyncHook(eventName: string, callback: (eventData: any) => void) {
+    this.logger.log(`Registering EContract sync hook for event: ${eventName}`);
+    if (this.eContractContract) {
+      this.eContractContract.on(eventName, (...args) => {
         // Last argument in ethers v6 event callback is the EventLog object
         const eventLog = args[args.length - 1];
         callback({ args: args.slice(0, args.length - 1), eventLog });

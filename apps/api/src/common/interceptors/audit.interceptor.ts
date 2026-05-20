@@ -45,7 +45,7 @@ export class AuditInterceptor implements NestInterceptor {
             ipAddress: ip,
           });
         } catch (error) {
-          this.logger.error('Failed to create audit log', error.stack);
+          this.logger.error('Failed to create audit log', (error as any).stack);
         }
       }),
     );

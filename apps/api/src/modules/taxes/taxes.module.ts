@@ -8,11 +8,13 @@ import { SystemConfig } from '../database/entities/system-config.entity';
 import { TaxesController } from './taxes.controller';
 import { TaxesService } from './taxes.service';
 import { AuthModule } from '../auth/auth.module';
+import { BlockchainModule } from '../blockchain/blockchain.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([TaxFee, Receipt, LandRecord, Transaction, SystemConfig]),
     AuthModule,
+    BlockchainModule,
   ],
   controllers: [TaxesController],
   providers: [TaxesService],

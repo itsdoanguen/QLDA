@@ -166,17 +166,78 @@ async function main() {
   console.log("Signing EContract as Certifier...");
   await (await eContractCertifier.signContract(contractId, { nonce: certifierNonce++ })).wait();
 
-  // 9. Verify Contract Status
+  // 9. Verify Contract Status and Tax Details
   console.log("\nVerifying EContract details...");
-  const purchaseContract = await eContractAdmin.getContract(contractId);
+  let purchaseContract = await eContractAdmin.getContract(contractId);
   
   console.log(`Contract Status   : ${purchaseContract.status} (Expected: 1 - COMPLETED)`);
   console.log(`Seller Signed     : ${purchaseContract.sellerSigned}`);
   console.log(`Buyer Signed      : ${purchaseContract.buyerSigned}`);
   console.log(`Certifier Signed  : ${purchaseContract.certifierSigned}`);
+  console.log(`Calculated TNCN   : ${ethers.formatEther(purchaseContract.taxTNCN)} ETH (Expected: 0.11 ETH)`);
+  console.log(`Calculated PreBa  : ${ethers.formatEther(purchaseContract.feePreBa)} ETH (Expected: 0.0275 ETH)`);
+  console.log(`Tax Paid Status   : ${purchaseContract.isTaxPaid} (Expected: false)`);
 
-  if (purchaseContract.status === 1n) {
-    console.log("\n🎉 EContract verification SUCCESS!");
+  // Check expected amounts
+  const expectedTNCN = (price * 200n) / 10000n;
+  const expectedPreBa = (price * 50n) / 10000n;
+  if (purchaseContract.taxTNCN !== expectedTNCN || purchaseContract.feePreBa !== expectedPreBa) {
+    throw new Error("Tax calculation discrepancy on-chain!");
+  }
+
+  // Test: payTax called by Seller (should revert)
+  console.log("Testing payTax authorization (Seller, should revert)...");
+  try {
+    await eContractSeller.payTax(contractId);
+    throw new Error("payTax should have reverted when called by non-owner!");
+  } catch (err) {
+    console.log("  ✅ Successfully reverted: " + err.message);
+  }
+
+  // Test: payTax called by Owner/Admin
+  console.log("Paying tax on-chain as Admin...");
+  const payTaxTx = await eContractAdmin.payTax(contractId, { nonce: adminNonce++ });
+  const payTaxReceipt = await payTaxTx.wait();
+
+  // Verify event TaxPaid
+  let taxPaidEventFound = false;
+  for (const log of payTaxReceipt.logs) {
+    try {
+      const parsed = eContractAdmin.interface.parseLog({
+        topics: log.topics,
+        data: log.data,
+      });
+      if (parsed && parsed.name === "TaxPaid") {
+        taxPaidEventFound = true;
+        console.log(`  Event TaxPaid emitted - Contract ID: ${parsed.args.contractId}, TNCN: ${ethers.formatEther(parsed.args.taxTNCN)} ETH, PreBa: ${ethers.formatEther(parsed.args.feePreBa)} ETH`);
+        break;
+      }
+    } catch {}
+  }
+  if (!taxPaidEventFound) {
+    throw new Error("TaxPaid event was not emitted!");
+  }
+
+  purchaseContract = await eContractAdmin.getContract(contractId);
+  console.log(`Tax Paid Status after update: ${purchaseContract.isTaxPaid} (Expected: true)`);
+  if (!purchaseContract.isTaxPaid) {
+    throw new Error("Tax status was not updated to paid!");
+  }
+
+  // Test: setTaxRates called by Admin
+  console.log("Testing setTaxRates dynamic rate adjustment...");
+  const setRatesTx = await eContractAdmin.setTaxRates(300, 100, { nonce: adminNonce++ });
+  await setRatesTx.wait();
+
+  const newTNCNRate = await eContractAdmin.taxRateTNCN();
+  const newPreBaRate = await eContractAdmin.feeRatePreBa();
+  console.log(`New rates: TNCN=${newTNCNRate} basis points, PreBa=${newPreBaRate} basis points`);
+  if (newTNCNRate !== 300n || newPreBaRate !== 100n) {
+    throw new Error("Tax rates were not updated correctly!");
+  }
+
+  if (purchaseContract.status === 1n && purchaseContract.isTaxPaid) {
+    console.log("\n🎉 EContract tax calculation & payTax verification SUCCESS!");
   } else {
     throw new Error("EContract status verification failed!");
   }
