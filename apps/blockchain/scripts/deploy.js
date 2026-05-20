@@ -76,6 +76,7 @@ function writeDeploymentFile(addresses, chainId) {
       MultiSigWorkflow: addresses.MultiSigWorkflow,
       WalletOverride: addresses.WalletOverride,
       AuditLog: addresses.AuditLog,
+      EContract: addresses.EContract,
     },
   };
 
@@ -192,12 +193,23 @@ async function main() {
   // ─────────────────────────────────────────────
   // Step 5: Deploy AuditLog (no dependencies)
   // ─────────────────────────────────────────────
-  console.log("\n[5/5] AuditLog (On-chain Audit Trail)");
+  console.log("\n[5/6] AuditLog (On-chain Audit Trail)");
   const auditLog = await deploySimple("AuditLog", wallet);
   addresses.AuditLog = auditLog.address;
 
   // ─────────────────────────────────────────────
-  // Step 6: Transfer LandNFT ownership to LandRegistry
+  // Step 6: Deploy EContract (depends on LandRegistry)
+  // ─────────────────────────────────────────────
+  console.log("\n[6/6] EContract (Electronic Purchase Agreements)");
+  const eContract = await deployWithAddress(
+    "EContract",
+    wallet,
+    landRegistry.address
+  );
+  addresses.EContract = eContract.address;
+
+  // ─────────────────────────────────────────────
+  // Step 7: Transfer LandNFT ownership to LandRegistry
   // LandRegistry.createLandRecord() calls LandNFT.mintLandNFT()
   // which is onlyOwner, so LandRegistry must own LandNFT.
   // ─────────────────────────────────────────────
@@ -222,6 +234,7 @@ async function main() {
   console.log(`    MultiSigWorkflow : ${addresses.MultiSigWorkflow}`);
   console.log(`    WalletOverride   : ${addresses.WalletOverride}`);
   console.log(`    AuditLog         : ${addresses.AuditLog}`);
+  console.log(`    EContract        : ${addresses.EContract}`);
   console.log("\n  Saved to deployed-address.json");
   console.log("=".repeat(60));
 }
