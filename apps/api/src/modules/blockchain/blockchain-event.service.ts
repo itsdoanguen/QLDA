@@ -6,6 +6,8 @@ import { LandRecord } from '../database/entities/land-record.entity';
 import { LandNFT } from '../database/entities/land-nft.entity';
 import { Wallet } from '../database/entities/wallet.entity';
 import { Transaction } from '../database/entities/transaction.entity';
+import { BlockchainLog } from '../database/entities/blockchain-log.entity';
+import { CachedProvenanceLog } from '../database/entities/cached-provenance-log.entity';
 import { LandRecordStatus } from '../../common/enums/land-record-status.enum';
 
 @Injectable()
@@ -22,11 +24,70 @@ export class BlockchainEventService implements OnModuleInit {
     private readonly walletRepo: Repository<Wallet>,
     @InjectRepository(Transaction)
     private readonly transactionRepo: Repository<Transaction>,
+    @InjectRepository(BlockchainLog)
+    private readonly blockchainLogRepo: Repository<BlockchainLog>,
+    @InjectRepository(CachedProvenanceLog)
+    private readonly provenanceLogRepo: Repository<CachedProvenanceLog>,
   ) {}
 
   onModuleInit() {
     this.logger.log('Initializing Blockchain Event Listeners...');
     this.registerListeners();
+  }
+
+  private async ensureBlockchainLog(eventLog: any, eventName: string): Promise<string> {
+    const txHash = eventLog.transactionHash;
+    if (!txHash) return null;
+
+    let log = await this.blockchainLogRepo.findOne({ where: { txHash } });
+    if (!log) {
+      try {
+        const provider = (this.blockchainService as any).provider;
+        if (provider) {
+          const receipt = await provider.getTransactionReceipt(txHash);
+          const block = await provider.getBlock(receipt.blockNumber);
+          
+          let gasFee = 0;
+          if (receipt.gasUsed && receipt.gasPrice) {
+            gasFee = Number(receipt.gasUsed * receipt.gasPrice) / 1e18; // Convert to ETH
+          }
+
+          log = this.blockchainLogRepo.create({
+            txHash,
+            actionType: eventName,
+            gasFee,
+            status: receipt.status === 1 ? 'Success' : 'Reverted',
+            timestamp: new Date(block.timestamp * 1000),
+          });
+          await this.blockchainLogRepo.save(log);
+          this.logger.log(`Created BlockchainLog for tx ${txHash}`);
+        }
+      } catch (error) {
+        this.logger.error(`Error fetching receipt for tx ${txHash}:`, error);
+      }
+    }
+    return txHash;
+  }
+
+  private async createProvenanceLog(eventName: string, tokenId: string, eventDataObj: any, eventLog: any) {
+    const txHash = await this.ensureBlockchainLog(eventLog, eventName);
+    if (!txHash) return;
+
+    try {
+      const cachedLog = this.provenanceLogRepo.create({
+        tokenId,
+        eventType: eventName,
+        eventData: JSON.stringify(eventDataObj, (key, value) =>
+          typeof value === 'bigint' ? value.toString() : value
+        ),
+        txHash,
+        blockNumber: eventLog.blockNumber,
+      });
+      await this.provenanceLogRepo.save(cachedLog);
+      this.logger.log(`Created CachedProvenanceLog for ${eventName} on token ${tokenId}`);
+    } catch (error) {
+      this.logger.error(`Error saving provenance log for token ${tokenId}:`, error);
+    }
   }
 
   private registerListeners() {
@@ -36,7 +97,6 @@ export class BlockchainEventService implements OnModuleInit {
       const tokenId = tokenIdBigInt.toString();
       this.logger.log(`Received LandNFTMinted event: tokenId=${tokenId}, to=${to}`);
       
-      // Update the NFT status if it exists, or just log
       const nft = await this.landNftRepo.findOne({ where: { tokenId } });
       if (nft) {
         nft.status = 'Normal';
@@ -44,6 +104,8 @@ export class BlockchainEventService implements OnModuleInit {
         await this.landNftRepo.save(nft);
         this.logger.log(`Updated LandNFT ${tokenId} status to Normal`);
       }
+
+      await this.createProvenanceLog('LandNFTMinted', tokenId, { to, tokenURI }, data.eventLog);
     });
 
     // 2. LandStatusChanged
@@ -54,9 +116,6 @@ export class BlockchainEventService implements OnModuleInit {
       
       const nft = await this.landNftRepo.findOne({ where: { tokenId } });
       if (nft) {
-        // Map on-chain status to DB NFT status
-        // 2: DA_CAP_SO (Normal), 3: DANG_GIAO_DICH (Trading)
-        // 4: THE_CHAP (Locked), 5: TRANH_CHAP (Locked), 6: CHUYEN_NHUONG (Normal)
         let dbStatus = 'Normal';
         const numStatus = Number(newStatus);
         if (numStatus === 3) dbStatus = 'Trading';
@@ -66,6 +125,8 @@ export class BlockchainEventService implements OnModuleInit {
         await this.landNftRepo.save(nft);
         this.logger.log(`Updated LandNFT ${tokenId} status to ${dbStatus}`);
       }
+
+      await this.createProvenanceLog('LandStatusChanged', tokenId, { oldStatus, newStatus }, data.eventLog);
     });
 
     // 3. TransactionSigned
@@ -74,9 +135,9 @@ export class BlockchainEventService implements OnModuleInit {
       const txId = Number(transactionIdBigInt);
       this.logger.log(`Received TransactionSigned event: txId=${txId}, signer=${signer}, approved=${isApproved}`);
       
-      // We could update a MultiSig request or Approval table here.
-      // Assuming Transaction entity represents the sale transaction, 
-      // MultiSig transactions might be separate, but we log the event.
+      // We don't have a specific tokenId for this event natively, so we pass null or empty 
+      // But we will ensure BlockchainLog is created.
+      await this.ensureBlockchainLog(data.eventLog, 'TransactionSigned');
     });
 
     // 4. RecoveryApproved
@@ -85,13 +146,7 @@ export class BlockchainEventService implements OnModuleInit {
       const reqId = Number(requestIdBigInt);
       this.logger.log(`Received RecoveryApproved event: reqId=${reqId}, citizen=${citizenIdHash}, newWallet=${newWallet}`);
       
-      // We could update the user's wallet address in the Wallet table.
-      // To do this reliably, we'd need to find the user by citizenIdHash, 
-      // but if we just have the wallet table we can check by old wallet or user.
-      // This serves as an automated sync hook.
-      // Since we don't store citizenIdHash directly in Wallet, we might need a mapping,
-      // but for now we'll just log it. 
-      // If we find a way to map citizenIdHash to userId, we would update it here.
+      await this.ensureBlockchainLog(data.eventLog, 'RecoveryApproved');
     });
   }
 }
