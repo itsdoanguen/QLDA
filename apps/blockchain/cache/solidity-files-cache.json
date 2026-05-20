@@ -869,8 +869,8 @@
       ]
     },
     "E:\\CODE\\QLDA\\LandContractQLDA\\apps\\blockchain\\contracts\\AuditLog.sol": {
-      "lastModificationDate": 1778563443360,
-      "contentHash": "bd256905ef2740cc54b60f5afd0c95a2",
+      "lastModificationDate": 1778661798397,
+      "contentHash": "e2f895ba84771f01dab73ae60afb1089",
       "sourceName": "contracts/AuditLog.sol",
       "solcConfig": {
         "version": "0.8.24",
