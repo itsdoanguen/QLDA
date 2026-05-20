@@ -18,6 +18,7 @@ export class BlockchainService {
   public eContractContract: ethers.Contract;
   public receiptContract: ethers.Contract;
   public accessControlContract: ethers.Contract;
+  public planningRegistryContract: ethers.Contract;
 
   constructor(private configService: ConfigService<AppEnv>) {
     this.initProvider();
@@ -89,6 +90,13 @@ export class BlockchainService {
       const accessControlAbi = this.getAbiLoader('AccessControl');
       this.accessControlContract = new ethers.Contract(accessControlAddress, accessControlAbi, this.signer);
       this.logger.log(`Initialized AccessControl contract at: ${accessControlAddress}`);
+    }
+
+    const planningRegistryAddress = this.configService.get<string>('PLANNING_REGISTRY_CONTRACT_ADDRESS');
+    if (planningRegistryAddress) {
+      const planningAbi = this.getAbiLoader('PlanningRegistry');
+      this.planningRegistryContract = new ethers.Contract(planningRegistryAddress, planningAbi, this.signer);
+      this.logger.log(`Initialized PlanningRegistry contract at: ${planningRegistryAddress}`);
     }
   }
 
@@ -357,6 +365,12 @@ export class BlockchainService {
     this.logger.log(`Fetching metadata URI on-chain for token ${tokenId}`);
     if (!this.landRegistryContract) throw new Error('LandRegistry contract is not initialized');
     return await this.landRegistryContract.getLandMetadata(tokenId);
+  }
+
+  public async isTokenInDangerZone(tokenId: string): Promise<boolean> {
+    this.logger.log(`Checking planning danger zone for token ${tokenId}`);
+    if (!this.planningRegistryContract) throw new Error('PlanningRegistry contract is not initialized');
+    return await this.planningRegistryContract.isTokenInDanger(tokenId);
   }
 
   public registerEventSyncHook(eventName: string, callback: (eventData: any) => void) {

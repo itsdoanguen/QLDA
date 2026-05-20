@@ -225,6 +225,13 @@ async function main() {
   addresses.Receipt = receipt.address;
 
   // ─────────────────────────────────────────────
+  // Step 8: Deploy PlanningRegistry (Planning Zone checks)
+  // ─────────────────────────────────────────────
+  console.log("\n[8/8] PlanningRegistry (Planning Zone checks)");
+  const planningRegistry = await deploySimple("PlanningRegistry", wallet);
+  addresses.PlanningRegistry = planningRegistry.address;
+
+  // ─────────────────────────────────────────────
   // Step 7: Transfer LandNFT ownership to LandRegistry
   // LandRegistry.createLandRecord() calls LandNFT.mintLandNFT()
   // which is onlyOwner, so LandRegistry must own LandNFT.
@@ -252,6 +259,7 @@ async function main() {
   console.log(`    AuditLog         : ${addresses.AuditLog}`);
   console.log(`    EContract        : ${addresses.EContract}`);
   console.log(`    Receipt          : ${addresses.Receipt}`);
+  console.log(`    PlanningRegistry  : ${addresses.PlanningRegistry}`);
   console.log("\n  Saved to deployed-address.json");
   console.log("=".repeat(60));
 }
