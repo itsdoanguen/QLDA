@@ -16,6 +16,7 @@ export class BlockchainService {
   public walletOverrideContract: ethers.Contract;
   public auditLogContract: ethers.Contract;
   public eContractContract: ethers.Contract;
+  public receiptContract: ethers.Contract;
 
   constructor(private configService: ConfigService<AppEnv>) {
     this.initProvider();
@@ -73,6 +74,13 @@ export class BlockchainService {
       const eContractAbi = this.getAbiLoader('EContract');
       this.eContractContract = new ethers.Contract(eContractAddress, eContractAbi, this.signer);
       this.logger.log(`Initialized EContract contract at: ${eContractAddress}`);
+    }
+
+    const receiptAddress = this.configService.get<string>('RECEIPT_CONTRACT_ADDRESS');
+    if (receiptAddress) {
+      const receiptAbi = this.getAbiLoader('Receipt');
+      this.receiptContract = new ethers.Contract(receiptAddress, receiptAbi, this.signer);
+      this.logger.log(`Initialized Receipt contract at: ${receiptAddress}`);
     }
   }
 
@@ -339,5 +347,37 @@ export class BlockchainService {
         callback({ args: args.slice(0, args.length - 1), eventLog });
       });
     }
+  }
+
+  public registerReceiptSyncHook(eventName: string, callback: (eventData: any) => void) {
+    this.logger.log(`Registering Receipt sync hook for event: ${eventName}`);
+    if (this.receiptContract) {
+      this.receiptContract.on(eventName, (...args) => {
+        const eventLog = args[args.length - 1];
+        callback({ args: args.slice(0, args.length - 1), eventLog });
+      });
+    }
+  }
+
+  public async recordReceipt(txHash: string, payer: string, amountWei: string | number | bigint, receiptCID: string): Promise<string> {
+    this.logger.log(`Recording receipt on-chain for tx ${txHash}, payer ${payer}, amount ${amountWei}`);
+    if (!this.receiptContract) throw new Error('Receipt contract not initialized');
+    // txHash is expected to be bytes32 hex string (0x...)
+    const tx = await this.receiptContract.recordReceipt(txHash, payer, BigInt(amountWei.toString()), receiptCID);
+    await tx.wait();
+    return tx.hash;
+  }
+
+  public async getReceipt(txHash: string): Promise<{ payer: string; amount: string; receiptCID: string; timestamp: number }> {
+    this.logger.log(`Fetching receipt on-chain for tx ${txHash}`);
+    if (!this.receiptContract) throw new Error('Receipt contract not initialized');
+    const res = await this.receiptContract.getReceipt(txHash);
+    // res: [payer, amount, receiptCID, timestamp]
+    return {
+      payer: res[0],
+      amount: res[1].toString(),
+      receiptCID: res[2],
+      timestamp: Number(res[3]),
+    };
   }
 }

@@ -172,5 +172,15 @@ export class BlockchainEventService implements OnModuleInit {
         await this.ensureBlockchainLog(data.eventLog, 'TaxPaid');
       }
     });
+
+    // 6. ReceiptRecorded (from Receipt contract)
+    this.blockchainService.registerReceiptSyncHook('ReceiptRecorded', async (data) => {
+      const [txHashBytes, payer, amount, receiptCID, timestamp] = data.args;
+      const txHash = txHashBytes;
+      this.logger.log(`Received ReceiptRecorded event: tx=${txHash}, payer=${payer}, amount=${amount.toString()}, cid=${receiptCID}`);
+
+      // Ensure BlockchainLog is created for this receipt tx
+      await this.ensureBlockchainLog(data.eventLog, 'ReceiptRecorded');
+    });
   }
 }

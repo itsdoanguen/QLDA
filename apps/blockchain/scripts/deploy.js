@@ -77,6 +77,7 @@ function writeDeploymentFile(addresses, chainId) {
       WalletOverride: addresses.WalletOverride,
       AuditLog: addresses.AuditLog,
       EContract: addresses.EContract,
+      Receipt: addresses.Receipt,
     },
   };
 
@@ -209,6 +210,13 @@ async function main() {
   addresses.EContract = eContract.address;
 
   // ─────────────────────────────────────────────
+  // Step 7: Deploy Receipt (on-chain receipts)
+  // ─────────────────────────────────────────────
+  console.log("\n[7/7] Receipt (On-chain Receipts)");
+  const receipt = await deploySimple("Receipt", wallet);
+  addresses.Receipt = receipt.address;
+
+  // ─────────────────────────────────────────────
   // Step 7: Transfer LandNFT ownership to LandRegistry
   // LandRegistry.createLandRecord() calls LandNFT.mintLandNFT()
   // which is onlyOwner, so LandRegistry must own LandNFT.
@@ -235,6 +243,7 @@ async function main() {
   console.log(`    WalletOverride   : ${addresses.WalletOverride}`);
   console.log(`    AuditLog         : ${addresses.AuditLog}`);
   console.log(`    EContract        : ${addresses.EContract}`);
+  console.log(`    Receipt          : ${addresses.Receipt}`);
   console.log("\n  Saved to deployed-address.json");
   console.log("=".repeat(60));
 }
