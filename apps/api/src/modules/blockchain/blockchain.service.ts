@@ -272,6 +272,24 @@ export class BlockchainService {
     return tx.hash;
   }
 
+  // --- BC-5: Revoke / Revert Signatures ---
+
+  public async revokeMySignature(txId: number): Promise<string> {
+    this.logger.log(`Revoking my signature for multisig tx ${txId}`);
+    if (!this.multiSigContract) throw new Error("MultiSig contract not initialized");
+    const tx = await this.multiSigContract.revokeMySignature(txId);
+    await tx.wait();
+    return tx.hash;
+  }
+
+  public async adminRevertTransaction(txId: number): Promise<string> {
+    this.logger.log(`Admin reverting multisig tx ${txId} to PENDING`);
+    if (!this.multiSigContract) throw new Error("MultiSig contract not initialized");
+    const tx = await this.multiSigContract.adminRevertTransaction(txId);
+    await tx.wait();
+    return tx.hash;
+  }
+
   // --- Task A7: Wallet Override ---
 
   public async requestWalletOverride(citizenIdHash: string, newWallet: string): Promise<number> {

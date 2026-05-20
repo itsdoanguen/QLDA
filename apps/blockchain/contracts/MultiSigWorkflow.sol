@@ -66,6 +66,8 @@ contract MultiSigWorkflow {
     event TransactionCreated(uint256 indexed transactionId, string documentCID, address indexed creator);
     event TransactionSigned(uint256 indexed transactionId, address indexed signer, SignerRole role, bool isApproved);
     event TransactionStatusChanged(uint256 indexed transactionId, TransactionStatus newStatus);
+    event SignatureRevoked(uint256 indexed transactionId, address indexed signer);
+    event TransactionRevertedToPending(uint256 indexed transactionId, address indexed by);
 
     // --- Admin Setup For Testing ---
     address public admin;
@@ -209,6 +211,76 @@ contract MultiSigWorkflow {
 
             emit TransactionSigned(txId, msg.sender, role, _isApproved[i]);
         }
+    }
+
+    /**
+     * @dev Allow a signer to revoke their own signature before execution.
+     * If transaction was REJECTED due to this or other signatures, revoking may set it back to PENDING.
+     */
+    function revokeMySignature(uint256 _txId) external {
+        Transaction storage txn = transactions[_txId];
+        require(txn.transactionId != 0, "Transaction does not exist");
+        require(txn.status != TransactionStatus.EXECUTED, "Cannot revoke after execution");
+
+        Signature storage sig = transactionSignatures[_txId][msg.sender];
+        require(sig.timestamp != 0, "No signature to revoke");
+
+        // Adjust counts
+        if (sig.isApproved) {
+            if (sig.role == SignerRole.CAN_BO && txn.cbSignaturesCount > 0) {
+                txn.cbSignaturesCount--;
+            } else if (sig.role == SignerRole.LANH_DAO && txn.ldSignaturesCount > 0) {
+                txn.ldSignaturesCount--;
+            }
+        }
+
+        // Remove signature
+        delete transactionSignatures[_txId][msg.sender];
+        emit SignatureRevoked(_txId, msg.sender);
+
+        // If txn was REJECTED, try to move back to PENDING
+        if (txn.status == TransactionStatus.REJECTED) {
+            txn.status = TransactionStatus.PENDING;
+            emit TransactionRevertedToPending(_txId, msg.sender);
+        }
+    }
+
+    /**
+     * @dev Admin function to revert a transaction to PENDING and clear all signatures.
+     * This is used when a mistake is detected and the workflow must be reset.
+     */
+    function adminRevertTransaction(uint256 _txId) external onlyAdmin {
+        Transaction storage txn = transactions[_txId];
+        require(txn.transactionId != 0, "Transaction does not exist");
+        require(txn.status != TransactionStatus.EXECUTED, "Cannot revert after execution");
+
+        address[] storage signers = transactionSigners[_txId];
+        for (uint256 i = 0; i < signers.length; i++) {
+            address s = signers[i];
+            Signature storage sig = transactionSignatures[_txId][s];
+            if (sig.timestamp != 0) {
+                // adjust counts
+                if (sig.isApproved) {
+                    if (sig.role == SignerRole.CAN_BO && txn.cbSignaturesCount > 0) {
+                        txn.cbSignaturesCount--;
+                    } else if (sig.role == SignerRole.LANH_DAO && txn.ldSignaturesCount > 0) {
+                        txn.ldSignaturesCount--;
+                    }
+                }
+                // delete signature record
+                delete transactionSignatures[_txId][s];
+            }
+        }
+
+        // clear signer list
+        delete transactionSigners[_txId];
+
+        // reset counts and status
+        txn.cbSignaturesCount = 0;
+        txn.ldSignaturesCount = 0;
+        txn.status = TransactionStatus.PENDING;
+
+        emit TransactionRevertedToPending(_txId, msg.sender);
     }
 
     // Function để get danh sách người ký của 1 transaction
