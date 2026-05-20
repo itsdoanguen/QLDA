@@ -3,22 +3,51 @@ const path = require("path");
 const { ethers } = require("ethers");
 require("dotenv").config();
 
-function resolveContractAddress() {
-  if (process.env.CONTRACT_ADDRESS) {
-    return process.env.CONTRACT_ADDRESS;
+// ─────────────────────────────────────────────────────
+// main.js — Demo: Create a LandRecord on-chain
+// Gọi LandRegistry.createLandRecord() để mint NFT và khởi tạo hồ sơ
+// ─────────────────────────────────────────────────────
+
+function loadArtifact(contractName) {
+  const artifactPath = path.join(
+    __dirname,
+    "artifacts",
+    "contracts",
+    `${contractName}.sol`,
+    `${contractName}.json`
+  );
+
+  if (!fs.existsSync(artifactPath)) {
+    throw new Error(
+      `Artifact not found for ${contractName}. Run 'npm run compile' first.`
+    );
   }
 
-  const deployedInfoPath = path.join(__dirname, "deployed-address.json");
-  if (!fs.existsSync(deployedInfoPath)) {
-    return null;
+  return JSON.parse(fs.readFileSync(artifactPath, "utf8"));
+}
+
+function loadDeployedAddresses() {
+  const deployedPath = path.join(__dirname, "deployed-address.json");
+
+  if (!fs.existsSync(deployedPath)) {
+    throw new Error(
+      "deployed-address.json not found. Run 'npm run deploy' first."
+    );
   }
 
-  try {
-    const deployedInfo = JSON.parse(fs.readFileSync(deployedInfoPath, "utf8"));
-    return deployedInfo.contractAddress || null;
-  } catch {
-    return null;
+  const data = JSON.parse(fs.readFileSync(deployedPath, "utf8"));
+
+  // Support both new format (contracts object) and legacy (single contractAddress)
+  if (data.contracts) {
+    return data.contracts;
   }
+
+  // Legacy fallback
+  if (data.contractAddress) {
+    return { LandRegistry: data.contractAddress };
+  }
+
+  throw new Error("deployed-address.json has invalid format.");
 }
 
 function getExpectedChainId() {
@@ -37,20 +66,34 @@ function getExpectedChainId() {
 async function main() {
   try {
     const { PRIVATE_KEY, QUICKNODE_RPC_URL } = process.env;
-    const contractAddress = resolveContractAddress();
     const expectedChainId = getExpectedChainId();
 
-    if (!PRIVATE_KEY || !QUICKNODE_RPC_URL || !contractAddress) {
+    if (!PRIVATE_KEY || !QUICKNODE_RPC_URL) {
       throw new Error(
-        "Missing config. Please set PRIVATE_KEY and QUICKNODE_RPC_URL in .env, then deploy contract to create CONTRACT_ADDRESS (or deployed-address.json)."
+        "Missing config. Please set PRIVATE_KEY and QUICKNODE_RPC_URL in .env."
       );
     }
 
-    if (!ethers.isAddress(contractAddress)) {
-      throw new Error(`Invalid contract address: ${contractAddress}`);
+    // Load deployed contract addresses
+    const addresses = loadDeployedAddresses();
+    const landRegistryAddress = addresses.LandRegistry;
+
+    if (!landRegistryAddress) {
+      throw new Error(
+        "LandRegistry address not found. Run 'npm run deploy' first."
+      );
     }
 
-    console.log("[1/4] Initializing provider and wallet...");
+    if (!ethers.isAddress(landRegistryAddress)) {
+      throw new Error(`Invalid LandRegistry address: ${landRegistryAddress}`);
+    }
+
+    console.log("=".repeat(60));
+    console.log("  LandContractQLDA — Create Land Record Demo");
+    console.log("=".repeat(60));
+
+    // Step 1: Initialize provider & wallet
+    console.log("\n[1/4] Initializing provider and wallet...");
     const provider = new ethers.JsonRpcProvider(QUICKNODE_RPC_URL);
     const wallet = new ethers.Wallet(PRIVATE_KEY, provider);
     const network = await provider.getNetwork();
@@ -62,41 +105,73 @@ async function main() {
       );
     }
 
-    console.log("[2/4] Loading contract ABI...");
-    const artifactPath = path.join(
-      __dirname,
-      "artifacts",
-      "contracts",
-      "LandRegistry.sol",
-      "LandRegistry.json"
-    );
+    console.log(`  Chain ID : ${currentChainId}`);
+    console.log(`  Wallet   : ${wallet.address}`);
 
-    if (!fs.existsSync(artifactPath)) {
-      throw new Error(
-        "ABI artifact not found. Run: npm run compile before executing this script."
-      );
-    }
+    // Step 2: Load contract ABI & connect
+    console.log("\n[2/4] Loading LandRegistry contract...");
+    const artifact = loadArtifact("LandRegistry");
 
-    const artifact = JSON.parse(fs.readFileSync(artifactPath, "utf8"));
-    const deployedCode = await provider.getCode(contractAddress);
+    const deployedCode = await provider.getCode(landRegistryAddress);
     if (deployedCode === "0x") {
       throw new Error(
-        `No contract found at ${contractAddress} on chain ${currentChainId}`
+        `No contract found at ${landRegistryAddress} on chain ${currentChainId}`
       );
     }
 
-    const contract = new ethers.Contract(contractAddress, artifact.abi, wallet);
+    const landRegistry = new ethers.Contract(
+      landRegistryAddress,
+      artifact.abi,
+      wallet
+    );
+    console.log(`  LandRegistry: ${landRegistryAddress}`);
 
-    console.log("[3/4] Calling registerLand on smart contract...");
-    // Just use a random or timestamp-based landId for testing
-    const landId = Math.floor(Date.now() / 1000);
-    const tx = await contract.registerLand(landId);
+    // Step 3: Call createLandRecord()
+    // Parameters: to (owner address), tokenURI (IPFS metadata URI)
+    const ownerAddress = wallet.address; // Demo: deployer is also the land owner
+    const tokenURI = "ipfs://QmDemoTokenURI_" + Date.now(); // Demo metadata
 
-    console.log("[4/4] Waiting for transaction confirmation...");
+    console.log("\n[3/4] Calling createLandRecord on smart contract...");
+    console.log(`  Owner    : ${ownerAddress}`);
+    console.log(`  TokenURI : ${tokenURI}`);
+
+    const tx = await landRegistry.createLandRecord(ownerAddress, tokenURI);
+
+    console.log(`  Tx Hash  : ${tx.hash}`);
+
+    // Step 4: Wait for confirmation & extract tokenId from events
+    console.log("\n[4/4] Waiting for transaction confirmation...");
     const receipt = await tx.wait();
 
-    console.log(`Register land successfully with ID: ${landId}`);
-    console.log(`Transaction Hash: ${receipt.hash}`);
+    // Parse LandCreated event to get the tokenId
+    let tokenId = null;
+    for (const log of receipt.logs) {
+      try {
+        const parsed = landRegistry.interface.parseLog({
+          topics: log.topics,
+          data: log.data,
+        });
+        if (parsed && parsed.name === "LandCreated") {
+          tokenId = parsed.args.tokenId;
+          break;
+        }
+      } catch {
+        // Not a LandRegistry event, skip
+      }
+    }
+
+    console.log("\n" + "=".repeat(60));
+    console.log("  ✅ Land record created successfully!");
+    console.log("=".repeat(60));
+
+    if (tokenId !== null) {
+      console.log(`  Token ID : ${tokenId}`);
+    }
+
+    console.log(`  Tx Hash  : ${receipt.hash}`);
+    console.log(`  Block    : ${receipt.blockNumber}`);
+    console.log(`  Gas Used : ${receipt.gasUsed.toString()}`);
+    console.log("=".repeat(60));
   } catch (error) {
     console.error("Execution failed:", error.message || error);
     process.exitCode = 1;
