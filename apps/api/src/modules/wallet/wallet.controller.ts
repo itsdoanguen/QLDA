@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards, Param } from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { WalletService } from './wallet.service';
 import { AuthGuard } from '../auth/auth.guard';
@@ -40,5 +40,17 @@ export class WalletController {
   @ApiUnauthorizedResponse({ description: 'Missing or invalid access token' })
   async getDetails(@Req() req: any) {
     return this.walletService.getWalletDetails(req.user.sub);
+  }
+
+  @Post('recovery-request/:id/approve')
+  @ApiOperation({ summary: 'Approve wallet recovery (Admin/Lãnh đạo)' })
+  async approveRecovery(@Param('id') id: number, @Req() req: any) {
+    return this.walletService.approveRecovery(id, req.user.sub);
+  }
+
+  @Post('recovery-request/:id/reject')
+  @ApiOperation({ summary: 'Reject wallet recovery (Admin/Lãnh đạo)' })
+  async rejectRecovery(@Param('id') id: number, @Body() body: { reason: string }, @Req() req: any) {
+    return this.walletService.rejectRecovery(id, req.user.sub, body.reason);
   }
 }

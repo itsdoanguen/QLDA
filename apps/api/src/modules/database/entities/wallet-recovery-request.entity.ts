@@ -42,4 +42,7 @@ export class WalletRecoveryRequest {
 
   @Column({ name: 'resolved_at', type: 'timestamp', nullable: true })
   resolvedAt: Date;
+
+  @Column({ name: 'chain_request_id', nullable: true })
+  chainRequestId: number;
 }

@@ -77,7 +77,7 @@ export class TaxesService {
     const transaction = await this.transactionRepository.findOne({ where: { id: transactionId } });
     if (!transaction) throw new NotFoundException('Transaction not found');
 
-    const amount = transaction.salePrice;
+    const amount = transaction.contractPrice;
 
     const tncn = this.calculateTNCN(amount);
     const registrationFee = this.calculateRegistrationFee(amount);

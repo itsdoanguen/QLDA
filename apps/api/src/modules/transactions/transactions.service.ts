@@ -47,7 +47,7 @@ export class TransactionsService {
       buyerId,
       sellerId,
       status: 'Draft',
-      salePrice,
+      contractPrice: salePrice,
     });
 
     // 4. Update on-chain state: DA_CAP_SO -> DANG_GIAO_DICH
@@ -62,33 +62,49 @@ export class TransactionsService {
       throw new NotFoundException('Transaction not found');
     }
 
-    if (transaction.status !== 'Draft') {
-      throw new BadRequestException('Can only sign draft transactions');
+    if (transaction.status !== 'Draft' && transaction.status !== 'Seller_Signed' && transaction.status !== 'Buyer_Signed') {
+      throw new BadRequestException('Can only sign draft or partially signed transactions');
     }
 
+    let isFullySigned = false;
+
     if (userId === transaction.sellerId) {
-      transaction.sellerSigned = true;
-      transaction.sellerSignedAt = new Date();
+      if (transaction.status === 'Buyer_Signed') {
+        isFullySigned = true;
+      } else if (transaction.status === 'Draft') {
+        transaction.status = 'Seller_Signed';
+      } else {
+        throw new BadRequestException('Seller has already signed');
+      }
     } else if (userId === transaction.buyerId) {
-      transaction.buyerSigned = true;
-      transaction.buyerSignedAt = new Date();
+      if (transaction.status === 'Seller_Signed') {
+        isFullySigned = true;
+      } else if (transaction.status === 'Draft') {
+        transaction.status = 'Buyer_Signed';
+      } else {
+        throw new BadRequestException('Buyer has already signed');
+      }
     } else {
       throw new BadRequestException('User is not a party to this transaction');
     }
 
     // If both signed, move to Pending_Tax and calculate taxes
-    if (transaction.sellerSigned && transaction.buyerSigned) {
+    if (isFullySigned) {
       transaction.status = 'Pending_Tax';
       
       // Calculate and save taxes
       await this.taxesService.calculateAndSaveTransferTaxes(transaction.id);
 
-      // Update NFT owner (Simulating blockchain transfer locally for now)
+      // Update NFT owner on blockchain
       // Task A3: Sync state machine: DANG_GIAO_DICH -> CHUYEN_NHUONG
       await this.blockchainService.completeTransfer(transaction.tokenId);
 
       const buyerWallet = await this.walletRepository.findOne({ where: { userId: transaction.buyerId } });
-      if (buyerWallet) {
+      const sellerWallet = await this.walletRepository.findOne({ where: { userId: transaction.sellerId } });
+      if (buyerWallet && sellerWallet) {
+        // Task A6: Tích hợp Transfer NFT
+        await this.blockchainService.transferNFT(sellerWallet.walletAddress, buyerWallet.walletAddress, transaction.tokenId);
+
         await this.landNftRepository.update({ tokenId: transaction.tokenId }, { ownerWallet: buyerWallet.walletAddress });
       }
     }

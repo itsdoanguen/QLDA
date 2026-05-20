@@ -13,6 +13,8 @@ export class BlockchainService {
   public landRegistryContract: ethers.Contract;
   public landNFTContract: ethers.Contract;
   public multiSigContract: ethers.Contract;
+  public walletOverrideContract: ethers.Contract;
+  public auditLogContract: ethers.Contract;
 
   constructor(private configService: ConfigService<AppEnv>) {
     this.initProvider();
@@ -49,6 +51,20 @@ export class BlockchainService {
       const multiSigAbi = this.getAbiLoader('MultiSigWorkflow');
       this.multiSigContract = new ethers.Contract(multiSigAddress, multiSigAbi, this.signer);
       this.logger.log(`Initialized MultiSigWorkflow contract at: ${multiSigAddress}`);
+    }
+
+    const walletOverrideAddress = this.configService.get<string>('WALLET_OVERRIDE_CONTRACT_ADDRESS');
+    if (walletOverrideAddress) {
+      const walletOverrideAbi = this.getAbiLoader('WalletOverride');
+      this.walletOverrideContract = new ethers.Contract(walletOverrideAddress, walletOverrideAbi, this.signer);
+      this.logger.log(`Initialized WalletOverride contract at: ${walletOverrideAddress}`);
+    }
+
+    const auditLogAddress = this.configService.get<string>('AUDIT_LOG_CONTRACT_ADDRESS');
+    if (auditLogAddress) {
+      const auditLogAbi = this.getAbiLoader('AuditLog');
+      this.auditLogContract = new ethers.Contract(auditLogAddress, auditLogAbi, this.signer);
+      this.logger.log(`Initialized AuditLog contract at: ${auditLogAddress}`);
     }
   }
 
@@ -121,6 +137,19 @@ export class BlockchainService {
       this.logger.error(`Failed to mint NFT on-chain:`, error);
       throw error;
     }
+  }
+
+  public async transferNFT(from: string, to: string, tokenId: string): Promise<string> {
+    this.logger.log(`Transferring NFT ${tokenId} from ${from} to ${to} on-chain`);
+    if (!this.landNFTContract) {
+      throw new Error("LandNFT contract is not initialized");
+    }
+    
+    // Using adminTransfer since backend is the owner of the contract 
+    // and standard transferFrom requires prior user approval on-chain.
+    const tx = await this.landNFTContract.adminTransfer(from, to, tokenId);
+    await tx.wait();
+    return tx.hash;
   }
 
   // --- Task A3: State Machine Transitions ---
@@ -209,6 +238,77 @@ export class BlockchainService {
     const tx = await this.multiSigContract.signTransaction(txId, isApproved, reason || '');
     await tx.wait();
     return tx.hash;
+  }
+
+  public async batchSignMultiSig(txIds: number[], isApproved: boolean[], reasons: string[]): Promise<string> {
+    this.logger.log(`Batch signing MultiSig txs: count=${txIds.length}`);
+    if (!this.multiSigContract) throw new Error("MultiSig contract not initialized");
+    const tx = await this.multiSigContract.batchSignTransactions(txIds, isApproved, reasons);
+    await tx.wait();
+    return tx.hash;
+  }
+
+  // --- Task A7: Wallet Override ---
+
+  public async requestWalletOverride(citizenIdHash: string, newWallet: string): Promise<number> {
+    this.logger.log(`Requesting wallet override on-chain for citizen ${citizenIdHash}`);
+    if (!this.walletOverrideContract) throw new Error("WalletOverride contract not initialized");
+    
+    const tx = await this.walletOverrideContract.requestWalletOverride(citizenIdHash, newWallet);
+    const receipt = await tx.wait();
+    
+    if (receipt && receipt.logs) {
+      for (const log of receipt.logs) {
+        try {
+          const parsedLog = this.walletOverrideContract.interface.parseLog(log);
+          if (parsedLog && parsedLog.name === 'RecoveryRequested') {
+            return Number(parsedLog.args[0]);
+          }
+        } catch (e) {}
+      }
+    }
+    throw new Error("Failed to get requestId from RecoveryRequested event");
+  }
+
+  public async approveWalletOverride(requestId: number, tokenIds: string[]): Promise<string> {
+    this.logger.log(`Approving wallet override on-chain for requestId ${requestId}`);
+    if (!this.walletOverrideContract) throw new Error("WalletOverride contract not initialized");
+    
+    const tx = await this.walletOverrideContract.approveWalletOverride(requestId, tokenIds);
+    await tx.wait();
+    return tx.hash;
+  }
+
+  public async rejectWalletOverride(requestId: number, reason: string): Promise<string> {
+    this.logger.log(`Rejecting wallet override on-chain for requestId ${requestId}`);
+    if (!this.walletOverrideContract) throw new Error("WalletOverride contract not initialized");
+    
+    const tx = await this.walletOverrideContract.rejectWalletOverride(requestId, reason);
+    await tx.wait();
+    return tx.hash;
+  }
+
+  // --- Task A8: Audit Log ---
+  public async recordLogHash(logHash: string): Promise<string> {
+    this.logger.log(`Recording audit log hash on-chain: ${logHash}`);
+    if (!this.auditLogContract) throw new Error("AuditLog contract not initialized");
+    
+    const tx = await this.auditLogContract.recordLogHash(logHash);
+    await tx.wait();
+    return tx.hash;
+  }
+
+  // --- Task A9: Pre-check ---
+  public async canTransact(tokenId: string): Promise<boolean> {
+    this.logger.log(`Checking canTransact on-chain for token ${tokenId}`);
+    if (!this.landRegistryContract) throw new Error("LandRegistry contract not initialized");
+    return this.landRegistryContract.canTransact(tokenId);
+  }
+
+  public async isBlocked(tokenId: string): Promise<boolean> {
+    this.logger.log(`Checking isBlocked on-chain for token ${tokenId}`);
+    if (!this.landRegistryContract) throw new Error("LandRegistry contract not initialized");
+    return this.landRegistryContract.isBlocked(tokenId);
   }
 
   public registerEventSyncHook(eventName: string, callback: (eventData: any) => void) {

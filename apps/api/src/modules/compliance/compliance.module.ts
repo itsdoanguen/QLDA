@@ -7,11 +7,13 @@ import { ComplianceController } from './compliance.controller';
 import { ComplianceService } from './compliance.service';
 
 import { AuthModule } from '../auth/auth.module';
+import { BlockchainModule } from '../blockchain/blockchain.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Dispute, Mortgage, PlanningZone]),
     AuthModule,
+    BlockchainModule,
   ],
   controllers: [ComplianceController],
   providers: [ComplianceService],
