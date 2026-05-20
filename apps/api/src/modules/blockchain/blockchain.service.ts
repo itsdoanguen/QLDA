@@ -353,6 +353,12 @@ export class BlockchainService {
     return this.landRegistryContract.isBlocked(tokenId);
   }
 
+  public async getLandMetadata(tokenId: string): Promise<string> {
+    this.logger.log(`Fetching metadata URI on-chain for token ${tokenId}`);
+    if (!this.landRegistryContract) throw new Error('LandRegistry contract is not initialized');
+    return await this.landRegistryContract.getLandMetadata(tokenId);
+  }
+
   public registerEventSyncHook(eventName: string, callback: (eventData: any) => void) {
     this.logger.log(`Registering sync hook for event: ${eventName}`);
     if (this.landRegistryContract) {

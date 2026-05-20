@@ -45,6 +45,7 @@ contract LandRegistry is Ownable, Pausable {
         uint256 tokenId;
         LandStatus status;
         string rejectReason; // Lý do từ chối (nếu có)
+        string metadataUri; // metadata URI / IPFS CID
         uint256 createdAt;
         uint256 updatedAt;
     }
@@ -106,6 +107,7 @@ contract LandRegistry is Ownable, Pausable {
             tokenId: tokenId,
             status: LandStatus.KHOI_TAO,
             rejectReason: "",
+            metadataUri: tokenURI,
             createdAt: block.timestamp,
             updatedAt: block.timestamp
         });
@@ -215,6 +217,14 @@ contract LandRegistry is Ownable, Pausable {
     function getLandStatus(uint256 tokenId) external view returns (LandStatus) {
         _requireRegistered(tokenId);
         return lands[tokenId].status;
+    }
+
+    /**
+     * @dev Returns the metadata URI (tokenURI / IPFS CID) for a land parcel.
+     */
+    function getLandMetadata(uint256 tokenId) external view returns (string memory) {
+        _requireRegistered(tokenId);
+        return lands[tokenId].metadataUri;
     }
 
     /**
