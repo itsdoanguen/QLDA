@@ -1,13 +1,16 @@
-import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LandRecord } from '../database/entities/land-record.entity';
 import { LandNFT } from '../database/entities/land-nft.entity';
+import { LandFile } from '../database/entities/land-file.entity';
 import { Wallet } from '../database/entities/wallet.entity';
 import { BlockchainLog } from '../database/entities/blockchain-log.entity';
 import { LandRecordStatus } from '../../common/enums/land-record-status.enum';
 import { BlockchainService } from '../blockchain/blockchain.service';
 import { ConfigService } from '@nestjs/config';
+import { IPFS_CLIENT } from '../ipfs/ipfs.constants';
+import { IpfsClient, NftMetadata } from '../ipfs/ipfs.types';
 
 @Injectable()
 export class NftService {
@@ -18,12 +21,16 @@ export class NftService {
     private readonly landRecordRepository: Repository<LandRecord>,
     @InjectRepository(LandNFT)
     private readonly landNftRepository: Repository<LandNFT>,
+    @InjectRepository(LandFile)
+    private readonly landFileRepository: Repository<LandFile>,
     @InjectRepository(Wallet)
     private readonly walletRepository: Repository<Wallet>,
     @InjectRepository(BlockchainLog)
     private readonly blockchainLogRepository: Repository<BlockchainLog>,
     private readonly blockchainService: BlockchainService,
     private readonly configService: ConfigService,
+    @Inject(IPFS_CLIENT)
+    private readonly ipfsClient: IpfsClient,
   ) {}
 
   async mint(recordId: number): Promise<LandNFT> {
@@ -54,8 +61,8 @@ export class NftService {
 
     this.logger.log(`Starting minting process for Record ${recordId}`);
 
-    // 1. Prepare Metadata (IPFS URL - will be updated when Pinata is fully integrated)
-    const metadataUrl = `ipfs://placeholder_metadata_${recordId}`;
+    // 1. Build NFT Metadata & upload to IPFS via Pinata
+    const metadataUrl = await this.buildAndUploadMetadata(record);
 
     // 2. Call Blockchain Service to Mint NFT via LandRegistry (Real on-chain transaction)
     let mintResult: { tokenId: string; txHash: string };
@@ -109,6 +116,51 @@ export class NftService {
     await this.landRecordRepository.save(record);
 
     return savedNft;
+  }
+
+  /**
+   * Builds ERC-721–compliant NFT metadata from the LandRecord,
+   * uploads it as JSON to IPFS (Pinata), and returns the ipfs:// URI.
+   */
+  private async buildAndUploadMetadata(record: LandRecord): Promise<string> {
+    // Look up any attached scan files for the "image" field
+    const files = await this.landFileRepository.find({
+      where: { recordId: record.id },
+      order: { createdAt: 'DESC' },
+    });
+
+    // Use the first uploaded file's CID as the NFT image (scan sổ đỏ)
+    const imageCid = files.length > 0 ? files[0].ipfsCid : undefined;
+
+    const ownerName = record.owner?.fullName ?? `Owner #${record.ownerId}`;
+
+    const metadata: NftMetadata = {
+      name: `Land Record - ${ownerName}`,
+      description: `Official Land Registry NFT for property located at ${record.address}`,
+      image: imageCid ? `ipfs://${imageCid}` : undefined,
+      attributes: [
+        { trait_type: 'ownerName', value: ownerName },
+        { trait_type: 'location', value: record.address },
+        { trait_type: 'area', value: Number(record.area) },
+        { trait_type: 'landType', value: record.landType ?? 'N/A' },
+        { trait_type: 'plotNumber', value: record.plotNumber ?? 'N/A' },
+        { trait_type: 'parcelNumber', value: record.parcelNumber ?? 'N/A' },
+        { trait_type: 'recordId', value: record.id },
+      ],
+    };
+
+    // Upload JSON metadata to IPFS
+    const sanitizedName = ownerName.replace(/\s+/g, '_');
+    const result = await this.ipfsClient.uploadJson({
+      json: metadata as unknown as Record<string, unknown>,
+      name: `${sanitizedName}_record_${record.id}_metadata.json`,
+    });
+
+    this.logger.log(
+      `NFT metadata uploaded to IPFS: CID=${result.cid} (${result.attempts} attempt(s))`,
+    );
+
+    return `ipfs://${result.cid}`;
   }
 
   async getByTokenId(tokenId: string): Promise<LandNFT> {

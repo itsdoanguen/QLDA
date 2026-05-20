@@ -3,7 +3,9 @@ import { ConfigService } from '@nestjs/config';
 import axios, { AxiosInstance } from 'axios';
 import * as FormData from 'form-data';
 
-import { IpfsClient, IpfsUploadInput, IpfsUploadResult } from './ipfs.types';
+import { IpfsClient, IpfsUploadInput, IpfsUploadResult, IpfsJsonUploadInput } from './ipfs.types';
+
+const MAX_RETRIES = 3;
 
 @Injectable()
 export class PinataIpfsClient implements IpfsClient {
@@ -40,16 +42,46 @@ export class PinataIpfsClient implements IpfsClient {
     });
     form.append('pinataMetadata', metadata);
 
+    return this.postWithRetry(
+      '/pinning/pinFileToIPFS',
+      form,
+      { ...form.getHeaders(), },
+    );
+  }
+
+  async uploadJson(input: IpfsJsonUploadInput): Promise<IpfsUploadResult> {
+    const body = {
+      pinataMetadata: {
+        name: input.name,
+      },
+      pinataContent: input.json,
+    };
+
+    return this.postWithRetry(
+      '/pinning/pinJSONToIPFS',
+      body,
+      { 'Content-Type': 'application/json' },
+    );
+  }
+
+  /**
+   * Shared retry logic for all Pinata API calls.
+   * Retries on 429 (rate limit), 5xx (server error), or network issues.
+   * Uses exponential backoff between retries.
+   */
+  private async postWithRetry(
+    url: string,
+    data: any,
+    extraHeaders: Record<string, string>,
+  ): Promise<IpfsUploadResult> {
     let attempts = 0;
     let lastError: any = null;
 
-    while (attempts < 3) {
+    while (attempts < MAX_RETRIES) {
       attempts += 1;
       try {
-        const response = await this.axiosInstance.post('/pinning/pinFileToIPFS', form, {
-          headers: {
-            ...form.getHeaders(),
-          },
+        const response = await this.axiosInstance.post(url, data, {
+          headers: extraHeaders,
           maxBodyLength: Infinity,
         });
 
@@ -64,7 +96,7 @@ export class PinataIpfsClient implements IpfsClient {
         // Retry only for 429 (Too Many Requests), 5xx (Server Error), or network issues
         const isRetryable = status === 429 || (status >= 500 && status <= 599) || !status;
         
-        if (!isRetryable || attempts >= 3) {
+        if (!isRetryable || attempts >= MAX_RETRIES) {
           this.logger.error(
             `IPFS upload failed: ${error.message}`,
             error.response?.data,
@@ -72,9 +104,8 @@ export class PinataIpfsClient implements IpfsClient {
           break;
         }
 
-
         this.logger.warn(`IPFS upload attempt ${attempts} failed, retrying...`);
-        // Exponential backoff or simple delay
+        // Exponential backoff
         await new Promise((resolve) => setTimeout(resolve, 1000 * attempts));
       }
     }
