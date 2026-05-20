@@ -72,6 +72,7 @@ function writeDeploymentFile(addresses, chainId) {
     deployedAt: new Date().toISOString(),
     contracts: {
       LandNFT: addresses.LandNFT,
+      AccessControl: addresses.AccessControl,
       LandRegistry: addresses.LandRegistry,
       MultiSigWorkflow: addresses.MultiSigWorkflow,
       WalletOverride: addresses.WalletOverride,
@@ -161,6 +162,13 @@ async function main() {
   console.log("\n[1/5] LandNFT (ERC-721)");
   const landNFT = await deploySimple("LandNFT", wallet);
   addresses.LandNFT = landNFT.address;
+
+  // ─────────────────────────────────────────────
+  // Step 1.5: Deploy AccessControl (RBAC)
+  // ─────────────────────────────────────────────
+  console.log("\n[1.5/7] AccessControl (RBAC)");
+  const accessControl = await deploySimple("AccessControl", wallet);
+  addresses.AccessControl = accessControl.address;
 
   // ─────────────────────────────────────────────
   // Step 2: Deploy LandRegistry (depends on LandNFT)

@@ -17,6 +17,7 @@ export class BlockchainService {
   public auditLogContract: ethers.Contract;
   public eContractContract: ethers.Contract;
   public receiptContract: ethers.Contract;
+  public accessControlContract: ethers.Contract;
 
   constructor(private configService: ConfigService<AppEnv>) {
     this.initProvider();
@@ -81,6 +82,13 @@ export class BlockchainService {
       const receiptAbi = this.getAbiLoader('Receipt');
       this.receiptContract = new ethers.Contract(receiptAddress, receiptAbi, this.signer);
       this.logger.log(`Initialized Receipt contract at: ${receiptAddress}`);
+    }
+
+    const accessControlAddress = this.configService.get<string>('ACCESS_CONTROL_CONTRACT_ADDRESS');
+    if (accessControlAddress) {
+      const accessControlAbi = this.getAbiLoader('AccessControl');
+      this.accessControlContract = new ethers.Contract(accessControlAddress, accessControlAbi, this.signer);
+      this.logger.log(`Initialized AccessControl contract at: ${accessControlAddress}`);
     }
   }
 
