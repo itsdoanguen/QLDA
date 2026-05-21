@@ -343,4 +343,69 @@ export class NftService {
       },
     };
   }
+
+  async getProvenance(tokenId: string): Promise<any> {
+    await this.getByTokenId(tokenId);
+
+    const rawEvents = await this.blockchainService.getLandNftEvents(tokenId);
+
+    const StatusMap: Record<number, string> = {
+      0: 'KHOI_TAO',
+      1: 'CHO_DUYET',
+      2: 'DA_CAP_SO',
+      3: 'TU_CHOI',
+      4: 'DANG_GIAO_DICH',
+      5: 'CHUYEN_NHUONG',
+      6: 'THE_CHAP',
+      7: 'TRANH_CHAP',
+    };
+
+    const StatusLabelMap: Record<number, string> = {
+      0: 'Khởi tạo',
+      1: 'Chờ duyệt',
+      2: 'Đã cấp số (Bình thường)',
+      3: 'Từ chối',
+      4: 'Đang giao dịch',
+      5: 'Chuyển nhượng',
+      6: 'Thế chấp',
+      7: 'Tranh chấp',
+    };
+
+    const events = rawEvents.map(event => {
+      let description = '';
+      const isoTimestamp = new Date(event.timestamp * 1000).toISOString();
+
+      if (event.type === 'LandCreated') {
+        description = `Hồ sơ đất đai được số hóa thành công trên Blockchain. Địa chỉ ví sở hữu ban đầu: ${event.owner}`;
+      } else if (event.type === 'Transfer') {
+        if (event.from === '0x0000000000000000000000000000000000000000') {
+          description = `NFT được đúc (mint) sang ví: ${event.to}`;
+        } else {
+          description = `Chuyển quyền sở hữu từ ví ${event.from} sang ví ${event.to}`;
+        }
+      } else if (event.type === 'LandStatusChanged') {
+        const oldLabel = StatusLabelMap[event.oldStatus] ?? 'Không rõ';
+        const newLabel = StatusLabelMap[event.newStatus] ?? 'Không rõ';
+        description = `Thay đổi trạng thái từ [${oldLabel}] sang [${newLabel}]`;
+      }
+
+      return {
+        type: event.type,
+        blockNumber: event.blockNumber,
+        transactionHash: event.transactionHash,
+        timestamp: isoTimestamp,
+        oldStatus: event.oldStatus !== undefined ? StatusMap[event.oldStatus] : undefined,
+        newStatus: event.newStatus !== undefined ? StatusMap[event.newStatus] : undefined,
+        from: event.from,
+        to: event.to,
+        metadataUri: event.metadataUri,
+        description,
+      };
+    });
+
+    return {
+      tokenId,
+      events,
+    };
+  }
 }

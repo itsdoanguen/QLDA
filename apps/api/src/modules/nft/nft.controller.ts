@@ -13,6 +13,7 @@ import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { RequireRoles } from '../../common/decorators/roles.decorator';
 import { NftVerifyResponseDto } from './dto/nft-verify.dto';
+import { NftProvenanceResponseDto } from './dto/nft-provenance.dto';
 
 @ApiTags('NFT')
 @Controller('nft')
@@ -37,6 +38,16 @@ export class NftController {
   @ApiOkResponse({ type: NftVerifyResponseDto })
   async verifyQr(@Query('qrData') qrData: string) {
     return this.nftService.verifyNft(qrData);
+  }
+
+  @Get(':tokenId/provenance')
+  @ApiOperation({
+    summary: 'Get land NFT provenance timeline (Public endpoint)',
+    description: 'Truy vấn các sự kiện lịch sử biến động của thửa đất từ blockchain bao gồm: đúc NFT, thay đổi trạng thái (cấp sổ, thế chấp, giải chấp, tranh chấp...) và chuyển nhượng sở hữu.'
+  })
+  @ApiOkResponse({ type: NftProvenanceResponseDto })
+  async getProvenance(@Param('tokenId') tokenId: string) {
+    return this.nftService.getProvenance(tokenId);
   }
 
   @Get(':tokenId')

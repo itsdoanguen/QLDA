@@ -438,4 +438,98 @@ export class BlockchainService {
       timestamp: Number(res[3]),
     };
   }
+
+  public async getLandNftEvents(tokenId: string): Promise<any[]> {
+    this.logger.log(`Querying events for tokenId ${tokenId}`);
+    if (!this.landRegistryContract || !this.landNFTContract) {
+      throw new Error("Blockchain contracts not fully initialized");
+    }
+
+    const tokenIdBigInt = BigInt(tokenId);
+
+    const statusChangedFilter = this.landRegistryContract.filters.LandStatusChanged(tokenIdBigInt);
+    const landCreatedFilter = this.landRegistryContract.filters.LandCreated(tokenIdBigInt);
+    const transferFilter = this.landNFTContract.filters.Transfer(null, null, tokenIdBigInt);
+
+    const [statusEvents, createdEvents, transferEvents] = await Promise.all([
+      this.landRegistryContract.queryFilter(statusChangedFilter),
+      this.landRegistryContract.queryFilter(landCreatedFilter),
+      this.landNFTContract.queryFilter(transferFilter),
+    ]);
+
+    const allEvents: any[] = [];
+    const blockCache = new Map<number, number>();
+
+    const getBlockTimestamp = async (blockNumber: number): Promise<number> => {
+      if (blockCache.has(blockNumber)) {
+        return blockCache.get(blockNumber)!;
+      }
+      try {
+        const block = await this.provider.getBlock(blockNumber);
+        const ts = block ? block.timestamp : Math.floor(Date.now() / 1000);
+        blockCache.set(blockNumber, ts);
+        return ts;
+      } catch (err) {
+        this.logger.warn(`Failed to get block ${blockNumber}:`, err);
+        return Math.floor(Date.now() / 1000);
+      }
+    };
+
+    for (const event of createdEvents) {
+      const eventLog = event as any;
+      const timestamp = await getBlockTimestamp(eventLog.blockNumber);
+      allEvents.push({
+        type: 'LandCreated',
+        blockNumber: eventLog.blockNumber,
+        transactionHash: eventLog.transactionHash,
+        transactionIndex: eventLog.transactionIndex ?? 0,
+        logIndex: eventLog.index ?? 0,
+        timestamp,
+        owner: eventLog.args[1],
+        metadataUri: eventLog.args[2],
+      });
+    }
+
+    for (const event of statusEvents) {
+      const eventLog = event as any;
+      const timestamp = await getBlockTimestamp(eventLog.blockNumber);
+      allEvents.push({
+        type: 'LandStatusChanged',
+        blockNumber: eventLog.blockNumber,
+        transactionHash: eventLog.transactionHash,
+        transactionIndex: eventLog.transactionIndex ?? 0,
+        logIndex: eventLog.index ?? 0,
+        timestamp,
+        oldStatus: Number(eventLog.args[1]),
+        newStatus: Number(eventLog.args[2]),
+      });
+    }
+
+    for (const event of transferEvents) {
+      const eventLog = event as any;
+      const timestamp = await getBlockTimestamp(eventLog.blockNumber);
+      allEvents.push({
+        type: 'Transfer',
+        blockNumber: eventLog.blockNumber,
+        transactionHash: eventLog.transactionHash,
+        transactionIndex: eventLog.transactionIndex ?? 0,
+        logIndex: eventLog.index ?? 0,
+        timestamp,
+        from: eventLog.args[0],
+        to: eventLog.args[1],
+      });
+    }
+
+    allEvents.sort((a, b) => {
+      if (a.blockNumber !== b.blockNumber) {
+        return a.blockNumber - b.blockNumber;
+      }
+      if (a.transactionIndex !== b.transactionIndex) {
+        return a.transactionIndex - b.transactionIndex;
+      }
+      return a.logIndex - b.logIndex;
+    });
+
+    return allEvents;
+  }
 }
