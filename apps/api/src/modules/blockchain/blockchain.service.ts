@@ -373,6 +373,18 @@ export class BlockchainService {
     return await this.planningRegistryContract.isTokenInDanger(tokenId);
   }
 
+  public async getNftOwner(tokenId: string): Promise<string> {
+    this.logger.log(`Querying ownerOf on-chain for token ${tokenId}`);
+    if (!this.landNFTContract) throw new Error('LandNFT contract is not initialized');
+    return await this.landNFTContract.ownerOf(tokenId);
+  }
+
+  public async getNftTokenUri(tokenId: string): Promise<string> {
+    this.logger.log(`Querying tokenURI on-chain for token ${tokenId}`);
+    if (!this.landNFTContract) throw new Error('LandNFT contract is not initialized');
+    return await this.landNFTContract.tokenURI(tokenId);
+  }
+
   public registerEventSyncHook(eventName: string, callback: (eventData: any) => void) {
     this.logger.log(`Registering sync hook for event: ${eventName}`);
     if (this.landRegistryContract) {
