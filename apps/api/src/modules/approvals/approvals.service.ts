@@ -65,13 +65,17 @@ export class ApprovalsService {
     await this.signatureRepository.save(signature);
 
     // Task A4: Tích hợp Multi-sig on-chain
+    let signTxHash: string;
     try {
       const txId = await this.blockchainService.getOrCreateMultiSigTx(recordId.toString());
-      await this.blockchainService.signMultiSig(txId, true, reason || 'Lãnh đạo phê duyệt');
+      signTxHash = await this.blockchainService.signMultiSig(txId, true, reason || 'Lãnh đạo phê duyệt');
     } catch (error) {
-      // In production, we should rollback or throw error. We'll throw to abort the transaction.
       throw new BadRequestException('Lỗi khi ký Multi-sig trên blockchain: ' + (error as Error).message);
     }
+
+    // Save chain tx hash on signature record
+    signature.signTxHash = signTxHash;
+    await this.signatureRepository.save(signature);
 
     // 3. Update record status
     record.status = LandRecordStatus.LEADER_SIGNED;
@@ -120,12 +124,17 @@ export class ApprovalsService {
     await this.signatureRepository.save(signature);
 
     // Task A4: Tích hợp Multi-sig on-chain
+    let rejectTxHash: string;
     try {
       const txId = await this.blockchainService.getOrCreateMultiSigTx(recordId.toString());
-      await this.blockchainService.signMultiSig(txId, false, reason);
+      rejectTxHash = await this.blockchainService.signMultiSig(txId, false, reason);
     } catch (error) {
       throw new BadRequestException('Lỗi khi từ chối Multi-sig trên blockchain: ' + (error as Error).message);
     }
+
+    // Save chain tx hash on signature record
+    signature.signTxHash = rejectTxHash;
+    await this.signatureRepository.save(signature);
 
     // 3. Update record status - return to Needs Supplement so Cán bộ or Citizen can fix
     record.status = LandRecordStatus.NEEDS_SUPPLEMENT;
@@ -136,12 +145,14 @@ export class ApprovalsService {
   async batchSign(
     batchData: { recordId: number; isApproved: boolean; reason?: string }[],
     userId: number,
-  ): Promise<any[]> {
-    const results = [];
+  ) {
+    const results: { recordId: number; success: boolean; decision?: string; error?: string }[] = [];
     const txIds: number[] = [];
     const isApprovedArr: boolean[] = [];
     const reasonsArr: string[] = [];
+    const signatureRecords: Signature[] = [];
 
+    // Phase 1: Validate and prepare all records, create DB entries
     for (const item of batchData) {
       try {
         if (!item.isApproved && !item.reason) {
@@ -173,20 +184,25 @@ export class ApprovalsService {
           await this.approvalRequestRepository.save(request);
         }
 
+        const reasonText = item.reason || (item.isApproved ? 'Lãnh đạo phê duyệt hàng loạt' : '');
+
         const signature = this.signatureRepository.create({
           requestId: request.id,
           userId,
           decision: requestStatus,
-          reason: item.reason || (item.isApproved ? 'Lãnh đạo phê duyệt hàng loạt' : ''),
+          reason: reasonText,
           signedAt: new Date(),
         });
         await this.signatureRepository.save(signature);
+        signatureRecords.push(signature);
 
+        // Prepare on-chain multi-sig tx
         const txId = await this.blockchainService.getOrCreateMultiSigTx(item.recordId.toString());
         txIds.push(txId);
         isApprovedArr.push(item.isApproved);
-        reasonsArr.push(item.reason || (item.isApproved ? 'Lãnh đạo phê duyệt hàng loạt' : ''));
+        reasonsArr.push(reasonText);
 
+        // Update record status in DB
         if (item.isApproved) {
           record.status = LandRecordStatus.LEADER_SIGNED;
         } else {
@@ -196,21 +212,41 @@ export class ApprovalsService {
         }
         await this.landRecordRepository.save(record);
         
-        results.push({ recordId: item.recordId, success: true });
+        results.push({ recordId: item.recordId, success: true, decision: requestStatus });
       } catch (error) {
         results.push({ recordId: item.recordId, success: false, error: (error as Error).message });
       }
     }
 
+    // Phase 2: Execute batch signing on-chain in a single transaction
+    let batchTxHash: string | undefined;
     if (txIds.length > 0) {
       try {
-        await this.blockchainService.batchSignMultiSig(txIds, isApprovedArr, reasonsArr);
+        batchTxHash = await this.blockchainService.batchSignMultiSig(txIds, isApprovedArr, reasonsArr);
+
+        // Save the batch tx hash on all signature records
+        for (const sig of signatureRecords) {
+          sig.signTxHash = batchTxHash;
+          await this.signatureRepository.save(sig);
+        }
       } catch (error) {
-        throw new BadRequestException('Lỗi khi ký hàng loạt trên blockchain: ' + (error as Error).message);
+        // On-chain batch signing failed — DB is already updated.
+        // In production, consider rolling back DB changes or flagging for retry.
+        throw new BadRequestException(
+          'Lỗi khi ký hàng loạt trên blockchain: ' + (error as Error).message
+          + '. Lưu ý: DB đã được cập nhật, cần đối soát thủ công.',
+        );
       }
     }
 
-    return results;
+    const totalSuccess = results.filter(r => r.success).length;
+    return {
+      results,
+      batchTxHash,
+      totalProcessed: results.length,
+      totalSuccess,
+      totalFailed: results.length - totalSuccess,
+    };
   }
 
   async getStats() {
