@@ -417,6 +417,26 @@ export class BlockchainService {
     }
   }
 
+  public registerMultiSigSyncHook(eventName: string, callback: (eventData: any) => void) {
+    this.logger.log(`Registering MultiSig sync hook for event: ${eventName}`);
+    if (this.multiSigContract) {
+      this.multiSigContract.on(eventName, (...args) => {
+        const eventLog = args[args.length - 1];
+        callback({ args: args.slice(0, args.length - 1), eventLog });
+      });
+    }
+  }
+
+  public registerWalletOverrideSyncHook(eventName: string, callback: (eventData: any) => void) {
+    this.logger.log(`Registering WalletOverride sync hook for event: ${eventName}`);
+    if (this.walletOverrideContract) {
+      this.walletOverrideContract.on(eventName, (...args) => {
+        const eventLog = args[args.length - 1];
+        callback({ args: args.slice(0, args.length - 1), eventLog });
+      });
+    }
+  }
+
   public async recordReceipt(txHash: string, payer: string, amountWei: string | number | bigint, receiptCID: string): Promise<string> {
     this.logger.log(`Recording receipt on-chain for tx ${txHash}, payer ${payer}, amount ${amountWei}`);
     if (!this.receiptContract) throw new Error('Receipt contract not initialized');
