@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ethers } from 'ethers';
 import { BlockchainService } from './blockchain.service';
 import { LandRecord } from '../database/entities/land-record.entity';
 import { LandNFT } from '../database/entities/land-nft.entity';
@@ -47,9 +48,18 @@ export class BlockchainEventService implements OnModuleInit {
           const receipt = await provider.getTransactionReceipt(txHash);
           const block = await provider.getBlock(receipt.blockNumber);
           
-          let gasFee = 0;
-          if (receipt.gasUsed && receipt.gasPrice) {
-            gasFee = Number(receipt.gasUsed * receipt.gasPrice) / 1e18; // Convert to ETH
+          let gasFee: string | number = 0;
+          try {
+            const gasUsed = BigInt(receipt.gasUsed.toString());
+            const gasPriceSource = receipt.effectiveGasPrice ?? receipt.gasPrice ?? 0;
+            const gasPrice = gasPriceSource ? BigInt(gasPriceSource.toString()) : 0n;
+            if (gasUsed > 0n && gasPrice > 0n) {
+              const wei = gasUsed * gasPrice;
+              gasFee = ethers.formatEther(wei); // string in ETH
+            }
+          } catch (e) {
+            this.logger.warn('Unable to compute gas fee from receipt', e as any);
+            gasFee = 0;
           }
 
           log = this.blockchainLogRepo.create({
