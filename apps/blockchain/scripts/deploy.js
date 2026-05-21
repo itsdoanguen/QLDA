@@ -63,7 +63,7 @@ function getExpectedChainId() {
 
 /**
  * Writes the deployment result to deployed-address.json.
- * Contains addresses for all 5 contracts plus metadata.
+ * Contains addresses for all deployed contracts plus metadata.
  */
 function writeDeploymentFile(addresses, chainId) {
   const outputPath = path.join(__dirname, "..", "deployed-address.json");
@@ -79,6 +79,7 @@ function writeDeploymentFile(addresses, chainId) {
       AuditLog: addresses.AuditLog,
       EContract: addresses.EContract,
       Receipt: addresses.Receipt,
+      PlanningRegistry: addresses.PlanningRegistry,
     },
   };
 
@@ -90,8 +91,8 @@ function writeDeploymentFile(addresses, chainId) {
 /**
  * Deploys a contract with no constructor arguments.
  */
-async function deploySimple(contractName, wallet) {
-  const artifact = loadArtifact(contractName);
+async function deploySimple(contractName, wallet, subDir) {
+  const artifact = loadArtifact(contractName, subDir);
   const factory = new ethers.ContractFactory(
     artifact.abi,
     artifact.bytecode,
@@ -167,7 +168,7 @@ async function main() {
   // Step 1.5: Deploy AccessControl (RBAC)
   // ─────────────────────────────────────────────
   console.log("\n[1.5/7] AccessControl (RBAC)");
-  const accessControl = await deploySimple("AccessControl", wallet);
+  const accessControl = await deploySimple("AccessControl", wallet, "utils");
   addresses.AccessControl = accessControl.address;
 
   // ─────────────────────────────────────────────
