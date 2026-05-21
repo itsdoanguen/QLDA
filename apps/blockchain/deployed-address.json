@@ -1,5 +1,11 @@
 {
-  "contractAddress": "0x2BafCC5274a46af43C49Fc77Df7465Aa16e88f5b",
   "chainId": 11155111,
-  "deployedAt": "2026-04-27T08:41:14.076Z"
+  "deployedAt": "2026-05-20T06:25:39.627Z",
+  "contracts": {
+    "LandNFT": "0xefB783C7a37196c35525Aa79429B2F301108f75d",
+    "LandRegistry": "0x2F8DA984dd0704BbB569026966C857536ff97E80",
+    "MultiSigWorkflow": "0x0A57813264023E769d3C074a3182b90c4ede41e7",
+    "WalletOverride": "0x8f9BCc9b743A465BACDFE8452db5108613AfC5cf",
+    "AuditLog": "0x994e97B1930088D4747d8E9037Cd3cB16C771F1F"
+  }
 }

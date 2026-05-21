@@ -15,6 +15,10 @@ export class BlockchainService {
   public multiSigContract: ethers.Contract;
   public walletOverrideContract: ethers.Contract;
   public auditLogContract: ethers.Contract;
+  public eContractContract: ethers.Contract;
+  public receiptContract: ethers.Contract;
+  public accessControlContract: ethers.Contract;
+  public planningRegistryContract: ethers.Contract;
 
   constructor(private configService: ConfigService<AppEnv>) {
     this.initProvider();
@@ -65,6 +69,34 @@ export class BlockchainService {
       const auditLogAbi = this.getAbiLoader('AuditLog');
       this.auditLogContract = new ethers.Contract(auditLogAddress, auditLogAbi, this.signer);
       this.logger.log(`Initialized AuditLog contract at: ${auditLogAddress}`);
+    }
+
+    const eContractAddress = this.configService.get<string>('ECONTRACT_CONTRACT_ADDRESS');
+    if (eContractAddress) {
+      const eContractAbi = this.getAbiLoader('EContract');
+      this.eContractContract = new ethers.Contract(eContractAddress, eContractAbi, this.signer);
+      this.logger.log(`Initialized EContract contract at: ${eContractAddress}`);
+    }
+
+    const receiptAddress = this.configService.get<string>('RECEIPT_CONTRACT_ADDRESS');
+    if (receiptAddress) {
+      const receiptAbi = this.getAbiLoader('Receipt');
+      this.receiptContract = new ethers.Contract(receiptAddress, receiptAbi, this.signer);
+      this.logger.log(`Initialized Receipt contract at: ${receiptAddress}`);
+    }
+
+    const accessControlAddress = this.configService.get<string>('ACCESS_CONTROL_CONTRACT_ADDRESS');
+    if (accessControlAddress) {
+      const accessControlAbi = this.getAbiLoader('AccessControl');
+      this.accessControlContract = new ethers.Contract(accessControlAddress, accessControlAbi, this.signer);
+      this.logger.log(`Initialized AccessControl contract at: ${accessControlAddress}`);
+    }
+
+    const planningRegistryAddress = this.configService.get<string>('PLANNING_REGISTRY_CONTRACT_ADDRESS');
+    if (planningRegistryAddress) {
+      const planningAbi = this.getAbiLoader('PlanningRegistry');
+      this.planningRegistryContract = new ethers.Contract(planningRegistryAddress, planningAbi, this.signer);
+      this.logger.log(`Initialized PlanningRegistry contract at: ${planningRegistryAddress}`);
     }
   }
 
@@ -248,6 +280,24 @@ export class BlockchainService {
     return tx.hash;
   }
 
+  // --- BC-5: Revoke / Revert Signatures ---
+
+  public async revokeMySignature(txId: number): Promise<string> {
+    this.logger.log(`Revoking my signature for multisig tx ${txId}`);
+    if (!this.multiSigContract) throw new Error("MultiSig contract not initialized");
+    const tx = await this.multiSigContract.revokeMySignature(txId);
+    await tx.wait();
+    return tx.hash;
+  }
+
+  public async adminRevertTransaction(txId: number): Promise<string> {
+    this.logger.log(`Admin reverting multisig tx ${txId} to PENDING`);
+    if (!this.multiSigContract) throw new Error("MultiSig contract not initialized");
+    const tx = await this.multiSigContract.adminRevertTransaction(txId);
+    await tx.wait();
+    return tx.hash;
+  }
+
   // --- Task A7: Wallet Override ---
 
   public async requestWalletOverride(citizenIdHash: string, newWallet: string): Promise<number> {
@@ -311,6 +361,18 @@ export class BlockchainService {
     return this.landRegistryContract.isBlocked(tokenId);
   }
 
+  public async getLandMetadata(tokenId: string): Promise<string> {
+    this.logger.log(`Fetching metadata URI on-chain for token ${tokenId}`);
+    if (!this.landRegistryContract) throw new Error('LandRegistry contract is not initialized');
+    return await this.landRegistryContract.getLandMetadata(tokenId);
+  }
+
+  public async isTokenInDangerZone(tokenId: string): Promise<boolean> {
+    this.logger.log(`Checking planning danger zone for token ${tokenId}`);
+    if (!this.planningRegistryContract) throw new Error('PlanningRegistry contract is not initialized');
+    return await this.planningRegistryContract.isTokenInDanger(tokenId);
+  }
+
   public registerEventSyncHook(eventName: string, callback: (eventData: any) => void) {
     this.logger.log(`Registering sync hook for event: ${eventName}`);
     if (this.landRegistryContract) {
@@ -320,5 +382,48 @@ export class BlockchainService {
         callback({ args: args.slice(0, args.length - 1), eventLog });
       });
     }
+  }
+
+  public registerEContractSyncHook(eventName: string, callback: (eventData: any) => void) {
+    this.logger.log(`Registering EContract sync hook for event: ${eventName}`);
+    if (this.eContractContract) {
+      this.eContractContract.on(eventName, (...args) => {
+        // Last argument in ethers v6 event callback is the EventLog object
+        const eventLog = args[args.length - 1];
+        callback({ args: args.slice(0, args.length - 1), eventLog });
+      });
+    }
+  }
+
+  public registerReceiptSyncHook(eventName: string, callback: (eventData: any) => void) {
+    this.logger.log(`Registering Receipt sync hook for event: ${eventName}`);
+    if (this.receiptContract) {
+      this.receiptContract.on(eventName, (...args) => {
+        const eventLog = args[args.length - 1];
+        callback({ args: args.slice(0, args.length - 1), eventLog });
+      });
+    }
+  }
+
+  public async recordReceipt(txHash: string, payer: string, amountWei: string | number | bigint, receiptCID: string): Promise<string> {
+    this.logger.log(`Recording receipt on-chain for tx ${txHash}, payer ${payer}, amount ${amountWei}`);
+    if (!this.receiptContract) throw new Error('Receipt contract not initialized');
+    // txHash is expected to be bytes32 hex string (0x...)
+    const tx = await this.receiptContract.recordReceipt(txHash, payer, BigInt(amountWei.toString()), receiptCID);
+    await tx.wait();
+    return tx.hash;
+  }
+
+  public async getReceipt(txHash: string): Promise<{ payer: string; amount: string; receiptCID: string; timestamp: number }> {
+    this.logger.log(`Fetching receipt on-chain for tx ${txHash}`);
+    if (!this.receiptContract) throw new Error('Receipt contract not initialized');
+    const res = await this.receiptContract.getReceipt(txHash);
+    // res: [payer, amount, receiptCID, timestamp]
+    return {
+      payer: res[0],
+      amount: res[1].toString(),
+      receiptCID: res[2],
+      timestamp: Number(res[3]),
+    };
   }
 }
