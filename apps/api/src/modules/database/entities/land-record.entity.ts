@@ -44,14 +44,14 @@ export class LandRecord {
   gpsCoordinates?: string; // Tọa độ / Polygon hiện hành
 
   @Column({ name: 'assigned_cb_id', type: 'integer', nullable: true })
-  assignedCbId?: number;
+  assignedCbId?: number | null;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'assigned_cb_id' })
   assignedCb?: User;
   
   @Column({ name: 'reviewed_by_first_id', type: 'integer', nullable: true })
-  reviewedByFirstId?: number;
+  reviewedByFirstId?: number | null;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'reviewed_by_first_id' })

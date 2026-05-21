@@ -9,7 +9,7 @@ export class BlockchainLog {
   actionType: string; // Mint_NFT, Transfer, Multi-sig, etc.
 
   @Column({ name: 'gas_fee', type: 'decimal', precision: 20, scale: 10, nullable: true })
-  gasFee: number;
+  gasFee: string;
 
   @Column({ length: 50 })
   status: string; // Success, Reverted, Out_Of_Gas

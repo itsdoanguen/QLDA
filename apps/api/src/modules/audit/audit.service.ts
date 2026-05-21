@@ -8,12 +8,20 @@ import { ethers } from 'ethers';
 @Injectable()
 export class AuditService {
   private readonly logger = new Logger(AuditService.name);
+  private readonly buffer: string[] = [];
+  private readonly flushThreshold = 10;
+  private readonly flushIntervalMs = 60000; // 60s
 
   constructor(
     @InjectRepository(SystemLog)
     private readonly systemLogRepository: Repository<SystemLog>,
     private readonly blockchainService: BlockchainService,
   ) {}
+
+  // Start periodic flush
+  onModuleInit() {
+    setInterval(() => this.flushBuffer().catch(err => this.logger.error('Batch flush failed', err)), this.flushIntervalMs);
+  }
 
   async createLog(data: {
     userId?: number;
@@ -37,11 +45,32 @@ export class AuditService {
 
     // Task A8: Tích hợp AuditLog on-chain
     try {
+      // Attempt immediate single record (best-effort)
       await this.blockchainService.recordLogHash(hashValue);
     } catch (error) {
-      this.logger.error(`Failed to record audit log on chain: ${(error as Error).message}`);
+      this.logger.error(`Failed to record audit log on chain (single): ${(error as Error).message}`);
+    }
+
+    // Buffer for batch recording to save gas
+    this.buffer.push(hashValue);
+    if (this.buffer.length >= this.flushThreshold) {
+      // fire-and-forget
+      this.flushBuffer().catch(err => this.logger.error('Batch flush failed', err));
     }
 
     return savedLog;
+  }
+
+  private async flushBuffer() {
+    if (this.buffer.length === 0) return;
+    const toFlush = this.buffer.splice(0, this.buffer.length);
+    try {
+      await this.blockchainService.batchRecordLogHashes(toFlush);
+      this.logger.log(`Flushed ${toFlush.length} audit log hashes on-chain`);
+    } catch (error) {
+      this.logger.error('Failed to batch record audit log hashes, reinserting to buffer', error as any);
+      // Re-insert failed batch at front
+      this.buffer.unshift(...toFlush);
+    }
   }
 }

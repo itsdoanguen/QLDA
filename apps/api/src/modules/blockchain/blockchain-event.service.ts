@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ethers } from 'ethers';
 import { BlockchainService } from './blockchain.service';
 import { LandRecord } from '../database/entities/land-record.entity';
 import { LandNFT } from '../database/entities/land-nft.entity';
@@ -47,9 +48,18 @@ export class BlockchainEventService implements OnModuleInit {
           const receipt = await provider.getTransactionReceipt(txHash);
           const block = await provider.getBlock(receipt.blockNumber);
           
-          let gasFee = 0;
-          if (receipt.gasUsed && receipt.gasPrice) {
-            gasFee = Number(receipt.gasUsed * receipt.gasPrice) / 1e18; // Convert to ETH
+          let gasFee: string | undefined = undefined;
+          try {
+            const gasUsed = BigInt(receipt.gasUsed.toString());
+            const gasPriceSource = receipt.effectiveGasPrice ?? receipt.gasPrice ?? 0;
+            const gasPrice = gasPriceSource ? BigInt(gasPriceSource.toString()) : 0n;
+            if (gasUsed > 0n && gasPrice > 0n) {
+              const wei = gasUsed * gasPrice;
+              gasFee = ethers.formatEther(wei); // string in ETH
+            }
+          } catch (e) {
+            this.logger.warn('Unable to compute gas fee from receipt', e as any);
+            gasFee = undefined;
           }
 
           log = this.blockchainLogRepo.create({
@@ -91,11 +101,11 @@ export class BlockchainEventService implements OnModuleInit {
   }
 
   private registerListeners() {
-    // 1. LandCreated or LandNFTMinted
-    this.blockchainService.registerEventSyncHook('LandNFTMinted', async (data) => {
+    // 1. LandCreated
+    this.blockchainService.registerEventSyncHook('LandCreated', async (data) => {
       const [tokenIdBigInt, to, tokenURI] = data.args;
       const tokenId = tokenIdBigInt.toString();
-      this.logger.log(`Received LandNFTMinted event: tokenId=${tokenId}, to=${to}`);
+      this.logger.log(`Received LandCreated event: tokenId=${tokenId}, to=${to}`);
       
       const nft = await this.landNftRepo.findOne({ where: { tokenId } });
       if (nft) {
@@ -105,7 +115,7 @@ export class BlockchainEventService implements OnModuleInit {
         this.logger.log(`Updated LandNFT ${tokenId} status to Normal`);
       }
 
-      await this.createProvenanceLog('LandNFTMinted', tokenId, { to, tokenURI }, data.eventLog);
+      await this.createProvenanceLog('LandCreated', tokenId, { to, tokenURI }, data.eventLog);
     });
 
     // 2. LandStatusChanged
@@ -129,8 +139,8 @@ export class BlockchainEventService implements OnModuleInit {
       await this.createProvenanceLog('LandStatusChanged', tokenId, { oldStatus, newStatus }, data.eventLog);
     });
 
-    // 3. TransactionSigned
-    this.blockchainService.registerEventSyncHook('TransactionSigned', async (data) => {
+    // 3. TransactionSigned (MultiSigWorkflow)
+    this.blockchainService.registerMultiSigSyncHook('TransactionSigned', async (data) => {
       const [transactionIdBigInt, signer, role, isApproved] = data.args;
       const txId = Number(transactionIdBigInt);
       this.logger.log(`Received TransactionSigned event: txId=${txId}, signer=${signer}, approved=${isApproved}`);
@@ -140,8 +150,8 @@ export class BlockchainEventService implements OnModuleInit {
       await this.ensureBlockchainLog(data.eventLog, 'TransactionSigned');
     });
 
-    // 4. RecoveryApproved
-    this.blockchainService.registerEventSyncHook('RecoveryApproved', async (data) => {
+    // 4. RecoveryApproved (WalletOverride)
+    this.blockchainService.registerWalletOverrideSyncHook('RecoveryApproved', async (data) => {
       const [requestIdBigInt, citizenIdHash, newWallet] = data.args;
       const reqId = Number(requestIdBigInt);
       this.logger.log(`Received RecoveryApproved event: reqId=${reqId}, citizen=${citizenIdHash}, newWallet=${newWallet}`);

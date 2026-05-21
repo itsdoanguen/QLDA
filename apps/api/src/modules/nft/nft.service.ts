@@ -180,4 +180,232 @@ export class NftService {
       relations: ['record'],
     });
   }
+
+  async verifyNft(qrDataOrTokenId: string): Promise<any> {
+    let tokenId = qrDataOrTokenId.trim();
+    if (tokenId.includes('/verify/')) {
+      const parts = tokenId.split('/verify/');
+      tokenId = parts[parts.length - 1];
+    }
+
+    this.logger.log(`Verifying NFT for input: ${qrDataOrTokenId}, extracted tokenId: ${tokenId}`);
+
+    let ownerOf: string | null = null;
+    let tokenURI: string | null = null;
+    let onChainExists = false;
+
+    try {
+      ownerOf = await this.blockchainService.getNftOwner(tokenId);
+      tokenURI = await this.blockchainService.getNftTokenUri(tokenId);
+      onChainExists = true;
+    } catch (error: any) {
+      this.logger.warn(`Token ${tokenId} not found on-chain: ${error.message}`);
+    }
+
+    const dbNft = await this.landNftRepository.findOne({
+      where: { tokenId },
+      relations: ['record', 'record.owner'],
+    });
+
+    if (!onChainExists && !dbNft) {
+      return {
+        qrData: qrDataOrTokenId,
+        tokenId,
+        isVerified: false,
+        message: 'Không tìm thấy thông tin NFT trên Blockchain và hệ thống.',
+        blockchain: null,
+        database: null,
+        comparison: {
+          ownerMatches: false,
+          metadataMatches: false,
+          isAuthentic: false,
+        },
+        landDetails: null,
+      };
+    }
+
+    if (onChainExists && !dbNft) {
+      return {
+        qrData: qrDataOrTokenId,
+        tokenId,
+        isVerified: false,
+        message: 'NFT tồn tại trên Blockchain nhưng không có thông tin trong cơ sở dữ liệu hệ thống.',
+        blockchain: {
+          tokenId,
+          ownerOf,
+          tokenURI,
+          isValid: true,
+        },
+        database: null,
+        comparison: {
+          ownerMatches: false,
+          metadataMatches: false,
+          isAuthentic: false,
+        },
+        landDetails: null,
+      };
+    }
+
+    if (!onChainExists && dbNft) {
+      return {
+        qrData: qrDataOrTokenId,
+        tokenId,
+        isVerified: false,
+        message: 'NFT có tồn tại trong hệ thống nhưng chưa được đồng bộ hoặc không tồn tại trên Blockchain.',
+        blockchain: null,
+        database: {
+          tokenId: dbNft.tokenId,
+          ownerWallet: dbNft.ownerWallet,
+          metadataUri: dbNft.metadataUri,
+          status: dbNft.status,
+          recordId: dbNft.recordId,
+        },
+        comparison: {
+          ownerMatches: false,
+          metadataMatches: false,
+          isAuthentic: false,
+        },
+        landDetails: {
+          ownerName: dbNft.record?.owner?.fullName ?? 'N/A',
+          location: dbNft.record?.address ?? 'N/A',
+          area: dbNft.record?.area ? Number(dbNft.record.area) : 0,
+          landType: dbNft.record?.landType ?? 'N/A',
+          plotNumber: dbNft.record?.plotNumber ?? 'N/A',
+          parcelNumber: dbNft.record?.parcelNumber ?? 'N/A',
+        },
+      };
+    }
+
+    if (!dbNft) {
+      // Should not happen as handled by early return, but satisfies TS compiler
+      return {
+        qrData: qrDataOrTokenId,
+        tokenId,
+        isVerified: false,
+        message: 'Lỗi đồng bộ dữ liệu hệ thống.',
+        blockchain: null,
+        database: null,
+        comparison: {
+          ownerMatches: false,
+          metadataMatches: false,
+          isAuthentic: false,
+        },
+        landDetails: null,
+      };
+    }
+
+    // Both on-chain and database exist
+    const ownerMatches = ownerOf?.toLowerCase() === dbNft.ownerWallet?.toLowerCase();
+    const metadataMatches = tokenURI === dbNft.metadataUri;
+    const isAuthentic = ownerMatches && metadataMatches;
+
+    let message = 'Xác thực thành công. Dữ liệu trên blockchain trùng khớp hoàn toàn với hệ thống.';
+    if (!isAuthentic) {
+      if (!ownerMatches && !metadataMatches) {
+        message = 'Cảnh báo: Cả chủ sở hữu và nội dung Metadata đều không trùng khớp với Blockchain.';
+      } else if (!ownerMatches) {
+        message = 'Cảnh báo: Địa chỉ ví chủ sở hữu trên Blockchain không trùng khớp với hệ thống.';
+      } else {
+        message = 'Cảnh báo: Nội dung Metadata/IPFS URI trên Blockchain không trùng khớp với hệ thống.';
+      }
+    }
+
+    return {
+      qrData: qrDataOrTokenId,
+      tokenId,
+      isVerified: isAuthentic,
+      message,
+      blockchain: {
+        tokenId,
+        ownerOf,
+        tokenURI,
+        isValid: true,
+      },
+      database: {
+        tokenId: dbNft.tokenId,
+        ownerWallet: dbNft.ownerWallet,
+        metadataUri: dbNft.metadataUri,
+        status: dbNft.status,
+        recordId: dbNft.recordId,
+      },
+      comparison: {
+        ownerMatches,
+        metadataMatches,
+        isAuthentic,
+      },
+      landDetails: {
+        ownerName: dbNft.record?.owner?.fullName ?? 'N/A',
+        location: dbNft.record?.address ?? 'N/A',
+        area: dbNft.record?.area ? Number(dbNft.record.area) : 0,
+        landType: dbNft.record?.landType ?? 'N/A',
+        plotNumber: dbNft.record?.plotNumber ?? 'N/A',
+        parcelNumber: dbNft.record?.parcelNumber ?? 'N/A',
+      },
+    };
+  }
+
+  async getProvenance(tokenId: string): Promise<any> {
+    await this.getByTokenId(tokenId);
+
+    const rawEvents = await this.blockchainService.getLandNftEvents(tokenId);
+
+    const StatusMap: Record<number, string> = {
+      0: 'KHOI_TAO',
+      1: 'CHO_DUYET',
+      2: 'DA_CAP_SO',
+      3: 'TU_CHOI',
+      4: 'DANG_GIAO_DICH',
+      5: 'CHUYEN_NHUONG',
+      6: 'THE_CHAP',
+      7: 'TRANH_CHAP',
+    };
+
+    const StatusLabelMap: Record<number, string> = {
+      0: 'Khởi tạo',
+      1: 'Chờ duyệt',
+      2: 'Đã cấp số (Bình thường)',
+      3: 'Từ chối',
+      4: 'Đang giao dịch',
+      5: 'Chuyển nhượng',
+      6: 'Thế chấp',
+      7: 'Tranh chấp',
+    };
+
+    const events = rawEvents.map(event => {
+      let description = '';
+      const isoTimestamp = new Date(event.timestamp * 1000).toISOString();
+
+      if (event.type === 'LandCreated') {
+        description = `Hồ sơ đất đai được số hóa thành công trên Blockchain. Địa chỉ ví sở hữu ban đầu: ${event.owner}`;
+      } else if (event.type === 'Transfer') {
+        if (event.from === '0x0000000000000000000000000000000000000000') {
+          description = `NFT được đúc (mint) sang ví: ${event.to}`;
+        } else {
+          description = `Chuyển quyền sở hữu từ ví ${event.from} sang ví ${event.to}`;
+        }
+      } else if (event.type === 'LandStatusChanged') {
+        const oldLabel = StatusLabelMap[event.oldStatus] ?? 'Không rõ';
+        const newLabel = StatusLabelMap[event.newStatus] ?? 'Không rõ';
+        description = `Thay đổi trạng thái từ [${oldLabel}] sang [${newLabel}]`;
+      }
+
+      return {
+        type: event.type,
+        blockNumber: event.blockNumber,
+        transactionHash: event.transactionHash,
+        timestamp: isoTimestamp,
+        oldStatus: event.oldStatus !== undefined ? StatusMap[event.oldStatus] : undefined,
+        newStatus: event.newStatus !== undefined ? StatusMap[event.newStatus] : undefined,
+        from: event.from,
+        to: event.to,
+        metadataUri: event.metadataUri,
+        description,
+      };
+    });
+
+    return {
+      tokenId,
+      events,
+    };
+  }
 }

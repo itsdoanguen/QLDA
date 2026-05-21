@@ -7,12 +7,13 @@ import {
   UseGuards,
   ParseIntPipe,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags, ApiOperation, ApiOkResponse } from '@nestjs/swagger';
 import { ApprovalsService } from './approvals.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { RequireRoles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { BatchSignRequestDto, BatchSignResponseDto } from './dto/batch-sign.dto';
 
 @ApiTags('Approvals')
 @ApiBearerAuth()
@@ -59,10 +60,15 @@ export class ApprovalsController {
 
   @Post('batch-sign')
   @RequireRoles('LANH_DAO')
-  @ApiOperation({ summary: 'Lãnh đạo batch sign and approve/reject multiple records' })
+  @ApiOperation({
+    summary: 'Lãnh đạo batch sign — ký duyệt/từ chối hàng loạt nhiều hồ sơ',
+    description: 'Gửi danh sách hồ sơ cần ký. Mỗi item gồm recordId, isApproved, reason (bắt buộc khi từ chối). '
+      + 'Backend sẽ cập nhật DB cho từng hồ sơ, sau đó gọi MultiSigWorkflow.batchSignTransactions() on-chain một lần duy nhất.',
+  })
+  @ApiOkResponse({ type: BatchSignResponseDto })
   batchSign(
     @CurrentUser() user: any,
-    @Body() body: { records: { recordId: number; isApproved: boolean; reason?: string }[] },
+    @Body() body: BatchSignRequestDto,
   ) {
     return this.approvalsService.batchSign(body.records, user.sub);
   }

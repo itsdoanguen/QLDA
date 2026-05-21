@@ -22,9 +22,8 @@ export class FraudReportsService {
     const report = this.fraudReportRepository.create({
       tokenId,
       reporterId,
-      reportType,
-      description,
-      evidenceLinks,
+      reason: description,
+      evidenceImages: evidenceLinks,
       status: 'Pending',
     });
 
@@ -42,7 +41,7 @@ export class FraudReportsService {
     }
 
     report.status = resolutionStatus;
-    report.reviewerId = reviewerId;
+    report.reviewedBy = reviewerId;
     report.resolutionNotes = notes;
     report.resolvedAt = new Date();
 

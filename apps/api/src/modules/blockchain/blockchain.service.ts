@@ -348,6 +348,15 @@ export class BlockchainService {
     return tx.hash;
   }
 
+  public async batchRecordLogHashes(logHashes: string[]): Promise<string> {
+    this.logger.log(`Batch recording ${logHashes.length} audit log hashes on-chain`);
+    if (!this.auditLogContract) throw new Error("AuditLog contract not initialized");
+
+    const tx = await this.auditLogContract.batchRecordLogHashes(logHashes);
+    await tx.wait();
+    return tx.hash;
+  }
+
   // --- Task A9: Pre-check ---
   public async canTransact(tokenId: string): Promise<boolean> {
     this.logger.log(`Checking canTransact on-chain for token ${tokenId}`);
@@ -371,6 +380,18 @@ export class BlockchainService {
     this.logger.log(`Checking planning danger zone for token ${tokenId}`);
     if (!this.planningRegistryContract) throw new Error('PlanningRegistry contract is not initialized');
     return await this.planningRegistryContract.isTokenInDanger(tokenId);
+  }
+
+  public async getNftOwner(tokenId: string): Promise<string> {
+    this.logger.log(`Querying ownerOf on-chain for token ${tokenId}`);
+    if (!this.landNFTContract) throw new Error('LandNFT contract is not initialized');
+    return await this.landNFTContract.ownerOf(tokenId);
+  }
+
+  public async getNftTokenUri(tokenId: string): Promise<string> {
+    this.logger.log(`Querying tokenURI on-chain for token ${tokenId}`);
+    if (!this.landNFTContract) throw new Error('LandNFT contract is not initialized');
+    return await this.landNFTContract.tokenURI(tokenId);
   }
 
   public registerEventSyncHook(eventName: string, callback: (eventData: any) => void) {
@@ -405,6 +426,26 @@ export class BlockchainService {
     }
   }
 
+  public registerMultiSigSyncHook(eventName: string, callback: (eventData: any) => void) {
+    this.logger.log(`Registering MultiSig sync hook for event: ${eventName}`);
+    if (this.multiSigContract) {
+      this.multiSigContract.on(eventName, (...args) => {
+        const eventLog = args[args.length - 1];
+        callback({ args: args.slice(0, args.length - 1), eventLog });
+      });
+    }
+  }
+
+  public registerWalletOverrideSyncHook(eventName: string, callback: (eventData: any) => void) {
+    this.logger.log(`Registering WalletOverride sync hook for event: ${eventName}`);
+    if (this.walletOverrideContract) {
+      this.walletOverrideContract.on(eventName, (...args) => {
+        const eventLog = args[args.length - 1];
+        callback({ args: args.slice(0, args.length - 1), eventLog });
+      });
+    }
+  }
+
   public async recordReceipt(txHash: string, payer: string, amountWei: string | number | bigint, receiptCID: string): Promise<string> {
     this.logger.log(`Recording receipt on-chain for tx ${txHash}, payer ${payer}, amount ${amountWei}`);
     if (!this.receiptContract) throw new Error('Receipt contract not initialized');
@@ -425,5 +466,99 @@ export class BlockchainService {
       receiptCID: res[2],
       timestamp: Number(res[3]),
     };
+  }
+
+  public async getLandNftEvents(tokenId: string): Promise<any[]> {
+    this.logger.log(`Querying events for tokenId ${tokenId}`);
+    if (!this.landRegistryContract || !this.landNFTContract) {
+      throw new Error("Blockchain contracts not fully initialized");
+    }
+
+    const tokenIdBigInt = BigInt(tokenId);
+
+    const statusChangedFilter = this.landRegistryContract.filters.LandStatusChanged(tokenIdBigInt);
+    const landCreatedFilter = this.landRegistryContract.filters.LandCreated(tokenIdBigInt);
+    const transferFilter = this.landNFTContract.filters.Transfer(null, null, tokenIdBigInt);
+
+    const [statusEvents, createdEvents, transferEvents] = await Promise.all([
+      this.landRegistryContract.queryFilter(statusChangedFilter),
+      this.landRegistryContract.queryFilter(landCreatedFilter),
+      this.landNFTContract.queryFilter(transferFilter),
+    ]);
+
+    const allEvents: any[] = [];
+    const blockCache = new Map<number, number>();
+
+    const getBlockTimestamp = async (blockNumber: number): Promise<number> => {
+      if (blockCache.has(blockNumber)) {
+        return blockCache.get(blockNumber)!;
+      }
+      try {
+        const block = await this.provider.getBlock(blockNumber);
+        const ts = block ? block.timestamp : Math.floor(Date.now() / 1000);
+        blockCache.set(blockNumber, ts);
+        return ts;
+      } catch (err) {
+        this.logger.warn(`Failed to get block ${blockNumber}:`, err);
+        return Math.floor(Date.now() / 1000);
+      }
+    };
+
+    for (const event of createdEvents) {
+      const eventLog = event as any;
+      const timestamp = await getBlockTimestamp(eventLog.blockNumber);
+      allEvents.push({
+        type: 'LandCreated',
+        blockNumber: eventLog.blockNumber,
+        transactionHash: eventLog.transactionHash,
+        transactionIndex: eventLog.transactionIndex ?? 0,
+        logIndex: eventLog.index ?? 0,
+        timestamp,
+        owner: eventLog.args[1],
+        metadataUri: eventLog.args[2],
+      });
+    }
+
+    for (const event of statusEvents) {
+      const eventLog = event as any;
+      const timestamp = await getBlockTimestamp(eventLog.blockNumber);
+      allEvents.push({
+        type: 'LandStatusChanged',
+        blockNumber: eventLog.blockNumber,
+        transactionHash: eventLog.transactionHash,
+        transactionIndex: eventLog.transactionIndex ?? 0,
+        logIndex: eventLog.index ?? 0,
+        timestamp,
+        oldStatus: Number(eventLog.args[1]),
+        newStatus: Number(eventLog.args[2]),
+      });
+    }
+
+    for (const event of transferEvents) {
+      const eventLog = event as any;
+      const timestamp = await getBlockTimestamp(eventLog.blockNumber);
+      allEvents.push({
+        type: 'Transfer',
+        blockNumber: eventLog.blockNumber,
+        transactionHash: eventLog.transactionHash,
+        transactionIndex: eventLog.transactionIndex ?? 0,
+        logIndex: eventLog.index ?? 0,
+        timestamp,
+        from: eventLog.args[0],
+        to: eventLog.args[1],
+      });
+    }
+
+    allEvents.sort((a, b) => {
+      if (a.blockNumber !== b.blockNumber) {
+        return a.blockNumber - b.blockNumber;
+      }
+      if (a.transactionIndex !== b.transactionIndex) {
+        return a.transactionIndex - b.transactionIndex;
+      }
+      return a.logIndex - b.logIndex;
+    });
+
+    return allEvents;
   }
 }
