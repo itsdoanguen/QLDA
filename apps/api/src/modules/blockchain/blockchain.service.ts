@@ -348,6 +348,15 @@ export class BlockchainService {
     return tx.hash;
   }
 
+  public async batchRecordLogHashes(logHashes: string[]): Promise<string> {
+    this.logger.log(`Batch recording ${logHashes.length} audit log hashes on-chain`);
+    if (!this.auditLogContract) throw new Error("AuditLog contract not initialized");
+
+    const tx = await this.auditLogContract.batchRecordLogHashes(logHashes);
+    await tx.wait();
+    return tx.hash;
+  }
+
   // --- Task A9: Pre-check ---
   public async canTransact(tokenId: string): Promise<boolean> {
     this.logger.log(`Checking canTransact on-chain for token ${tokenId}`);
