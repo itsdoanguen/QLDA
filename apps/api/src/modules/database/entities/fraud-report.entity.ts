@@ -45,6 +45,12 @@ export class FraudReport {
   @Column({ name: 'reviewed_by', nullable: true })
   reviewedBy: number;
 
+  @Column({ name: 'resolution_notes', type: 'text', nullable: true })
+  resolutionNotes?: string;
+
+  @Column({ name: 'resolved_at', type: 'timestamp', nullable: true })
+  resolvedAt?: Date;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 }

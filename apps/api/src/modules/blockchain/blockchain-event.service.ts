@@ -48,7 +48,7 @@ export class BlockchainEventService implements OnModuleInit {
           const receipt = await provider.getTransactionReceipt(txHash);
           const block = await provider.getBlock(receipt.blockNumber);
           
-          let gasFee: string | number = 0;
+          let gasFee: string | undefined = undefined;
           try {
             const gasUsed = BigInt(receipt.gasUsed.toString());
             const gasPriceSource = receipt.effectiveGasPrice ?? receipt.gasPrice ?? 0;
@@ -59,7 +59,7 @@ export class BlockchainEventService implements OnModuleInit {
             }
           } catch (e) {
             this.logger.warn('Unable to compute gas fee from receipt', e as any);
-            gasFee = 0;
+            gasFee = undefined;
           }
 
           log = this.blockchainLogRepo.create({

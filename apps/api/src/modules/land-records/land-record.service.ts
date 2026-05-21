@@ -110,7 +110,7 @@ export class LandRecordService {
     return record;
   }
 
-  async getGps(id: number): Promise<{ gpsCoordinates: string }> {
+  async getGps(id: number): Promise<{ gpsCoordinates?: string }> {
     const record = await this.landRecordRepository.findOne({
       where: { id },
       select: ['gpsCoordinates'],

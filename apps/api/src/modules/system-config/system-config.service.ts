@@ -33,7 +33,7 @@ export class SystemConfigService {
       configKey: key,
       oldValue: config.configValue,
       newValue: value,
-      changedByUserId: userId,
+      editorId: userId,
     });
     await this.auditRepository.save(audit);
 
@@ -44,7 +44,7 @@ export class SystemConfigService {
 
   async getAudits() {
     return this.auditRepository.find({
-      relations: ['changedByUser'],
+      relations: ['editor'],
       order: { changedAt: 'DESC' },
     });
   }
