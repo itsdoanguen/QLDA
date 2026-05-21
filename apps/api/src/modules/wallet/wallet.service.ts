@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { createCipheriv, randomBytes } from 'crypto';
@@ -14,6 +14,8 @@ import { WalletLinkRequest, WalletRecoveryRequestDto } from '@land-registry/shar
 
 @Injectable()
 export class WalletService {
+  private readonly logger = new Logger(WalletService.name);
+
   constructor(
     @InjectRepository(Wallet)
     private walletRepository: Repository<Wallet>,
@@ -54,6 +56,13 @@ export class WalletService {
     };
   }
 
+  /**
+   * Compute the citizen ID hash (SHA-256 of CCCD number) used as on-chain identifier.
+   */
+  private computeCitizenIdHash(vneidNumber: string): string {
+    return ethers.sha256(ethers.toUtf8Bytes(vneidNumber));
+  }
+
   async linkWallet(userId: number, payload: WalletLinkRequest) {
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {
@@ -76,6 +85,22 @@ export class WalletService {
       status: 'Active',
     });
     wallet = await this.walletRepository.save(wallet);
+
+    // Register the citizen-wallet mapping on-chain (WalletOverride contract)
+    try {
+      const citizenIdHash = this.computeCitizenIdHash(user.vneidNumber);
+      if (this.blockchainService.walletOverrideContract) {
+        await this.blockchainService.walletOverrideContract.registerCitizenWallet(
+          citizenIdHash,
+          payload.walletAddress,
+        );
+        this.logger.log(`Registered citizen-wallet mapping on-chain for user ${userId}`);
+      }
+    } catch (error: any) {
+      // Log but don't fail — the on-chain registration is best-effort during link.
+      // It may already be registered or the contract may not be deployed.
+      this.logger.warn(`Failed to register citizen-wallet on-chain for user ${userId}: ${error.message}`);
+    }
 
     return { message: 'Wallet linked successfully' };
   }
@@ -115,6 +140,21 @@ export class WalletService {
       });
 
       await walletSecretRepo.save(walletSecret);
+
+      // Register on-chain citizen-wallet mapping
+      try {
+        const citizenIdHash = this.computeCitizenIdHash(user.vneidNumber);
+        if (this.blockchainService.walletOverrideContract) {
+          await this.blockchainService.walletOverrideContract.registerCitizenWallet(
+            citizenIdHash,
+            newWallet.address,
+          );
+          this.logger.log(`Registered managed wallet on-chain for user ${userId}`);
+        }
+      } catch (error: any) {
+        this.logger.warn(`Failed to register managed wallet on-chain for user ${userId}: ${error.message}`);
+      }
+
       return savedWallet;
     });
   }
@@ -138,10 +178,11 @@ export class WalletService {
     if (!user) {
       throw new BadRequestException('User not found');
     }
-    const citizenIdHash = ethers.sha256(ethers.toUtf8Bytes(user.vneidNumber));
+    const citizenIdHash = this.computeCitizenIdHash(user.vneidNumber);
     
-    // Task A7: Tích hợp Wallet Override request on-chain
+    // Call WalletOverride.requestWalletOverride() on-chain
     const chainRequestId = await this.blockchainService.requestWalletOverride(citizenIdHash, payload.newWalletAddress);
+    this.logger.log(`Created on-chain recovery request #${chainRequestId} for user ${userId}`);
 
     const request = this.recoveryRepository.create({
       userId,
@@ -153,35 +194,40 @@ export class WalletService {
 
     await this.recoveryRepository.save(request);
     
-    return { message: 'Recovery request submitted successfully' };
+    return { message: 'Recovery request submitted successfully', requestId: request.id, chainRequestId };
   }
 
   async approveRecovery(requestId: number, adminUserId: number) {
-    const request = await this.recoveryRepository.findOne({ where: { id: requestId }, relations: ['user'] });
+    const request = await this.recoveryRepository.findOne({
+      where: { id: requestId },
+      relations: ['user'],
+    });
     if (!request || request.status !== 'Pending') {
       throw new BadRequestException('Request not found or not pending');
     }
 
-    // Find all NFTs owned by the old wallet
+    // Find all NFTs owned by the old wallet (for bulk transfer)
     const nfts = await this.landNftRepository.find({ where: { ownerWallet: request.oldWalletAddress } });
     const tokenIds = nfts.map(nft => nft.tokenId);
 
-    // Task A7: Tích hợp Wallet Override approve on-chain
+    // Call WalletOverride.approveWalletOverride() on-chain — transfers NFTs on-chain
     await this.blockchainService.approveWalletOverride(request.chainRequestId, tokenIds);
+    this.logger.log(`Approved on-chain recovery request #${request.chainRequestId}, transferred ${tokenIds.length} NFTs`);
 
-    // Update local DB
+    // Update local DB — recovery request
     request.status = 'Approved';
     request.approvedBy = adminUserId;
     request.resolvedAt = new Date();
     await this.recoveryRepository.save(request);
 
-    // Update wallet records
+    // Update old wallet status to 'Replaced' (per DB schema: Active, Locked, Replaced)
     const oldWallet = await this.walletRepository.findOne({ where: { walletAddress: request.oldWalletAddress } });
     if (oldWallet) {
-      oldWallet.status = 'Inactive';
+      oldWallet.status = 'Replaced';
       await this.walletRepository.save(oldWallet);
     }
 
+    // Create or activate the new wallet record
     let newWallet = await this.walletRepository.findOne({ where: { walletAddress: request.newWalletAddress } });
     if (!newWallet) {
       newWallet = this.walletRepository.create({
@@ -195,13 +241,17 @@ export class WalletService {
       await this.walletRepository.save(newWallet);
     }
 
-    // Update NFTs local owner
+    // Update NFTs local owner to the new wallet address
     for (const nft of nfts) {
       nft.ownerWallet = request.newWalletAddress;
       await this.landNftRepository.save(nft);
     }
 
-    return { message: 'Recovery approved and executed' };
+    return {
+      message: 'Recovery approved and executed',
+      transferredTokenIds: tokenIds,
+      newWalletAddress: request.newWalletAddress,
+    };
   }
 
   async rejectRecovery(requestId: number, adminUserId: number, reason: string) {
@@ -210,15 +260,79 @@ export class WalletService {
       throw new BadRequestException('Request not found or not pending');
     }
 
+    // Call WalletOverride.rejectWalletOverride() on-chain
     await this.blockchainService.rejectWalletOverride(request.chainRequestId, reason);
+    this.logger.log(`Rejected on-chain recovery request #${request.chainRequestId}: ${reason}`);
 
     request.status = 'Rejected';
     request.approvedBy = adminUserId;
     request.resolvedAt = new Date();
     await this.recoveryRepository.save(request);
 
-    return { message: 'Recovery rejected' };
+    return { message: 'Recovery rejected', reason };
   }
+
+  // --- Admin/Lãnh đạo: list & detail for recovery management ---
+
+  async listRecoveryRequests(status?: string) {
+    const where: any = {};
+    if (status) {
+      where.status = status;
+    }
+
+    const requests = await this.recoveryRepository.find({
+      where,
+      relations: ['user', 'approver'],
+      order: { createdAt: 'DESC' },
+    });
+
+    return requests.map(r => ({
+      id: r.id,
+      userId: r.userId,
+      userFullName: r.user?.fullName,
+      userVneidNumber: r.user?.vneidNumber,
+      oldWalletAddress: r.oldWalletAddress,
+      newWalletAddress: r.newWalletAddress,
+      status: r.status,
+      chainRequestId: r.chainRequestId,
+      approverFullName: r.approver?.fullName,
+      createdAt: r.createdAt,
+      resolvedAt: r.resolvedAt,
+    }));
+  }
+
+  async getRecoveryRequestDetail(requestId: number) {
+    const request = await this.recoveryRepository.findOne({
+      where: { id: requestId },
+      relations: ['user', 'approver'],
+    });
+
+    if (!request) {
+      throw new NotFoundException('Recovery request not found');
+    }
+
+    // Find NFTs currently held by the old wallet (shows what will be transferred)
+    const affectedNfts = await this.landNftRepository.find({
+      where: { ownerWallet: request.oldWalletAddress },
+    });
+
+    return {
+      id: request.id,
+      userId: request.userId,
+      userFullName: request.user?.fullName,
+      userVneidNumber: request.user?.vneidNumber,
+      oldWalletAddress: request.oldWalletAddress,
+      newWalletAddress: request.newWalletAddress,
+      status: request.status,
+      chainRequestId: request.chainRequestId,
+      approverFullName: request.approver?.fullName,
+      createdAt: request.createdAt,
+      resolvedAt: request.resolvedAt,
+      affectedTokenIds: affectedNfts.map(nft => nft.tokenId),
+    };
+  }
+
+  // --- User endpoints ---
 
   async getStatus(userId: number) {
     const wallet = await this.walletRepository.findOne({ where: { userId } });
