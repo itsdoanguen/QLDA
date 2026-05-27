@@ -39,17 +39,22 @@ export class AuditService {
 
     const log = this.systemLogRepository.create({
       ...data,
+      userId: data.userId || 0,
       hashValue,
     });
     const savedLog = await this.systemLogRepository.save(log);
 
     // Task A8: Tích hợp AuditLog on-chain
+    // Disabled immediate blocking call to prevent transaction nonce collisions on our single backend signer wallet.
+    // Hashes are safely buffered and batch-flushed on-chain via flushBuffer() below.
+    /*
     try {
       // Attempt immediate single record (best-effort)
       await this.blockchainService.recordLogHash(hashValue);
     } catch (error) {
       this.logger.error(`Failed to record audit log on chain (single): ${(error as Error).message}`);
     }
+    */
 
     // Buffer for batch recording to save gas
     this.buffer.push(hashValue);

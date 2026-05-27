@@ -103,12 +103,23 @@ export class BlockchainService {
   public getAbiLoader(contractName: string): any {
     this.logger.log(`Loading ABI for contract: ${contractName}`);
     try {
-      const artifactPath = path.resolve(
+      let artifactPath = path.resolve(
         __dirname,
         '../../../../blockchain/artifacts/contracts',
         `${contractName}.sol`,
         `${contractName}.json`
       );
+
+      // Fallback for contracts in the utils directory
+      if (!fs.existsSync(artifactPath)) {
+        artifactPath = path.resolve(
+          __dirname,
+          '../../../../blockchain/artifacts/contracts/utils',
+          `${contractName}.sol`,
+          `${contractName}.json`
+        );
+      }
+
       const artifact = JSON.parse(fs.readFileSync(artifactPath, 'utf8'));
       return artifact.abi;
     } catch (error) {
@@ -177,27 +188,82 @@ export class BlockchainService {
       throw new Error("LandNFT contract is not initialized");
     }
     
-    // Using adminTransfer since backend is the owner of the contract 
-    // and standard transferFrom requires prior user approval on-chain.
-    const tx = await this.landNFTContract.adminTransfer(from, to, tokenId);
-    await tx.wait();
-    return tx.hash;
+    let attempts = 0;
+    while (attempts < 3) {
+      try {
+        // Using proxyAdminTransfer since backend is the owner of LandRegistry
+        // and LandRegistry is the owner of LandNFT.
+        const tx = await this.landRegistryContract.proxyAdminTransfer(from, to, tokenId);
+        await tx.wait();
+        
+        this.logger.log('transferNFT tx confirmed. Sleeping 4 seconds for RPC sync...');
+        await new Promise(resolve => setTimeout(resolve, 4000));
+        
+        return tx.hash;
+      } catch (error: any) {
+        attempts++;
+        const errMsg = error.message || '';
+        if ((errMsg.includes('underpriced') || errMsg.includes('replacement') || errMsg.includes('fee too low') || errMsg.includes('reverted') || errMsg.includes('CALL_EXCEPTION')) && attempts < 3) {
+          this.logger.warn(`[Blockchain] RPC sync delay or underpriced on transferNFT. Sleeping 4s before retry ${attempts}/3...`);
+          await new Promise(resolve => setTimeout(resolve, 4000));
+        } else {
+          throw error;
+        }
+      }
+    }
+    throw new Error("Failed to transferNFT after retries");
   }
 
   // --- Task A3: State Machine Transitions ---
 
   public async submitForApproval(tokenId: string): Promise<string> {
     this.logger.log(`Calling submitForApproval on-chain for token ${tokenId}`);
-    const tx = await this.landRegistryContract.submitForApproval(tokenId);
-    await tx.wait();
-    return tx.hash;
+    
+    let attempts = 0;
+    while (attempts < 3) {
+      try {
+        const tx = await this.landRegistryContract.submitForApproval(tokenId);
+        await tx.wait();
+        
+        this.logger.log('submitForApproval tx confirmed. Sleeping 4 seconds for RPC sync...');
+        await new Promise(resolve => setTimeout(resolve, 4000));
+        
+        return tx.hash;
+      } catch (error: any) {
+        attempts++;
+        const errMsg = error.message || '';
+        if ((errMsg.includes('underpriced') || errMsg.includes('replacement') || errMsg.includes('fee too low') || errMsg.includes('reverted') || errMsg.includes('CALL_EXCEPTION')) && attempts < 3) {
+          this.logger.warn(`[Blockchain] RPC sync delay or underpriced on submitForApproval. Sleeping 4s before retry ${attempts}/3...`);
+          await new Promise(resolve => setTimeout(resolve, 4000));
+        } else {
+          throw error;
+        }
+      }
+    }
+    throw new Error("Failed to submitForApproval after retries");
   }
 
   public async approveLand(tokenId: string): Promise<string> {
     this.logger.log(`Calling approveLand on-chain for token ${tokenId}`);
-    const tx = await this.landRegistryContract.approveLand(tokenId);
-    await tx.wait();
-    return tx.hash;
+    
+    let attempts = 0;
+    while (attempts < 3) {
+      try {
+        const tx = await this.landRegistryContract.approveLand(tokenId);
+        await tx.wait();
+        return tx.hash;
+      } catch (error: any) {
+        attempts++;
+        const errMsg = error.message || '';
+        if ((errMsg.includes('underpriced') || errMsg.includes('replacement') || errMsg.includes('fee too low') || errMsg.includes('reverted') || errMsg.includes('CALL_EXCEPTION')) && attempts < 3) {
+          this.logger.warn(`[Blockchain] RPC sync delay or underpriced on approveLand. Sleeping 4s before retry ${attempts}/3...`);
+          await new Promise(resolve => setTimeout(resolve, 4000));
+        } else {
+          throw error;
+        }
+      }
+    }
+    throw new Error("Failed to approveLand after retries");
   }
 
   public async rejectLand(tokenId: string, reason: string): Promise<string> {
@@ -209,9 +275,29 @@ export class BlockchainService {
 
   public async startTransaction(tokenId: string): Promise<string> {
     this.logger.log(`Calling startTransaction on-chain for token ${tokenId}`);
-    const tx = await this.landRegistryContract.startTransaction(tokenId);
-    await tx.wait();
-    return tx.hash;
+    
+    let attempts = 0;
+    while (attempts < 3) {
+      try {
+        const tx = await this.landRegistryContract.startTransaction(tokenId);
+        await tx.wait();
+        
+        this.logger.log('startTransaction tx confirmed. Sleeping 4 seconds for RPC sync...');
+        await new Promise(resolve => setTimeout(resolve, 4000));
+        
+        return tx.hash;
+      } catch (error: any) {
+        attempts++;
+        const errMsg = error.message || '';
+        if ((errMsg.includes('underpriced') || errMsg.includes('replacement') || errMsg.includes('fee too low') || errMsg.includes('reverted') || errMsg.includes('CALL_EXCEPTION')) && attempts < 3) {
+          this.logger.warn(`[Blockchain] RPC sync delay or underpriced on startTransaction. Sleeping 4s before retry ${attempts}/3...`);
+          await new Promise(resolve => setTimeout(resolve, 4000));
+        } else {
+          throw error;
+        }
+      }
+    }
+    throw new Error("Failed to startTransaction after retries");
   }
 
   public async cancelTransaction(tokenId: string): Promise<string> {
@@ -223,9 +309,29 @@ export class BlockchainService {
 
   public async completeTransfer(tokenId: string): Promise<string> {
     this.logger.log(`Calling completeTransfer on-chain for token ${tokenId}`);
-    const tx = await this.landRegistryContract.completeTransfer(tokenId);
-    await tx.wait();
-    return tx.hash;
+    
+    let attempts = 0;
+    while (attempts < 3) {
+      try {
+        const tx = await this.landRegistryContract.completeTransfer(tokenId);
+        await tx.wait();
+        
+        this.logger.log('completeTransfer tx confirmed. Sleeping 4 seconds for RPC sync...');
+        await new Promise(resolve => setTimeout(resolve, 4000));
+        
+        return tx.hash;
+      } catch (error: any) {
+        attempts++;
+        const errMsg = error.message || '';
+        if ((errMsg.includes('underpriced') || errMsg.includes('replacement') || errMsg.includes('fee too low') || errMsg.includes('reverted') || errMsg.includes('CALL_EXCEPTION')) && attempts < 3) {
+          this.logger.warn(`[Blockchain] RPC sync delay or underpriced on completeTransfer. Sleeping 4s before retry ${attempts}/3...`);
+          await new Promise(resolve => setTimeout(resolve, 4000));
+        } else {
+          throw error;
+        }
+      }
+    }
+    throw new Error("Failed to completeTransfer after retries");
   }
 
   // --- Task A4: Multi-sig Transitions ---
@@ -236,7 +342,7 @@ export class BlockchainService {
 
     // Fetch existing events to see if it's already created
     const filter = this.multiSigContract.filters.TransactionCreated();
-    const events = await this.multiSigContract.queryFilter(filter);
+    const events = await this.multiSigContract.queryFilter(filter, 10900000);
     
     for (const event of events) {
       const args = (event as any).args;
@@ -248,6 +354,10 @@ export class BlockchainService {
     // If not found, create it
     const tx = await this.multiSigContract.createTransaction(documentCID);
     const receipt = await tx.wait();
+    
+    // Sleep 4 seconds to let the public RPC nodes sync up and avoid nonce reuse race condition
+    this.logger.log('Sleeping 4 seconds to allow public RPC node synchronization...');
+    await new Promise(resolve => setTimeout(resolve, 4000));
     
     // Parse logs
     if (receipt && receipt.logs) {
@@ -267,9 +377,25 @@ export class BlockchainService {
   public async signMultiSig(txId: number, isApproved: boolean, reason: string): Promise<string> {
     this.logger.log(`Signing MultiSig tx ${txId}: approved=${isApproved}`);
     if (!this.multiSigContract) throw new Error("MultiSig contract not initialized");
-    const tx = await this.multiSigContract.signTransaction(txId, isApproved, reason || '');
-    await tx.wait();
-    return tx.hash;
+    
+    let attempts = 0;
+    while (attempts < 3) {
+      try {
+        const tx = await this.multiSigContract.signTransaction(txId, isApproved, reason || '');
+        await tx.wait();
+        return tx.hash;
+      } catch (error: any) {
+        attempts++;
+        const errMsg = error.message || '';
+        if ((errMsg.includes('underpriced') || errMsg.includes('replacement') || errMsg.includes('fee too low')) && attempts < 3) {
+          this.logger.warn(`[Blockchain] Replacement transaction underpriced detected. Sleeping 4s before retry ${attempts}/3...`);
+          await new Promise(resolve => setTimeout(resolve, 4000));
+        } else {
+          throw error;
+        }
+      }
+    }
+    throw new Error("Failed to sign MultiSig after retries");
   }
 
   public async batchSignMultiSig(txIds: number[], isApproved: boolean[], reasons: string[]): Promise<string> {
@@ -481,9 +607,9 @@ export class BlockchainService {
     const transferFilter = this.landNFTContract.filters.Transfer(null, null, tokenIdBigInt);
 
     const [statusEvents, createdEvents, transferEvents] = await Promise.all([
-      this.landRegistryContract.queryFilter(statusChangedFilter),
-      this.landRegistryContract.queryFilter(landCreatedFilter),
-      this.landNFTContract.queryFilter(transferFilter),
+      this.landRegistryContract.queryFilter(statusChangedFilter, 10900000),
+      this.landRegistryContract.queryFilter(landCreatedFilter, 10900000),
+      this.landNFTContract.queryFilter(transferFilter, 10900000),
     ]);
 
     const allEvents: any[] = [];

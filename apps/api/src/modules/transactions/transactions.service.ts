@@ -92,20 +92,24 @@ export class TransactionsService {
     if (isFullySigned) {
       transaction.status = 'Pending_Tax';
       
-      // Calculate and save taxes
-      await this.taxesService.calculateAndSaveTransferTaxes(transaction.id);
+      try {
+        // Calculate and save taxes
+        await this.taxesService.calculateAndSaveTransferTaxes(transaction.id);
 
-      // Update NFT owner on blockchain
-      // Task A3: Sync state machine: DANG_GIAO_DICH -> CHUYEN_NHUONG
-      await this.blockchainService.completeTransfer(transaction.tokenId);
+        // Update NFT owner on blockchain
+        // Task A3: Sync state machine: DANG_GIAO_DICH -> CHUYEN_NHUONG
+        await this.blockchainService.completeTransfer(transaction.tokenId);
 
-      const buyerWallet = await this.walletRepository.findOne({ where: { userId: transaction.buyerId } });
-      const sellerWallet = await this.walletRepository.findOne({ where: { userId: transaction.sellerId } });
-      if (buyerWallet && sellerWallet) {
-        // Task A6: Tích hợp Transfer NFT
-        await this.blockchainService.transferNFT(sellerWallet.walletAddress, buyerWallet.walletAddress, transaction.tokenId);
+        const buyerWallet = await this.walletRepository.findOne({ where: { userId: transaction.buyerId } });
+        const sellerWallet = await this.walletRepository.findOne({ where: { userId: transaction.sellerId } });
+        if (buyerWallet && sellerWallet) {
+          // Task A6: Tích hợp Transfer NFT
+          await this.blockchainService.transferNFT(sellerWallet.walletAddress, buyerWallet.walletAddress, transaction.tokenId);
 
-        await this.landNftRepository.update({ tokenId: transaction.tokenId }, { ownerWallet: buyerWallet.walletAddress });
+          await this.landNftRepository.update({ tokenId: transaction.tokenId }, { ownerWallet: buyerWallet.walletAddress });
+        }
+      } catch (e: any) {
+        throw new BadRequestException("Sign process failed: " + e.message);
       }
     }
 

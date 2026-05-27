@@ -34,6 +34,7 @@ export class NftService {
   ) {}
 
   async mint(recordId: number): Promise<LandNFT> {
+    try {
     const record = await this.landRecordRepository.findOne({ 
       where: { id: recordId },
       relations: ['owner']
@@ -116,6 +117,10 @@ export class NftService {
     await this.landRecordRepository.save(record);
 
     return savedNft;
+    } catch (e: any) {
+      this.logger.error('Mint Error', e);
+      throw new BadRequestException('Detailed Mint Error: ' + e.message);
+    }
   }
 
   /**
