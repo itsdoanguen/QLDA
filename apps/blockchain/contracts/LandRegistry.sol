@@ -174,6 +174,14 @@ contract LandRegistry is Ownable, Pausable {
     }
 
     /**
+     * @dev Proxy to LandNFT's adminTransfer. Callable only by owner (Backend admin).
+     * This is required because LandRegistry is the owner of LandNFT, not the backend directly.
+     */
+    function proxyAdminTransfer(address from, address to, uint256 tokenId) external onlyOwner whenNotPaused {
+        landNFTContract.adminTransfer(from, to, tokenId);
+    }
+
+    /**
      * @dev DA_CAP_SO → THE_CHAP: Cầm cố ngân hàng.
      */
     function mortgage(uint256 tokenId) external onlyOwner whenNotPaused {

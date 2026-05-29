@@ -9,12 +9,17 @@ import { TaxesController } from './taxes.controller';
 import { TaxesService } from './taxes.service';
 import { AuthModule } from '../auth/auth.module';
 import { BlockchainModule } from '../blockchain/blockchain.module';
+import { IpfsModule } from '../ipfs/ipfs.module';
+
+import { Wallet } from '../database/entities/wallet.entity';
+import { LandNFT } from '../database/entities/land-nft.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([TaxFee, Receipt, LandRecord, Transaction, SystemConfig]),
+    TypeOrmModule.forFeature([TaxFee, Receipt, LandRecord, Transaction, SystemConfig, Wallet, LandNFT]),
     AuthModule,
     BlockchainModule,
+    IpfsModule,
   ],
   controllers: [TaxesController],
   providers: [TaxesService],

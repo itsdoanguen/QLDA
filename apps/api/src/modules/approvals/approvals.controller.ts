@@ -36,6 +36,13 @@ export class ApprovalsController {
     return this.approvalsService.findPendingApprovals();
   }
 
+  @Get('approved')
+  @RequireRoles('LANH_DAO')
+  @ApiOperation({ summary: 'List all records already approved by Lãnh đạo' })
+  getApproved() {
+    return this.approvalsService.findApprovedApprovals();
+  }
+
   @Post(':id/sign')
   @RequireRoles('LANH_DAO')
   @ApiOperation({ summary: 'Lãnh đạo sign and approve a record' })

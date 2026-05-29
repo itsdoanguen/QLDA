@@ -37,13 +37,15 @@ export default function LeaderDashboardPage() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [pendingRes, statsRes] = await Promise.all([
+      const [pendingRes, statsRes, approvedRes] = await Promise.all([
         api.get('/approvals/pending'),
-        api.get('/approvals/stats')
+        api.get('/approvals/stats'),
+        api.get('/approvals/approved')
       ]);
       
       const pendingData = pendingRes.data;
       const statsData = statsRes.data;
+      const approvedData = approvedRes.data;
       
       setData({
         stats: statsData,
@@ -53,6 +55,15 @@ export default function LeaderDashboardPage() {
           type: item.landType || "Cấp mới GCN",
           officer: item.assignedCb?.fullName || "Chưa gán",
           status: "CHỜ DUYỆT",
+          isUrgent: false
+        })),
+        approvedQueue: approvedData.map((item: any) => ({
+          id: item.id,
+          displayId: `HS-${item.id.toString().padStart(4, '0')}`,
+          type: item.landType || "Cấp mới GCN",
+          officer: item.assignedCb?.fullName || "Chưa gán",
+          status: item.status === 'Minted' ? "ĐÃ MINT NFT" : "ĐÃ KÝ DUYỆT",
+          tokenId: item.tokenId || "N/A",
           isUrgent: false
         })),
         speeds: [
@@ -88,7 +99,7 @@ export default function LeaderDashboardPage() {
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Left Column */}
         <div className="w-full lg:w-2/3">
-          <ApprovalQueue data={data.queue} />
+          <ApprovalQueue data={data.queue} approvedData={data.approvedQueue} />
         </div>
         
         {/* Right Column */}

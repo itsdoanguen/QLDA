@@ -107,6 +107,16 @@ export class LandRecordService {
     if (!record) {
       throw new NotFoundException('Land record not found');
     }
+    
+    // Attach tokenId and mintTxHash if already minted
+    const nft = await this.landRecordRepository.manager.getRepository('LandNFT').findOne({
+      where: { recordId: record.id }
+    });
+    if (nft) {
+      (record as any).tokenId = nft.tokenId;
+      (record as any).mintTxHash = nft.mintTxHash;
+    }
+    
     return record;
   }
 
@@ -121,12 +131,26 @@ export class LandRecordService {
     return { gpsCoordinates: record.gpsCoordinates };
   }
 
-  async findAll(ownerId?: number): Promise<LandRecord[]> {
+  async findAll(ownerId?: number): Promise<any[]> {
     const where = ownerId ? { ownerId } : {};
-    return this.landRecordRepository.find({
+    const records = await this.landRecordRepository.find({
       where,
+      relations: ['owner', 'assignedCb', 'reviewedByFirst', 'files'],
       order: { createdAt: 'DESC' },
     });
+
+    const enriched = [];
+    for (const record of records) {
+      const nft = await this.landRecordRepository.manager.getRepository('LandNFT').findOne({
+        where: { recordId: record.id }
+      });
+      enriched.push({
+        ...record,
+        tokenId: nft ? nft.tokenId : null,
+        mintTxHash: nft ? nft.mintTxHash : null
+      });
+    }
+    return enriched;
   }
 
   async findAssignedRecords(staffId: number): Promise<LandRecord[]> {

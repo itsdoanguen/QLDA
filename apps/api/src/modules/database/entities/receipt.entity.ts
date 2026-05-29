@@ -36,6 +36,9 @@ export class Receipt {
   @Column({ name: 'blockchain_tx_hash', length: 255, nullable: true })
   blockchainTxHash: string;
 
+  @Column({ name: 'receipt_cid', length: 255, nullable: true })
+  receiptCid: string;
+
   @CreateDateColumn({ name: 'paid_at' })
   paidAt: Date;
 }

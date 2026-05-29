@@ -151,35 +151,46 @@ export class BlockchainService {
       throw new Error("LandRegistry contract is not initialized");
     }
 
-    try {
-      const tx = await this.landRegistryContract.createLandRecord(ownerAddress, metadataUrl);
-      const receipt = await tx.wait();
-      
-      let tokenId = "unknown";
-      
-      // Try to parse logs to find the LandCreated event and extract tokenId
-      if (receipt && receipt.logs) {
-        for (const log of receipt.logs) {
-          try {
-            const parsedLog = this.landRegistryContract.interface.parseLog(log);
-            if (parsedLog && parsedLog.name === 'LandCreated') {
-              tokenId = parsedLog.args[0].toString();
-              break;
+    let attempts = 0;
+    while (attempts < 3) {
+      try {
+        const tx = await this.landRegistryContract.createLandRecord(ownerAddress, metadataUrl);
+        const receipt = await tx.wait();
+        
+        let tokenId = "unknown";
+        
+        // Try to parse logs to find the LandCreated event and extract tokenId
+        if (receipt && receipt.logs) {
+          for (const log of receipt.logs) {
+            try {
+              const parsedLog = this.landRegistryContract.interface.parseLog(log);
+              if (parsedLog && parsedLog.name === 'LandCreated') {
+                tokenId = parsedLog.args[0].toString();
+                break;
+              }
+            } catch (e) {
+              // Ignore parsing errors for other logs
             }
-          } catch (e) {
-            // Ignore parsing errors for other logs
           }
         }
-      }
 
-      return {
-        tokenId,
-        txHash: tx.hash,
-      };
-    } catch (error) {
-      this.logger.error(`Failed to mint NFT on-chain:`, error);
-      throw error;
+        return {
+          tokenId,
+          txHash: tx.hash,
+        };
+      } catch (error: any) {
+        attempts++;
+        const errMsg = error.message || '';
+        if ((errMsg.includes('underpriced') || errMsg.includes('replacement') || errMsg.includes('fee too low') || errMsg.includes('reverted') || errMsg.includes('CALL_EXCEPTION') || errMsg.includes('timeout')) && attempts < 3) {
+          this.logger.warn(`[Blockchain] RPC sync delay or underpriced on mintNFT. Sleeping 4s before retry ${attempts}/3...`);
+          await new Promise(resolve => setTimeout(resolve, 4000));
+        } else {
+          this.logger.error(`Failed to mint NFT on-chain:`, error);
+          throw error;
+        }
+      }
     }
+    throw new Error("Failed to mintNFT after retries");
   }
 
   public async transferNFT(from: string, to: string, tokenId: string): Promise<string> {
@@ -194,10 +205,11 @@ export class BlockchainService {
         // Using proxyAdminTransfer since backend is the owner of LandRegistry
         // and LandRegistry is the owner of LandNFT.
         const tx = await this.landRegistryContract.proxyAdminTransfer(from, to, tokenId);
-        await tx.wait();
         
-        this.logger.log('transferNFT tx confirmed. Sleeping 4 seconds for RPC sync...');
-        await new Promise(resolve => setTimeout(resolve, 4000));
+        // Fire and forget wait to avoid HTTP timeout
+        tx.wait()
+          .then(() => this.logger.log('transferNFT tx confirmed.'))
+          .catch((e: any) => this.logger.error('transferNFT tx failed to confirm', e));
         
         return tx.hash;
       } catch (error: any) {
@@ -280,10 +292,11 @@ export class BlockchainService {
     while (attempts < 3) {
       try {
         const tx = await this.landRegistryContract.startTransaction(tokenId);
-        await tx.wait();
         
-        this.logger.log('startTransaction tx confirmed. Sleeping 4 seconds for RPC sync...');
-        await new Promise(resolve => setTimeout(resolve, 4000));
+        // Fire and forget wait to avoid HTTP timeout
+        tx.wait()
+          .then(() => this.logger.log('startTransaction tx confirmed.'))
+          .catch((e: any) => this.logger.error('startTransaction tx failed to confirm', e));
         
         return tx.hash;
       } catch (error: any) {
@@ -303,7 +316,11 @@ export class BlockchainService {
   public async cancelTransaction(tokenId: string): Promise<string> {
     this.logger.log(`Calling cancelTransaction on-chain for token ${tokenId}`);
     const tx = await this.landRegistryContract.cancelTransaction(tokenId);
-    await tx.wait();
+    
+    tx.wait()
+      .then(() => this.logger.log('cancelTransaction tx confirmed.'))
+      .catch((e: any) => this.logger.error('cancelTransaction tx failed to confirm', e));
+      
     return tx.hash;
   }
 
@@ -314,10 +331,10 @@ export class BlockchainService {
     while (attempts < 3) {
       try {
         const tx = await this.landRegistryContract.completeTransfer(tokenId);
-        await tx.wait();
         
-        this.logger.log('completeTransfer tx confirmed. Sleeping 4 seconds for RPC sync...');
-        await new Promise(resolve => setTimeout(resolve, 4000));
+        tx.wait()
+          .then(() => this.logger.log('completeTransfer tx confirmed.'))
+          .catch((e: any) => this.logger.error('completeTransfer tx failed to confirm', e));
         
         return tx.hash;
       } catch (error: any) {
@@ -566,6 +583,16 @@ export class BlockchainService {
     this.logger.log(`Registering WalletOverride sync hook for event: ${eventName}`);
     if (this.walletOverrideContract) {
       this.walletOverrideContract.on(eventName, (...args) => {
+        const eventLog = args[args.length - 1];
+        callback({ args: args.slice(0, args.length - 1), eventLog });
+      });
+    }
+  }
+
+  public registerNftSyncHook(eventName: string, callback: (eventData: any) => void) {
+    this.logger.log(`Registering NFT sync hook for event: ${eventName}`);
+    if (this.landNFTContract) {
+      this.landNFTContract.on(eventName, (...args) => {
         const eventLog = args[args.length - 1];
         callback({ args: args.slice(0, args.length - 1), eventLog });
       });

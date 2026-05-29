@@ -241,7 +241,7 @@ export function RecordDetailPage({ id }: { id: string }) {
         </div>
       </header>
 
-      {record?.reviewReason && (
+      {record?.reviewReason && (record.status === "Needs Supplement" || record.status === "Rejected") && (
         <div className="mb-8 bg-orange-50 border border-orange-200 p-4 rounded-lg flex gap-4">
           <InfoCircleOutlined className="text-orange-500 text-lg mt-0.5" />
           <div>
@@ -249,6 +249,39 @@ export function RecordDetailPage({ id }: { id: string }) {
             <p className="text-[13px] text-orange-700 leading-relaxed font-medium">
               {record.reviewReason}
             </p>
+          </div>
+        </div>
+      )}
+
+      {record?.status === 'Minted' && (
+        <div className="mb-8 bg-green-50 border border-green-200 rounded-xl p-6 flex gap-6 items-center">
+          <div className="bg-white p-2 rounded-lg border border-green-100 shadow-sm shrink-0">
+            <img 
+              src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://sepolia.etherscan.io/tx/${record.mintTxHash}`} 
+              alt="NFT QR Code" 
+              className="w-24 h-24" 
+            />
+          </div>
+          <div>
+            <h4 className="text-green-800 font-bold text-lg mb-1">Hồ sơ đã được số hóa thành công!</h4>
+            <p className="text-green-700 text-sm mb-3">Tài sản đã được đúc thành NFT trên mạng lưới Blockchain Sepolia.</p>
+            <div className="flex gap-3">
+              <Button 
+                type="primary" 
+                ghost 
+                size="small" 
+                className="font-bold border-green-600 text-green-600"
+                onClick={() => {
+                  if (record.mintTxHash) {
+                    window.open(`https://sepolia.etherscan.io/tx/${record.mintTxHash}`, '_blank');
+                  } else {
+                    message.warning("Mã giao dịch đúc (Transaction Hash) chưa được đồng bộ.");
+                  }
+                }}
+              >
+                Xem trên Explorer
+              </Button>
+            </div>
           </div>
         </div>
       )}
@@ -402,49 +435,49 @@ export function RecordDetailPage({ id }: { id: string }) {
             </div>
           </div>
         </div>
-
-        {/* Floating Footer */}
-        <footer className="fixed bottom-0 left-0 lg:left-[260px] right-0 bg-white border-t border-[#e1e2e4] px-8 py-4 z-40 flex justify-between items-center shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-          <div className="flex items-center gap-4 text-[12px] font-medium text-[#737685]">
-            <span className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-green-500"></span> 
-              Hệ thống trực tuyến
-            </span>
-          </div>
-          <div className="flex gap-4">
-            <Button
-              type="default"
-              onClick={() => router.push("/dashboard")}
-              className="!px-6 !h-10 !border-[#c3c6d6] !text-[#191c1e] !font-medium !rounded-lg hover:!bg-[#f8f9fb]"
-            >
-              Quay lại
-            </Button>
-            
-            {isEditable && (
-              <>
-                <Button
-                  type="default"
-                  onClick={handleSaveDraft}
-                  loading={drafting}
-                  className="!px-6 !h-10 !border-[#003d9b] !text-[#003d9b] !font-medium !rounded-lg hover:!bg-[#f0f4ff]"
-                >
-                  <SaveOutlined />
-                  Cập nhật bản thảo
-                </Button>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={submitting}
-                  className="!px-8 !h-10 !bg-[#0052cc] !text-white !font-bold !rounded-lg hover:!bg-[#0040a2] shadow-lg shadow-blue-500/20 flex items-center gap-2"
-                >
-                  <SendOutlined />
-                  Nộp hồ sơ
-                </Button>
-              </>
-            )}
-          </div>
-        </footer>
       </Form>
+
+      {/* Floating Footer */}
+      <footer className="fixed bottom-0 left-0 lg:left-[260px] right-0 bg-white border-t border-[#e1e2e4] px-8 py-4 z-40 flex justify-between items-center shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        <div className="flex items-center gap-4 text-[12px] font-medium text-[#737685]">
+          <span className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-green-500"></span> 
+            Hệ thống trực tuyến
+          </span>
+        </div>
+        <div className="flex gap-4">
+          <Button
+            type="default"
+            onClick={() => router.push("/dashboard")}
+            className="!px-6 !h-10 !border-[#c3c6d6] !text-[#191c1e] !font-medium !rounded-lg hover:!bg-[#f8f9fb]"
+          >
+            Quay lại
+          </Button>
+          
+          {isEditable && (
+            <>
+              <Button
+                type="default"
+                onClick={handleSaveDraft}
+                loading={drafting}
+                className="!px-6 !h-10 !border-[#003d9b] !text-[#003d9b] !font-medium !rounded-lg hover:!bg-[#f0f4ff]"
+              >
+                <SaveOutlined />
+                Cập nhật bản thảo
+              </Button>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={submitting}
+                className="!px-8 !h-10 !bg-[#0052cc] !text-white !font-bold !rounded-lg hover:!bg-[#0040a2] shadow-lg shadow-blue-500/20 flex items-center gap-2"
+              >
+                <SendOutlined />
+                Nộp hồ sơ
+              </Button>
+            </>
+          )}
+        </div>
+      </footer>
     </div>
   );
 }

@@ -39,4 +39,23 @@ export class TaxesController {
     const amount = this.taxesService.calculateAnnualLandTax(area, pricePerM2, limit);
     return { area, pricePerM2, limit, calculatedTax: amount };
   }
+
+  @Get('transaction/:id')
+  @ApiOperation({ summary: 'Lấy danh sách các khoản thuế phí của một giao dịch' })
+  @ApiResponse({ status: 200, description: 'Trả về danh sách thuế' })
+  getTaxesByTransaction(@Param('id', ParseIntPipe) id: number) {
+    return this.taxesService.getTaxesByTransaction(id);
+  }
+
+  @Get('receipts/my')
+  @ApiOperation({ summary: 'Lấy danh sách biên lai của công dân' })
+  getMyReceipts(@CurrentUser() user: any) {
+    return this.taxesService.getMyReceipts(user.sub);
+  }
+
+  @Get('receipts/:id/verify')
+  @ApiOperation({ summary: 'Xác minh biên lai trên IPFS và Blockchain' })
+  verifyReceipt(@Param('id', ParseIntPipe) id: number) {
+    return this.taxesService.verifyReceipt(id);
+  }
 }

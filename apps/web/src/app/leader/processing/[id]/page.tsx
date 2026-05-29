@@ -83,12 +83,13 @@ export default function ApprovalDetailPage() {
         ],
         signatures: [
           { role: "Cán bộ Thụ lý", name: record.reviewedByFirst?.fullName || "Chưa có dữ liệu", status: record.reviewedByFirst ? "signed" as const : "pending" as const, time: record.createdAt },
-          { role: "Cán bộ Thẩm định", name: record.assignedCb?.fullName || "Đang xử lý", status: record.status === 'CB_APPROVED' || record.status === 'Leader_Signed' || record.status === 'Minted' ? "signed" as const : "pending" as const, time: record.updatedAt },
-          { role: "Lãnh đạo Chi nhánh", name: "ĐANG CHỜ PHÊ DUYỆT", status: record.status === 'CB_APPROVED' ? "pending" as const : "signed" as const, isCurrentUser: true }
+          { role: "Cán bộ Thẩm định", name: record.assignedCb?.fullName || "Đang xử lý", status: record.status === 'CB_APPROVED' || record.status === 'Leader Signed' || record.status === 'Minted' ? "signed" as const : "pending" as const, time: record.updatedAt },
+          { role: "Lãnh đạo Chi nhánh", name: record.status === 'Leader Signed' || record.status === 'Minted' ? "Đã ký số" : "ĐANG CHỜ PHÊ DUYỆT", status: record.status === 'CB_APPROVED' ? "pending" as const : "signed" as const, isCurrentUser: true }
         ],
         nft: record.status === 'Minted' ? {
-          tokenId: "1001", // Should fetch from /nft/:recordId
-          qrCode: `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://landregistry.gov.vn/verify/${record.id}`
+          tokenId: record.tokenId || "—",
+          mintTxHash: record.mintTxHash || "",
+          qrCode: `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://sepolia.etherscan.io/tx/${record.mintTxHash}`
         } : null
       };
 
@@ -153,7 +154,21 @@ export default function ApprovalDetailPage() {
                 <h4 className="text-green-800 font-bold text-lg mb-1">Hồ sơ đã được số hóa thành công!</h4>
                 <p className="text-green-700 text-sm mb-3">Tài sản đã được đúc thành NFT trên mạng lưới Blockchain Sepolia.</p>
                 <div className="flex gap-3">
-                  <Button type="primary" ghost size="small" className="font-bold border-green-600 text-green-600">Xem trên Explorer</Button>
+                  <Button 
+                    type="primary" 
+                    ghost 
+                    size="small" 
+                    className="font-bold border-green-600 text-green-600"
+                    onClick={() => {
+                      if (data.nft?.mintTxHash) {
+                        window.open(`https://sepolia.etherscan.io/tx/${data.nft.mintTxHash}`, '_blank');
+                      } else {
+                        message.warning("Mã giao dịch đúc (Transaction Hash) chưa được đồng bộ.");
+                      }
+                    }}
+                  >
+                    Xem trên Explorer
+                  </Button>
                   <Button type="primary" size="small" className="bg-green-600 hover:bg-green-700 font-bold border-none">Tải GCN Kỹ thuật số</Button>
                 </div>
               </div>
@@ -165,8 +180,8 @@ export default function ApprovalDetailPage() {
         <div className="w-full lg:w-1/3 flex flex-col">
           <RiskMonitoring data={data.risks} />
           <SignatureStepper data={data.signatures} />
-          {data.status === 'CB_APPROVED' && (
-            <ApprovalActions recordId={data.id} onRefresh={fetchData} />
+          {(data.status === 'CB_APPROVED' || data.status === 'Leader Signed') && (
+            <ApprovalActions recordId={data.id} onRefresh={fetchData} status={data.status} />
           )}
         </div>
       </div>

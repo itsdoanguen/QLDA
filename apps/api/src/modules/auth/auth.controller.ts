@@ -45,4 +45,12 @@ export class AuthController {
   async getProfile(@Req() req: any) {
     return this.authService.getProfile(req.user.sub);
   }
+
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth('access-token')
+  @Get('users/lookup')
+  @ApiOperation({ summary: 'Lookup user by VNeID number' })
+  async lookupUser(@Query('vneid') vneid: string) {
+    return this.authService.lookupByVneid(vneid);
+  }
 }
