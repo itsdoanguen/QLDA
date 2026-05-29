@@ -192,5 +192,40 @@ export class BlockchainEventService implements OnModuleInit {
       // Ensure BlockchainLog is created for this receipt tx
       await this.ensureBlockchainLog(data.eventLog, 'ReceiptRecorded');
     });
+
+    // 7. Transfer (from LandNFT)
+    this.blockchainService.registerNftSyncHook('Transfer', async (data) => {
+      const [from, to, tokenIdBigInt] = data.args;
+      const tokenId = tokenIdBigInt.toString();
+      this.logger.log(`Received Transfer event: tokenId=${tokenId}, from=${from}, to=${to}`);
+
+      // Optional: don't sync if it's the zero address (minting), since LandCreated handles it
+      if (from === '0x0000000000000000000000000000000000000000') {
+        return;
+      }
+
+      // Update LandNFT ownerWallet
+      const nft = await this.landNftRepo.findOne({ where: { tokenId } });
+      if (nft) {
+        nft.ownerWallet = to;
+        await this.landNftRepo.save(nft);
+        this.logger.log(`Updated LandNFT ${tokenId} ownerWallet to ${to}`);
+
+        // Try to sync LandRecord ownerId if user exists
+        const userWallet = await this.walletRepo.findOne({ where: { walletAddress: to } });
+        if (userWallet) {
+          const record = await this.landRecordRepo.findOne({ where: { id: nft.recordId } });
+          if (record) {
+            record.ownerId = userWallet.userId;
+            await this.landRecordRepo.save(record);
+            this.logger.log(`Updated LandRecord ${record.id} ownerId to ${userWallet.userId}`);
+          }
+        } else {
+          this.logger.warn(`No user found with wallet ${to}, skipping LandRecord owner sync.`);
+        }
+      }
+
+      await this.createProvenanceLog('Transfer', tokenId, { from, to }, data.eventLog);
+    });
   }
 }

@@ -113,15 +113,9 @@ contract WalletOverride is Ownable {
         // Update the canonical citizen => wallet mapping
         citizenWallet[req.citizenIdHash] = req.newWallet;
 
-        // Transfer all specified NFTs from oldWallet to newWallet using adminTransfer
-        // (bypasses standard approval requirement — authorized by Admin/Owner only)
-        for (uint256 i = 0; i < tokenIds.length; i++) {
-            uint256 tokenId = tokenIds[i];
-            // Verify the token is actually owned by the old wallet before transferring
-            if (landNFTContract.ownerOf(tokenId) == req.oldWallet) {
-                landNFTContract.adminTransfer(req.oldWallet, req.newWallet, tokenId);
-            }
-        }
+        // NOTE: Transfer of all specified NFTs from oldWallet to newWallet is now
+        // handled directly by the Backend calling LandRegistry.proxyAdminTransfer
+        // to bypass the Ownable restriction.
 
         emit RecoveryApproved(requestId, req.oldWallet, req.newWallet, tokenIds);
     }
