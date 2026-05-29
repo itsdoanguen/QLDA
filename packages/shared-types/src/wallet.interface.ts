@@ -34,9 +34,10 @@ export class WalletRecoveryRequestDto {
   @IsString()
   oldWalletAddress: string;
 
-  @ApiProperty({ example: '0xNew...' })
+  @ApiProperty({ example: '0xNew...', required: false })
+  @IsOptional()
   @IsString()
-  newWalletAddress: string;
+  newWalletAddress?: string;
 
   @ApiProperty({ required: false })
   @IsOptional()

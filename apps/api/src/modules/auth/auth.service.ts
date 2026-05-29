@@ -233,4 +233,16 @@ export class AuthService {
       vneid,
     };
   }
+
+  async lookupByVneid(vneidNumber: string) {
+    const user = await this.userRepository.findOne({ where: { vneidNumber } });
+    if (!user) {
+      throw new HttpException('Người dùng không tồn tại trong hệ thống', HttpStatus.NOT_FOUND);
+    }
+    return {
+      id: user.id,
+      fullName: user.fullName,
+      vneidNumber: user.vneidNumber,
+    };
+  }
 }

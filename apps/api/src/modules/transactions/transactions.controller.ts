@@ -16,12 +16,12 @@ export class TransactionsController {
   @ApiResponse({ status: 201, description: 'Bản nháp được tạo sau khi vượt qua bước kiểm tra tuân thủ (Compliance Pre-check)' })
   createDraft(
     @Body('tokenId') tokenId: string,
-    @Body('sellerId') sellerId: number,
+    @Body('buyerId') buyerId: number,
     @Body('salePrice') salePrice: number,
     @CurrentUser() user: any,
   ) {
-    // Current user is the buyer
-    return this.transactionsService.createDraft(tokenId, user.sub, sellerId, salePrice);
+    // Current user is the seller
+    return this.transactionsService.createDraft(tokenId, buyerId, user.sub, salePrice);
   }
 
   @Post(':id/sign')
@@ -42,6 +42,13 @@ export class TransactionsController {
     @CurrentUser() user: any,
   ) {
     return this.transactionsService.cancel(id, user.sub);
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'Lấy danh sách các giao dịch của người dùng hiện tại (với tư cách Bên mua hoặc Bên bán)' })
+  @ApiResponse({ status: 200, description: 'Trả về danh sách giao dịch' })
+  findAll(@CurrentUser() user: any) {
+    return this.transactionsService.findAll(user.sub);
   }
 
   @Get(':id')

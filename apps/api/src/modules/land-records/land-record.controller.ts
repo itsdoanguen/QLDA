@@ -53,6 +53,13 @@ export class LandRecordController {
     return this.landRecordService.findAll(user.sub);
   }
 
+  @Get('all')
+  @RequireRoles('LANH_DAO', 'CAN_BO', 'ADMIN')
+  @ApiOperation({ summary: 'Get all land records in the system' })
+  findAllSystem() {
+    return this.landRecordService.findAll();
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get details of a specific land record' })
   findOne(@Param('id', ParseIntPipe) id: number) {

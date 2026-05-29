@@ -27,6 +27,29 @@ export class ApprovalsService {
     });
   }
 
+  async findApprovedApprovals(): Promise<any[]> {
+    const records = await this.landRecordRepository.find({
+      where: [
+        { status: LandRecordStatus.LEADER_SIGNED },
+        { status: LandRecordStatus.MINTED }
+      ],
+      relations: ['owner', 'files'],
+      order: { updatedAt: 'DESC' },
+    });
+
+    const results = [];
+    for (const record of records) {
+      const nft = await this.landRecordRepository.manager.getRepository('LandNFT').findOne({
+        where: { recordId: record.id }
+      });
+      results.push({
+        ...record,
+        tokenId: nft ? nft.tokenId : null
+      });
+    }
+    return results;
+  }
+
   async sign(recordId: number, userId: number, reason?: string): Promise<LandRecord> {
     const record = await this.landRecordRepository.findOne({ where: { id: recordId } });
     if (!record) {
