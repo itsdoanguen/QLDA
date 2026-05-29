@@ -18,7 +18,7 @@ export class Wallet {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @Column({ name: 'user_id', unique: true })
+  @Column({ name: 'user_id' })
   userId: number;
 
   @Column({ length: 20, default: 'Active' })
