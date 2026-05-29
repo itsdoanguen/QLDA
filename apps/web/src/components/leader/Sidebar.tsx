@@ -51,6 +51,17 @@ export default function Sidebar() {
           <span className="material-symbols-outlined text-[20px]">analytics</span>
           <span>Báo cáo</span>
         </Link>
+        <Link 
+          href="/leader/recovery" 
+          className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors font-medium text-sm ${
+            isActive('/leader/recovery') 
+              ? 'bg-blue-50 text-[#0c56d0] font-bold border-r-4 border-[#0c56d0]' 
+              : 'text-gray-600 hover:bg-gray-50'
+          }`}
+        >
+          <span className="material-symbols-outlined text-[20px]">vpn_key</span>
+          <span>Khôi phục ví</span>
+        </Link>
       </nav>
     </aside>
   );

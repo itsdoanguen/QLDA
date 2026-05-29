@@ -30,6 +30,7 @@ export function CreateRecordPage() {
   const [drafting, setDrafting] = useState(false);
   const [fileList, setFileList] = useState<any[]>([]);
   const [profile, setProfile] = useState<any>(null);
+  const [createdRecordId, setCreatedRecordId] = useState<string>("");
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
@@ -179,6 +180,7 @@ export function CreateRecordPage() {
       // Submit for review
       await api.post(`/land-records/${recordId}/submit`);
       
+      setCreatedRecordId(recordId);
       message.success("Nộp hồ sơ xét duyệt thành công!");
       setStep(3); // Go to success view
     } catch (error: any) {
@@ -187,38 +189,6 @@ export function CreateRecordPage() {
     } finally {
       setSubmitting(false);
     }
-  };
-
-  const renderStepper = () => {
-    // Nếu ở bước 3 (thành công) thì không hiện stepper trên này nữa vì trang success có stepper riêng
-    if (step === 3) return null;
-
-    return (
-      <div className="flex items-center w-full mb-10 relative">
-        <div className="flex flex-col items-center flex-1 relative z-10">
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 ${step >= 1 ? 'bg-[#0c56d0] text-white' : 'bg-[#f3f4f6] text-[#737685]'}`}>
-            {step > 1 ? <CheckOutlined /> : 1}
-          </div>
-          <span className={`text-[12px] font-bold ${step >= 1 ? 'text-[#0c56d0]' : 'text-[#737685]'}`}>Dịch vụ</span>
-        </div>
-        <div className={`absolute top-4 left-[15%] right-[50%] h-[2px] -z-0 ${step >= 2 ? 'bg-[#0c56d0]' : 'bg-[#e1e2e4]'}`}></div>
-        
-        <div className="flex flex-col items-center flex-1 relative z-10">
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 ${step >= 2 ? 'bg-[#0c56d0] text-white' : 'bg-[#f3f4f6] text-[#737685]'}`}>
-            {step > 2 ? <CheckOutlined /> : 2}
-          </div>
-          <span className={`text-[12px] font-bold ${step >= 2 ? 'text-[#0c56d0]' : 'text-[#737685]'}`}>Tải lên tài liệu</span>
-        </div>
-        <div className={`absolute top-4 left-[50%] right-[15%] h-[2px] -z-0 ${step >= 3 ? 'bg-[#0c56d0]' : 'bg-[#e1e2e4]'}`}></div>
-
-        <div className="flex flex-col items-center flex-1 relative z-10">
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 ${step >= 3 ? 'bg-[#0c56d0] text-white' : 'bg-[#f3f4f6] text-[#737685]'}`}>
-            3
-          </div>
-          <span className={`text-[12px] font-medium ${step >= 3 ? 'text-[#0c56d0]' : 'text-[#737685]'}`}>Ký số & Xác nhận</span>
-        </div>
-      </div>
-    );
   };
 
   const renderUploadForm = () => (
@@ -230,9 +200,6 @@ export function CreateRecordPage() {
         onFinish={onFinish}
         requiredMark={false}
       >
-        {/* Hidden fields to keep BE mappings */}
-        <Form.Item name="landType" hidden><Input /></Form.Item>
-
         <div className="space-y-6">
           {/* Thông tin thửa đất */}
           <div className="bg-white border border-[#c3c6d6] rounded-xl overflow-hidden">
@@ -279,9 +246,39 @@ export function CreateRecordPage() {
               </Form.Item>
 
               <Form.Item
+                name="landType"
+                label={<span className="text-[12px] font-bold text-[#737685] uppercase">LOẠI ĐẤT</span>}
+                className="mb-0"
+                rules={[{ required: true, message: "Vui lòng chọn loại đất" }]}
+              >
+                <Select
+                  className="w-full !h-[46px] [&_.ant-select-selector]:!rounded [&_.ant-select-selector]:!border-[#c3c6d6] [&_.ant-select-selector]:hover:!border-[#0c56d0] [&_.ant-select-selector]:focus:!border-[#0c56d0] [&_.ant-select-selector]:!shadow-none"
+                  placeholder="Chọn loại đất"
+                >
+                  <Option value="LUC">Đất chuyên trồng lúa nước (LUC)</Option>
+                  <Option value="LUK">Đất trồng lúa nước còn lại (LUK)</Option>
+                  <Option value="BHK">Đất bằng trồng cây hàng năm khác (BHK)</Option>
+                  <Option value="NHK">Đất nương rẫy trồng cây hàng năm khác (NHK)</Option>
+                  <Option value="CLN">Đất trồng cây lâu năm (CLN)</Option>
+                  <Option value="RSX">Đất rừng sản xuất (RSX)</Option>
+                  <Option value="RPH">Đất rừng phòng hộ (RPH)</Option>
+                  <Option value="RDD">Đất rừng đặc dụng (RDD)</Option>
+                  <Option value="NTS">Đất nuôi trồng thủy sản (NTS)</Option>
+                  <Option value="LMU">Đất làm muối (LMU)</Option>
+                  <Option value="NKH">Đất nông nghiệp khác (NKH)</Option>
+                  <Option value="ONT">Đất ở tại nông thôn (ONT)</Option>
+                  <Option value="ODT">Đất ở tại đô thị (ODT)</Option>
+                  <Option value="TSC">Đất xây dựng trụ sở cơ quan (TSC)</Option>
+                  <Option value="TSN">Đất xây dựng trụ sở của tổ chức sự nghiệp (TSN)</Option>
+                  <Option value="TMD">Đất thương mại, dịch vụ (TMD)</Option>
+                  <Option value="SKC">Đất cơ sở sản xuất phi nông nghiệp (SKC)</Option>
+                </Select>
+              </Form.Item>
+
+              <Form.Item
                 name="address"
                 label={<span className="text-[12px] font-bold text-[#737685] uppercase">ĐỊA CHỈ THỬA ĐẤT</span>}
-                className="mb-0"
+                className="mb-0 col-span-2"
                 rules={[{ required: true, message: "Vui lòng nhập địa chỉ" }]}
               >
                 <Input
@@ -449,18 +446,15 @@ export function CreateRecordPage() {
   );
 
   return (
-    <div className="max-w-[1000px] mx-auto pb-24 pt-6">
-      {/* Header (Chỉ hiện khi chưa thành công) */}
-      {step !== 3 && (
-        <header className="mb-8">
-          {renderStepper()}
-        </header>
-      )}
-
+    <div className="max-w-[1200px] mx-auto pb-24 pt-6">
       {/* Render Steps */}
       {step === 1 && (
         <ServiceSelection 
           onNext={(serviceId) => {
+            if (serviceId === 'chuyen-nhuong') {
+              router.push('/dashboard/transactions?create=true');
+              return;
+            }
             setServiceType(serviceId);
             setStep(2);
           }} 
@@ -469,7 +463,7 @@ export function CreateRecordPage() {
 
       {step === 2 && renderUploadForm()}
 
-      {step === 3 && <SuccessView />}
+      {step === 3 && <SuccessView recordId={createdRecordId} profile={profile} />}
     </div>
   );
 }

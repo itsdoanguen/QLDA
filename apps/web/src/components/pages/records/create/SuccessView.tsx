@@ -3,44 +3,21 @@ import { CheckCircleFilled, FileTextOutlined, CheckOutlined } from '@ant-design/
 import { Button } from 'antd';
 import { useRouter } from 'next/navigation';
 
-export function SuccessView({ recordId = "HS-2024-8912" }) {
+export function SuccessView({ recordId = "HS-2024-8912", profile }: { recordId?: string, profile?: any }) {
   const router = useRouter();
+  
+  const formattedId = recordId.toString().padStart(4, "0");
+  const timeNow = new Date().toLocaleString("vi-VN");
 
   return (
-    <div className="max-w-[1000px] mx-auto pb-24 animate-fade-in">
-      {/* Stepper with all steps checked */}
-      <div className="flex items-center w-full mb-16 relative px-12 mt-8">
-        <div className="flex flex-col items-center flex-1 relative z-10">
-          <div className="w-10 h-10 rounded-full bg-[#0c56d0] text-white flex items-center justify-center mb-3 shadow-md">
-            <CheckOutlined />
-          </div>
-          <span className="text-xs font-bold text-[#0c56d0] uppercase tracking-wider">Khai báo</span>
-        </div>
-        <div className="absolute top-5 left-[20%] right-[50%] h-[3px] bg-[#0c56d0] -z-0"></div>
-        
-        <div className="flex flex-col items-center flex-1 relative z-10">
-          <div className="w-10 h-10 rounded-full bg-[#0c56d0] text-white flex items-center justify-center mb-3 shadow-md">
-            <CheckOutlined />
-          </div>
-          <span className="text-xs font-bold text-[#0c56d0] uppercase tracking-wider">Tải tệp tin</span>
-        </div>
-        <div className="absolute top-5 left-[50%] right-[20%] h-[3px] bg-[#0c56d0] -z-0"></div>
-
-        <div className="flex flex-col items-center flex-1 relative z-10">
-          <div className="w-10 h-10 rounded-full bg-[#0c56d0] text-white flex items-center justify-center mb-3 shadow-md">
-            <CheckOutlined />
-          </div>
-          <span className="text-xs font-bold text-[#0c56d0] uppercase tracking-wider">Ký số & Xác nhận</span>
-        </div>
-      </div>
-
+    <div className="max-w-[1200px] mx-auto pb-24 animate-fade-in">
       {/* Success Banner */}
       <div className="bg-white rounded-2xl border border-gray-200 py-16 px-8 text-center shadow-sm mb-8">
         <div className="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6 text-5xl text-green-500">
           <CheckCircleFilled />
         </div>
         <h1 className="text-4xl font-black text-gray-900 mb-4 tracking-tight">Nộp hồ sơ thành công</h1>
-        <p className="text-gray-500 text-lg max-w-lg mx-auto">Hồ sơ của quý khách đã được tiếp nhận và đang trong quá trình thẩm định bởi Cơ quan chức năng.</p>
+        <p className="text-gray-500 text-lg mx-auto mt-4">Hồ sơ của quý khách đã được tiếp nhận và đang trong quá trình thẩm định bởi Cơ quan chức năng.</p>
       </div>
 
       {/* Details Grid */}
@@ -53,7 +30,7 @@ export function SuccessView({ recordId = "HS-2024-8912" }) {
           <div className="space-y-6 text-sm">
             <div className="flex justify-between border-b border-gray-100 pb-4">
               <span className="text-gray-500 font-medium uppercase text-xs tracking-wider">Mã hồ sơ</span>
-              <span className="bg-blue-50 text-[#0c56d0] font-bold px-3 py-1 rounded text-xs">{recordId}</span>
+              <span className="bg-blue-50 text-[#0c56d0] font-bold px-3 py-1 rounded text-xs">HS-{formattedId}</span>
             </div>
             <div className="flex justify-between border-b border-gray-100 pb-4">
               <span className="text-gray-500 font-medium uppercase text-xs tracking-wider">Loại giao dịch</span>
@@ -61,11 +38,11 @@ export function SuccessView({ recordId = "HS-2024-8912" }) {
             </div>
             <div className="flex justify-between border-b border-gray-100 pb-4">
               <span className="text-gray-500 font-medium uppercase text-xs tracking-wider">Thời gian nộp</span>
-              <span className="font-bold text-gray-900">14:32:05 - 24/05/2024</span>
+              <span className="font-bold text-gray-900">{timeNow}</span>
             </div>
             <div className="flex justify-between border-b border-gray-100 pb-4">
               <span className="text-gray-500 font-medium uppercase text-xs tracking-wider">Người nộp</span>
-              <span className="font-bold text-gray-900">Nguyễn Văn A</span>
+              <span className="font-bold text-gray-900">{profile?.fullName || "—"}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-500 font-medium uppercase text-xs tracking-wider">Trạng thái</span>
@@ -87,10 +64,6 @@ export function SuccessView({ recordId = "HS-2024-8912" }) {
               </div>
               <div className="flex gap-4">
                 <span className="font-black text-[#0c56d0]">02.</span>
-                <span className="text-gray-700 font-medium">Thông báo lệ phí sẽ được gửi qua email và tin nhắn SMS.</span>
-              </div>
-              <div className="flex gap-4">
-                <span className="font-black text-[#0c56d0]">03.</span>
                 <span className="text-gray-700 font-medium">Nhận kết quả bản điện tử hoặc bản giấy tại trung tâm hành chính.</span>
               </div>
             </div>

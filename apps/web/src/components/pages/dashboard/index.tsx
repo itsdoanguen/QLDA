@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "antd";
+import { Button, Pagination } from "antd";
 import Link from "next/link";
 import { api } from "@/utils/api";
 import {
@@ -40,6 +40,9 @@ export function DashboardPage() {
   const router = useRouter();
   const [records, setRecords] = useState<any[]>([]);
   const [recordsLoading, setRecordsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [currentNftPage, setCurrentNftPage] = useState(1);
+  const pageSize = 5;
 
   useEffect(() => {
     const fetchRecords = async () => {
@@ -109,12 +112,12 @@ export function DashboardPage() {
                   <h2 className="text-lg font-bold text-[#111827]">
                     Sổ đỏ số của tôi
                   </h2>
-                  <a
-                    href="#"
+                  <Link
+                    href="/dashboard/records"
                     className="text-[13px] font-bold text-[#0b57d0] uppercase tracking-wider hover:underline"
                   >
                     XEM TẤT CẢ
-                  </a>
+                  </Link>
                 </div>
 
                 {recordsLoading ? (
@@ -126,34 +129,50 @@ export function DashboardPage() {
                     <p className="text-[#6b7280] font-medium text-[14px]">Chưa có dữ liệu hồ sơ</p>
                   </div>
                 ) : (
-                  <div className="mt-4 grid gap-3">
-                    {records
-                      .filter((r) => r.status === 'CB_APPROVED' || r.status === 'Minted')
-                      .map((record) => {
-                        const status = STATUS_MAP[record.status] || STATUS_MAP.Draft;
-                        return (
-                          <Link href={`/dashboard/records/${record.id}`} key={record.id}>
-                            <div className="border border-[#e1e2e4] rounded-md p-4 bg-white hover:shadow-md transition-shadow cursor-pointer">
-                              <div className="flex justify-between items-start mb-2">
-                                <div className="max-w-[70%]">
-                                  <p className="font-semibold text-[14px] text-[#111827] truncate" title={record.address}>
-                                    {record.address}
-                                  </p>
+                  <>
+                    <div className="mt-4 grid gap-3">
+                      {records
+                        .filter((r) => r.status === 'CB_APPROVED' || r.status === 'Minted')
+                        .slice((currentNftPage - 1) * pageSize, currentNftPage * pageSize)
+                        .map((record) => {
+                          const status = STATUS_MAP[record.status] || STATUS_MAP.Draft;
+                          return (
+                            <Link href={`/dashboard/records/${record.id}`} key={record.id}>
+                              <div className="border border-[#e1e2e4] rounded-md p-4 bg-white hover:shadow-md transition-shadow cursor-pointer">
+                                <div className="flex justify-between items-start mb-2">
+                                  <div className="max-w-[70%]">
+                                    <p className="font-semibold text-[14px] text-[#111827] truncate" title={record.address}>
+                                      {record.address}
+                                    </p>
+                                  </div>
+                                  <span className={`text-[11px] font-semibold px-2 py-1 rounded border ${status.className}`}>
+                                    {status.label}
+                                  </span>
                                 </div>
-                                <span className={`text-[11px] font-semibold px-2 py-1 rounded border ${status.className}`}>
-                                  {status.label}
-                                </span>
+                                <div className="flex gap-4 text-[12px] text-[#6b7280]">
+                                  <span>Tờ bản đồ: {record.plotNumber || 'N/A'}</span>
+                                  <span>Thửa đất: {record.parcelNumber || 'N/A'}</span>
+                                  <span>Diện tích: {record.area} m²</span>
+                                </div>
                               </div>
-                              <div className="flex gap-4 text-[12px] text-[#6b7280]">
-                                <span>Tờ bản đồ: {record.plotNumber || 'N/A'}</span>
-                                <span>Thửa đất: {record.parcelNumber || 'N/A'}</span>
-                                <span>Diện tích: {record.area} m²</span>
-                              </div>
-                            </div>
-                          </Link>
-                        );
-                      })}
-                  </div>
+                            </Link>
+                          );
+                        })}
+                    </div>
+                    {records.filter((r) => r.status === 'CB_APPROVED' || r.status === 'Minted').length > pageSize && (
+                      <div className="mt-4 flex justify-end">
+                        <Pagination
+                          current={currentNftPage}
+                          pageSize={pageSize}
+                          total={records.filter((r) => r.status === 'CB_APPROVED' || r.status === 'Minted').length}
+                          onChange={(page) => setCurrentNftPage(page)}
+                          showSizeChanger={false}
+                          className="custom-pagination"
+                          size="small"
+                        />
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>
@@ -188,46 +207,62 @@ export function DashboardPage() {
                       </tr>
                     ) : records.length === 0 ? (
                       <tr>
-                        <td colSpan={4} className="px-5 py-8 text-center text-[#6b7280] font-medium text-[14px]">
+                        <td colSpan={6} className="px-5 py-8 text-center text-[#6b7280] font-medium text-[14px]">
                           Chưa có tài liệu nào
                         </td>
                       </tr>
                     ) : (
-                      records.map((record) => {
-                        const status = STATUS_MAP[record.status] || STATUS_MAP.Draft;
-                        return (
-                          <tr 
-                            key={record.id} 
-                            className="hover:bg-[#f9fafb] transition-colors cursor-pointer group"
-                            onClick={() => router.push(`/dashboard/records/${record.id}`)}
-                          >
-                            <td className="px-5 py-4 text-[#111827] font-medium max-w-[200px] truncate group-hover:text-[#0b57d0]" title={record.address}>
-                              {record.address}
-                            </td>
-                            <td className="px-5 py-4 text-[#374151]">
-                              {record.plotNumber || "—"}
-                            </td>
-                            <td className="px-5 py-4 text-[#374151]">
-                              {record.parcelNumber || "—"}
-                            </td>
-                            <td className="px-5 py-4 text-[#374151]">
-                              {record.landType || "—"}
-                            </td>
-                            <td className="px-5 py-4 text-[#6b7280]">
-                              {formatDate(record.updatedAt || record.createdAt)}
-                            </td>
-                            <td className="px-5 py-4 text-right">
-                              <span className={`inline-block px-2.5 py-1 rounded-[4px] border text-[12px] font-semibold ${status.className}`}>
-                                {status.label}
-                              </span>
-                            </td>
-                          </tr>
-                        );
-                      })
+                      records
+                        .slice((currentPage - 1) * pageSize, currentPage * pageSize)
+                        .map((record) => {
+                          const status = STATUS_MAP[record.status] || STATUS_MAP.Draft;
+                          return (
+                            <tr 
+                              key={record.id} 
+                              className="hover:bg-[#f9fafb] transition-colors cursor-pointer group"
+                              onClick={() => router.push(`/dashboard/records/${record.id}`)}
+                            >
+                              <td className="px-5 py-4 text-[#111827] font-medium max-w-[200px] truncate group-hover:text-[#0b57d0]" title={record.address}>
+                                {record.address}
+                              </td>
+                              <td className="px-5 py-4 text-[#374151]">
+                                {record.plotNumber || "—"}
+                              </td>
+                              <td className="px-5 py-4 text-[#374151]">
+                                {record.parcelNumber || "—"}
+                              </td>
+                              <td className="px-5 py-4 text-[#374151]">
+                                {record.landType || "—"}
+                              </td>
+                              <td className="px-5 py-4 text-[#6b7280]">
+                                {formatDate(record.updatedAt || record.createdAt)}
+                              </td>
+                              <td className="px-5 py-4 text-right">
+                                <span className={`inline-block px-2.5 py-1 rounded-[4px] border text-[12px] font-semibold ${status.className}`}>
+                                  {status.label}
+                                </span>
+                              </td>
+                            </tr>
+                          );
+                        })
                     )}
                   </tbody>
                 </table>
               </div>
+              
+              {/* Pagination control */}
+              {records.length > pageSize && (
+                <div className="mt-4 flex justify-end">
+                  <Pagination
+                    current={currentPage}
+                    pageSize={pageSize}
+                    total={records.length}
+                    onChange={(page) => setCurrentPage(page)}
+                    showSizeChanger={false}
+                    className="custom-pagination"
+                  />
+                </div>
+              )}
             </div>
 
             {/* Footer */}

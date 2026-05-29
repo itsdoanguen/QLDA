@@ -10,6 +10,7 @@ import {
   FileTextOutlined,
   CloudUploadOutlined,
   LogoutOutlined,
+  SwapOutlined,
 } from "@ant-design/icons";
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -116,6 +117,17 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               Tạo mới hồ sơ
             </Link>
             <Link
+              href="/dashboard/transactions"
+              className={`flex items-center gap-3 px-6 py-3 font-medium text-[15px] transition-colors ${
+                pathname.startsWith("/dashboard/transactions")
+                  ? "border-l-4 border-[#0b57d0] bg-white text-[#0b57d0]"
+                  : "border-l-4 border-transparent text-[#4b5563] hover:bg-[#f3f4f6]"
+              }`}
+            >
+              <SwapOutlined className="text-lg" />
+              Giao dịch chuyển nhượng
+            </Link>
+            <Link
               href="/profile"
               className={`flex items-center gap-3 px-6 py-3 font-medium text-[15px] transition-colors ${
                 pathname === "/profile"
@@ -126,12 +138,23 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               <UserOutlined className="text-lg" />
               Thông tin cá nhân
             </Link>
+            <Link
+              href="/dashboard/receipts"
+              className={`flex items-center gap-3 px-6 py-3 font-medium text-[15px] transition-colors ${
+                pathname === "/dashboard/receipts"
+                  ? "border-l-4 border-[#0b57d0] bg-white text-[#0b57d0]"
+                  : "border-l-4 border-transparent text-[#4b5563] hover:bg-[#f3f4f6]"
+              }`}
+            >
+              <FileTextOutlined className="text-lg" />
+              Lịch sử biên lai
+            </Link>
           </nav>
         </aside>
 
         {/* Main Content */}
         <main className="flex-1 overflow-auto p-10 bg-white">
-          <div className="max-w-[1000px]">
+          <div className="max-w-[1200px] mx-auto">
             {children}
           </div>
         </main>

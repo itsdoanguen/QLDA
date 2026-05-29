@@ -43,7 +43,7 @@ export function ProfilePage() {
   };
 
   return (
-    <div className="max-w-[1000px]">
+    <div className="max-w-[1200px]">
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight text-[#111827] mb-2">Hồ sơ định danh</h1>
         <p className="text-[15px] text-[#4b5563]">Quản lý thông tin cá nhân và thiết lập bảo mật hệ thống.</p>

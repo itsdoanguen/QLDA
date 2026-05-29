@@ -34,8 +34,23 @@ export default function MapComponent({ record }: { record: any }) {
 
   const parseCoordinates = (gpsString: string): [number, number][] => {
     if (!gpsString) return [];
+    
+    const cleaned = gpsString.trim();
+    // Check if it is a simple "lat, lng" string
+    if (!cleaned.startsWith('[')) {
+      const parts = cleaned.split(',');
+      if (parts.length === 2) {
+        const lat = parseFloat(parts[0].trim());
+        const lng = parseFloat(parts[1].trim());
+        if (!isNaN(lat) && !isNaN(lng)) {
+          return [[lat, lng]];
+        }
+      }
+      return [];
+    }
+
     try {
-      const parsed = JSON.parse(gpsString);
+      const parsed = JSON.parse(cleaned);
       if (!Array.isArray(parsed)) return [];
       
       return parsed.map((p: any): [number, number] | null => {
