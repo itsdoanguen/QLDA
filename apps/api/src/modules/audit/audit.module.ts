@@ -6,11 +6,14 @@ import { AuditService } from './audit.service';
 import { AuditInterceptor } from '../../common/interceptors/audit.interceptor';
 import { BlockchainModule } from '../blockchain/blockchain.module';
 
+import { AuditController } from './audit.controller';
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([SystemLog]),
     BlockchainModule
   ],
+  controllers: [AuditController],
   providers: [
     AuditService,
     {
