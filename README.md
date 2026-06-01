@@ -9,15 +9,6 @@
 ### Tổng quan dự án
 LandContractQLDA là một hệ thống quản lý hợp đồng đất đai ứng dụng công nghệ Blockchain, giúp đảm bảo tính minh bạch, an toàn và toàn vẹn dữ liệu trong các giao dịch bất động sản và quản lý quyền sử dụng đất. Dự án cung cấp một giải pháp toàn diện bao gồm giao diện Web cho người dùng, API Backend để xử lý nghiệp vụ và Smart Contract trên Blockchain để lưu trữ thông tin không thể thay đổi.
 
-### Các tính năng chủ đạo
-<!-- Vui lòng thay thế các placeholder bên dưới bằng hình ảnh thực tế của dự án -->
-1. **Quản lý hợp đồng đất đai**:
-   ![Quản lý hợp đồng đất đai](placeholder-image-1.png)
-2. **Theo dõi lịch sử giao dịch trên Blockchain**:
-   ![Lịch sử giao dịch](placeholder-image-2.png)
-3. **Bản đồ trực quan**:
-   ![Bản đồ](placeholder-image-3.png)
-
 ### Công nghệ sử dụng
 - **Web (Frontend)**: Next.js, React, Ant Design, Zustand, Tailwind CSS, React Leaflet.
 - **API (Backend)**: NestJS, TypeORM, PostgreSQL, Ethers.js.
@@ -58,15 +49,6 @@ LandContractQLDA/
 
 ### プロジェクト概要
 LandContractQLDAは、ブロックチェーン技術を応用した土地契約管理システムであり、不動産取引や土地利用権管理における透明性、安全性、データ整合性を確保します。このプロジェクトは、ユーザー向けのWebインターフェース、ビジネスロジックを処理するバックエンドAPI、そして改ざん不可能な情報を保存するブロックチェーン上のスマートコントラクトを含む包括的なソリューションを提供します。
-
-### 主な機能
-<!-- 下記のプレースホルダーを実際のプロジェクト画像に置き換えてください -->
-1. **土地契約管理**:
-   ![土地契約管理](placeholder-image-1.png)
-2. **ブロックチェーン上の取引履歴追跡**:
-   ![取引履歴](placeholder-image-2.png)
-3. **ビジュアルマップ**:
-   ![マップ](placeholder-image-3.png)
 
 ### 使用技術
 - **Web (フロントエンド)**: Next.js, React, Ant Design, Zustand, Tailwind CSS, React Leaflet.
