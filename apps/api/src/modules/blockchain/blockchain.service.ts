@@ -359,7 +359,9 @@ export class BlockchainService {
 
     // Fetch existing events to see if it's already created
     const filter = this.multiSigContract.filters.TransactionCreated();
-    const events = await this.multiSigContract.queryFilter(filter, 10900000);
+    const currentBlock = await this.provider.getBlockNumber();
+    const fromBlock = Math.max(0, currentBlock - 40000);
+    const events = await this.multiSigContract.queryFilter(filter, fromBlock);
     
     for (const event of events) {
       const args = (event as any).args;
@@ -633,10 +635,13 @@ export class BlockchainService {
     const landCreatedFilter = this.landRegistryContract.filters.LandCreated(tokenIdBigInt);
     const transferFilter = this.landNFTContract.filters.Transfer(null, null, tokenIdBigInt);
 
+    const currentBlock = await this.provider.getBlockNumber();
+    const fromBlock = Math.max(0, currentBlock - 40000);
+
     const [statusEvents, createdEvents, transferEvents] = await Promise.all([
-      this.landRegistryContract.queryFilter(statusChangedFilter, 10900000),
-      this.landRegistryContract.queryFilter(landCreatedFilter, 10900000),
-      this.landNFTContract.queryFilter(transferFilter, 10900000),
+      this.landRegistryContract.queryFilter(statusChangedFilter, fromBlock),
+      this.landRegistryContract.queryFilter(landCreatedFilter, fromBlock),
+      this.landNFTContract.queryFilter(transferFilter, fromBlock),
     ]);
 
     const allEvents: any[] = [];

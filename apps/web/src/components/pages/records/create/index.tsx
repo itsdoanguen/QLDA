@@ -452,7 +452,7 @@ export function CreateRecordPage() {
         <ServiceSelection 
           onNext={(serviceId) => {
             if (serviceId === 'chuyen-nhuong') {
-              router.push('/dashboard/transactions?create=true');
+              router.push('/dashboard/transactions/create');
               return;
             }
             setServiceType(serviceId);
