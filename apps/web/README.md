@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Web (Frontend) - LandContractQLDA
 
-## Getting Started
+[Tiếng Việt](#tiếng-việt) | [日本語 (Japanese)](#日本語)
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Tiếng Việt
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Tổng quan
+Giao diện người dùng Web của hệ thống LandContractQLDA, được xây dựng bằng Next.js, React, và Ant Design. Ứng dụng này cung cấp trải nghiệm trực quan để người dùng và quản trị viên có thể tương tác với hệ thống quản lý đất đai và xem các bản đồ thửa đất.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Yêu cầu
+- Node.js
+- API Backend (đang chạy)
+- **Ví Blockchain (Ví dụ: MetaMask)** đã được cài đặt trên trình duyệt (extension).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Hướng dẫn cài đặt
+1. **Di chuyển vào thư mục web:**
+   ```bash
+   cd apps/web
+   ```
+2. **Cấu hình biến môi trường:**
+   Tạo file `.env.local` hoặc `.env` để cấu hình URL trỏ tới API Backend và Blockchain provider:
+   ```bash
+   # URL mặc định của API là http://localhost:3000 (tuỳ cấu hình Backend)
+   ```
+3. **Khởi chạy ứng dụng Web (môi trường Dev):**
+   ```bash
+   npm run dev
+   ```
+4. Truy cập giao diện tại: `http://localhost:4060` (hoặc port được chỉ định trong script dev).
+5. **Kết nối ví:** Đảm bảo ví MetaMask của bạn đang trỏ tới mạng lưới Blockchain nội bộ (Hardhat network) với RPC URL phù hợp (thường là `http://127.0.0.1:8545`) và import một tài khoản test có sẵn ETH.
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 日本語
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 概要
+Next.js、React、およびAnt Designを使用して構築されたLandContractQLDAシステムのWebユーザーインターフェースです。このアプリケーションは、ユーザーや管理者が土地管理システムと対話し、区画の地図を表示するための直感的な体験を提供します。
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 要件
+- Node.js
+- バックエンドAPI (稼働中であること)
+- ブラウザ拡張機能として**ブロックチェーンウォレット（例：MetaMask）**がインストールされていること。
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### セットアップ手順
+1. **webディレクトリに移動：**
+   ```bash
+   cd apps/web
+   ```
+2. **環境変数の設定：**
+   バックエンドAPIやブロックチェーンプロバイダーのURLを設定するために、`.env.local`または`.env`ファイルを作成します：
+   ```bash
+   # APIのデフォルトURLは http://localhost:3000 です（バックエンドの設定による）
+   ```
+3. **Webアプリケーションの起動 (開発環境)：**
+   ```bash
+   npm run dev
+   ```
+4. ブラウザでアクセスします： `http://localhost:4060` (またはdevスクリプトで指定されたポート)。
+5. **ウォレットの接続:** MetaMaskウォレットが適切なRPC URL（通常は `http://127.0.0.1:8545`）でローカルブロックチェーンネットワーク（Hardhat network）を指していることを確認し、テスト用のETHを持つアカウントをインポートしてください。
